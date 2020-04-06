@@ -48,7 +48,7 @@ Here is example game format:
 }
 ```
 
-## Storage Account structure
+## Table Storage structure
 
 ### Player
 
@@ -57,3 +57,10 @@ TBD
 ### Game
 
 TBD
+
+| PartitionKey | RowKey | Updated |Data* | 
+|---|---|---|---|
+| user123 | 123-abc-123 | 2020-04-03T15:51:05.000Z | ... |
+| user123 | 123-abc-123 | 2020-04-04T15:51:05.000Z | ... |
+
+*) Compressed game data object.
