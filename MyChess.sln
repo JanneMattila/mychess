@@ -27,7 +27,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{C28B4796-8A82-4D04-BC53-9939F765F074}"
 	ProjectSection(SolutionItems) = preProject
-		doc\data_structure.md = doc\data_structure.md
+		doc\api.md = doc\api.md
+		doc\data.md = doc\data.md
+		doc\functions.http = doc\functions.http
 		doc\history.md = doc\history.md
 	EndProjectSection
 EndProject
@@ -35,9 +37,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".devcontainer", ".devcontai
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".vscode", ".vscode", "{CB311C4B-77FC-4407-A2D5-B0E46A7A3AE0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChess", "src\MyChess\MyChess.csproj", "{D3490502-6FD5-457B-B895-B1F6E8749B4E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess", "src\MyChess\MyChess.csproj", "{D3490502-6FD5-457B-B895-B1F6E8749B4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChess.Tests", "test\unit\MyChess.Tests\MyChess.Tests.csproj", "{3928C475-8F6C-4E34-BE3A-E69CF5B43538}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Tests", "test\unit\MyChess.Tests\MyChess.Tests.csproj", "{3928C475-8F6C-4E34-BE3A-E69CF5B43538}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

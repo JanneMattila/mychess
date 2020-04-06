@@ -1,10 +1,21 @@
-# Data structure
+# Data
 
-## Player
+## JSON schemas
 
-TBD
+### Player
 
-## Game
+Here is example game format:
+
+```json
+{
+  "id": "123-abc-123",
+  "name": "John Doe",
+  "created": "2020-04-05T15:48:57.484Z",
+  "updated": "2020-04-06T15:48:57.484Z"
+}
+```
+
+### Game
 
 Here is example game format:
 
@@ -36,3 +47,13 @@ Here is example game format:
   ]
 }
 ```
+
+## Storage Account structure
+
+### Player
+
+TBD
+
+### Game
+
+TBD
