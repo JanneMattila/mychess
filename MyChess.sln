@@ -26,6 +26,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{687BED3D-9EF7-438F-95F4-188C32736656}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{C28B4796-8A82-4D04-BC53-9939F765F074}"
+	ProjectSection(SolutionItems) = preProject
+		doc\data_structure.md = doc\data_structure.md
+		doc\history.md = doc\history.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".devcontainer", ".devcontainer", "{05B34AD6-E6F6-4E12-B628-0271E7DCA275}"
 EndProject
