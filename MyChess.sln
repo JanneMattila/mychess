@@ -31,7 +31,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".devcontainer", ".devcontai
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".vscode", ".vscode", "{CB311C4B-77FC-4407-A2D5-B0E46A7A3AE0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChess", "src\MyChess\MyChess.csproj", "{D3490502-6FD5-457B-B895-B1F6E8749B4E}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3490502-6FD5-457B-B895-B1F6E8749B4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3490502-6FD5-457B-B895-B1F6E8749B4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3490502-6FD5-457B-B895-B1F6E8749B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3490502-6FD5-457B-B895-B1F6E8749B4E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
@@ -43,6 +55,7 @@ Global
 		{C28B4796-8A82-4D04-BC53-9939F765F074} = {7B2AAD5E-368D-44EC-9215-418C718128CD}
 		{05B34AD6-E6F6-4E12-B628-0271E7DCA275} = {7B2AAD5E-368D-44EC-9215-418C718128CD}
 		{CB311C4B-77FC-4407-A2D5-B0E46A7A3AE0} = {7B2AAD5E-368D-44EC-9215-418C718128CD}
+		{D3490502-6FD5-457B-B895-B1F6E8749B4E} = {E74445DD-28F2-4920-961A-C3778DA73664}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F99521D6-99C8-41D7-83DC-3D5523498EE7}
