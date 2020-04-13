@@ -4,6 +4,7 @@ parameters:
   resourceGroupName: 'rg-mychess-default'
   cdn: 'mychess-default'
   customDomain: 'customdomain.local'
+  azureSubscription: AzureDevSubscription
 
 stages:
 - stage: ${{ parameters.environtName }}
@@ -40,7 +41,7 @@ stages:
           - task: AzurePowerShell@4
             displayName: 'Azure PowerShell script: FilePath'
             inputs:
-              azureSubscription: AzureDevSubscription
+              azureSubscription: ${{ parameters.azureSubscription }}
               ScriptPath: '$(System.DefaultWorkingDirectory)/deploy/deploy.ps1'
               ScriptArguments: '-ResourceGroupName ${{ parameters.resourceGroupName }} -CDN ${{ parameters.cdn }} -CustomDomain ${{ parameters.customDomain }} -AppRootFolder "$(System.DefaultWorkingDirectory)/web/"'
               azurePowerShellVersion: LatestVersion
@@ -48,7 +49,7 @@ stages:
           - task: AzureRmWebAppDeployment@4
             displayName: 'Deploy Azure Functions App'
             inputs:
-              azureSubscription: AzureDevSubscription
+              azureSubscription: ${{ parameters.azureSubscription }}
               appType: functionApp
               WebAppName: '$(Custom.WebAppName)'
               enableCustomDeployment: true
