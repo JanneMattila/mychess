@@ -1,0 +1,75 @@
+parameters:
+  depends: 'Build'
+  environtName: 'default'
+  resourceGroupName: 'rg-mychess-default'
+  cdn: 'mychess-default'
+  customDomain: 'customdomain.local'
+
+stages:
+- stage: ${{ parameters.environtName }}
+  dependsOn: ${{ parameters.depends }}
+  condition: succeeded()
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy to ${{ parameters.environtName }}'
+    pool:
+      vmImage: windows-latest
+    environment: ${{ parameters.environtName }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Build Artifacts: app'
+            inputs:
+              artifactName: app
+              downloadPath: '$(System.DefaultWorkingDirectory)'
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Build Artifacts: deploy'
+            inputs:
+              artifactName: deploy
+              downloadPath: '$(System.DefaultWorkingDirectory)'
+
+          - task: DownloadBuildArtifacts@0
+            displayName: 'Download Build Artifacts: web'
+            inputs:
+              artifactName: web
+              downloadPath: '$(System.DefaultWorkingDirectory)'
+
+          - task: AzurePowerShell@4
+            displayName: 'Azure PowerShell script: FilePath'
+            inputs:
+              azureSubscription: AzureDevSubscription
+              ScriptPath: '$(System.DefaultWorkingDirectory)/deploy/deploy.ps1'
+              ScriptArguments: '-ResourceGroupName ${{ parameters.resourceGroupName }} -CDN ${{ parameters.cdn }} -CustomDomain ${{ parameters.customDomain }} -AppRootFolder "$(System.DefaultWorkingDirectory)/web/"'
+              azurePowerShellVersion: LatestVersion
+
+          - task: AzureRmWebAppDeployment@4
+            displayName: 'Deploy Azure Functions App'
+            inputs:
+              azureSubscription: AzureDevSubscription
+              appType: functionApp
+              WebAppName: '$(Custom.WebAppName)'
+              enableCustomDeployment: true
+              DeploymentType: runFromZip
+
+#          - task: DownloadBuildArtifacts@0
+#            displayName: 'Download Build Artifacts: releasetests'
+#            inputs:
+#              artifactName: releasetests
+#              downloadPath: '$(System.DefaultWorkingDirectory)'
+
+#          - task: VSTest@2
+#            displayName: 'Execute Release Tests'
+#            continueOnError: true
+#            inputs:
+#              testAssemblyVer2: |
+#               **\MyChess.ReleaseTests.dll
+#               !**\*TestAdapter.dll
+#               !**\obj\**
+#              searchFolder: '$(System.DefaultWorkingDirectory)\releasetests'
+#              runSettingsFile: '$(System.DefaultWorkingDirectory)\releasetests\app.runsettings'
+#              uiTests: true
+#              overrideTestrunParameters: '-baseUrl $(Custom.WebAppUri)'
+#              rerunFailedTests: false

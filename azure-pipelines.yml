@@ -1,0 +1,104 @@
+pool:
+  vmImage: windows-latest
+  demands:
+  - msbuild
+  - visualstudio
+  - vstest
+
+variables:
+  BuildPlatform: 'any cpu'
+  BuildConfiguration: 'release'
+
+trigger:
+- master
+- develop
+
+name: 1.0.$(Rev:r)
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+    - task: NuGetToolInstaller@1
+      displayName: 'Use NuGet'
+      inputs:
+        versionSpec: 5.4.0
+
+    - task: NuGetCommand@2
+      displayName: 'NuGet restore'
+      inputs:
+        restoreSolution: '**\*.sln'
+
+    - task: VSBuild@1
+      displayName: 'Build solution'
+      inputs:
+        msbuildArgs: '/p:DeployOnBuild=true /p:DeployDefaultTarget=WebPublish /p:WebPublishMethod=FileSystem /p:publishUrl="$(Agent.TempDirectory)\WebAppContent\\"'
+        platform: '$(BuildPlatform)'
+        configuration: '$(BuildConfiguration)'
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive Files'
+      inputs:
+        rootFolderOrFile: '$(Agent.TempDirectory)\WebAppContent'
+        includeRootFolder: false
+
+    - task: VSTest@2
+      displayName: 'Test Assemblies'
+      inputs:
+        testAssemblyVer2: |
+         **\*.Tests.dll
+         !**\obj\**
+        platform: '$(BuildPlatform)'
+        configuration: '$(BuildConfiguration)'
+        diagnosticsEnabled: True
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: web'
+      inputs:
+        PathtoPublish: 'src/MyChessWeb/wwwroot'
+        ArtifactName: web
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: app'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
+        ArtifactName: app
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: deploy'
+      inputs:
+        PathtoPublish: deploy
+        ArtifactName: deploy
+
+#    - task: CopyFiles@2
+#      displayName: 'Copy Files to: $(build.artifactstagingdirectory)\releasetests'
+#      inputs:
+#        SourceFolder: test\release\MyChess.ReleaseTests\bin\Release\
+#        Contents: |
+#         *.dll
+#         *.runsettings
+#         *.pdb
+#         *.xml
+#         *.png
+#        TargetFolder: '$(build.artifactstagingdirectory)\releasetests'
+
+#    - task: PublishBuildArtifacts@1
+#      displayName: 'Publish Artifact: releasetests'
+#      inputs:
+#        PathtoPublish: '$(build.artifactstagingdirectory)\releasetests'
+#        ArtifactName: releasetests
+
+- template: azure-pipelines-deploy.yml
+  parameters:
+    environtName: 'Dev'
+    resourceGroupName: 'rg-mychess-dev'
+    cdn: '$(CDN-Dev)'
+    customDomain: '$(CustomDomain-Dev)'
+
+- template: azure-pipelines-deploy.yml
+  parameters:
+    depends: 'Dev'
+    environtName: 'Prod'
+    resourceGroupName: 'rg-mychess-prod'
+    cdn: '$(CDN-Prod)'
+    customDomain: '$(CustomDomain-Prod)'
