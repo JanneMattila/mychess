@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{8E178E
 		deploy\azuredeploy.json = deploy\azuredeploy.json
 		deploy\azuredeploy.parameters.json = deploy\azuredeploy.parameters.json
 		deploy\deploy.ps1 = deploy\deploy.ps1
+		deploy\deploy_aad_apps.ps1 = deploy\deploy_aad_apps.ps1
 		deploy\deploy_web.ps1 = deploy\deploy_web.ps1
 	EndProjectSection
 EndProject
@@ -49,7 +50,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess", "src\MyChess\MyCh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Tests", "test\unit\MyChess.Tests\MyChess.Tests.csproj", "{3928C475-8F6C-4E34-BE3A-E69CF5B43538}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChess.Functions", "src\MyChess.Functions\MyChess.Functions.csproj", "{77AEC0AA-ACFF-4464-9400-44C50CB06DD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Functions", "src\MyChess.Functions\MyChess.Functions.csproj", "{77AEC0AA-ACFF-4464-9400-44C50CB06DD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
