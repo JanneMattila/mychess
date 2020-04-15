@@ -1,9 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const Msal = require("msal");
+import * as Msal from "msal";
+
 let userAgentApplication;
 let accessTokenRequest;
 let accessToken;
+
 function processConfiguration(data) {
     endpoint = data.endpoint;
     accessTokenRequest = {
@@ -11,13 +11,15 @@ function processConfiguration(data) {
             data.applicationIdURI + "User.ReadWrite",
             data.applicationIdURI + "Games.ReadWrite"
         ]
-    };
+    }
+
     const config = {
         auth: {
             clientId: data.clientId,
             authority: "https://login.microsoftonline.com/common",
         }
-    };
+    }
+
     userAgentApplication = new Msal.UserAgentApplication(config);
     function authCallback(error, response) {
         // Handle redirect responses
@@ -38,7 +40,9 @@ function processConfiguration(data) {
             }
         }
     }
+
     userAgentApplication.handleRedirectCallback(authCallback);
+
     userAgentApplication.acquireTokenSilent(accessTokenRequest).then(function (accessTokenResponse) {
         // Acquire token silent success
         // Call API with token
@@ -52,7 +56,7 @@ function processConfiguration(data) {
         }
     });
 }
+
 function login() {
     userAgentApplication.loginRedirect(accessTokenRequest);
 }
-//# sourceMappingURL=auth.js.map
