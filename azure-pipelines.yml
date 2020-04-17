@@ -37,7 +37,7 @@ stages:
         configuration: '$(BuildConfiguration)'
 
     - powershell: |
-        cd src/MyChessReacty
+        cd src/MyChessReact
         yarn build
       displayName: 'Build React app'
 
