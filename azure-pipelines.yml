@@ -36,6 +36,11 @@ stages:
         platform: '$(BuildPlatform)'
         configuration: '$(BuildConfiguration)'
 
+    - powershell: |
+        cd src/MyChessReacty
+        yarn build
+      displayName: 'Build React app'
+
     - task: ArchiveFiles@2
       displayName: 'Archive Files'
       inputs:
@@ -55,7 +60,7 @@ stages:
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: web'
       inputs:
-        PathtoPublish: 'src/MyChessWeb/wwwroot'
+        PathtoPublish: 'src/MyChessReact/build'
         ArtifactName: web
 
     - task: PublishBuildArtifacts@1
