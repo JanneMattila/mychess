@@ -1,7 +1,9 @@
+import EventNames from "./eventNames";
+
 type Action =
-    | { type: "login", success: boolean }
-    | { type: "logout" }
-    | { type: "login expired" }
+    | { type: EventNames.LOGIN, success: boolean }
+    | { type: EventNames.LOGOUT }
+    | { type: EventNames.LOGIN_EXPIRED }
 
 const initialState = {
     loggedIn: false,
@@ -9,14 +11,14 @@ const initialState = {
 
 export default function appReducer(state = initialState, action: Action) {
     switch (action.type) {
-        case "login": {
+        case EventNames.LOGIN: {
             return Object.assign({}, state, {
                 loggedIn: action.success
             })
         }
-        case "logout":
+        case EventNames.LOGOUT:
         // eslint-disable-next-line
-        case "logout": {
+        case EventNames.LOGIN_EXPIRED: {
             return Object.assign({}, state, {
                 loggedIn: false
             })
