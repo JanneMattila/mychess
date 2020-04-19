@@ -39,6 +39,7 @@ stages:
     - powershell: |
         cd src/MyChessReact
         yarn install
+        yarn test --watchAll false --verbose --ci true
         yarn build
       displayName: 'Build React app'
 
