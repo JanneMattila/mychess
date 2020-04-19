@@ -1,46 +1,21 @@
-import React from "react";
-import {
-    UserAgentApplication, AuthenticationParameters,
-    Account, Configuration
-} from "msal";
-
-type Game = {
-    id: string;
-    title: string;
-};
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { useTypedSelector, RootState } from "../reducers";
+import { loginEvent } from "../actions";
+import { UserAgentApplication, Configuration } from "msal";
 
 type AuthProps = {
     clientId: string;
     applicationIdURI: string;
 };
 
-type LoginState = {
-    loggedIn: boolean;
-    error: string;
-    account?: Account;
-};
+let userAgentApplication: UserAgentApplication;
 
-export class Auth extends React.Component<AuthProps, LoginState> {
-    static displayName = Auth.name;
-    userAgentApplication?: UserAgentApplication;
-    accessTokenRequest?: AuthenticationParameters
-
-    constructor(props: AuthProps) {
-        super(props);
-        this.state = { loggedIn: false, error: "" };
-    }
-
-    componentDidMount() {
-        this.accessTokenRequest = {
-            scopes: [
-                this.props.applicationIdURI + "User.ReadWrite",
-                this.props.applicationIdURI + "Games.ReadWrite"
-            ]
-        };
-
+export function Auth(props: AuthProps) {
+    if (!userAgentApplication) {
         const config: Configuration = {
             auth: {
-                clientId: this.props.clientId,
+                clientId: props.clientId,
                 authority: "https://login.microsoftonline.com/common",
                 navigateToLoginRequestUrl: false
             },
@@ -52,46 +27,51 @@ export class Auth extends React.Component<AuthProps, LoginState> {
             }
         };
 
-        this.userAgentApplication = new UserAgentApplication(config);
-        this.userAgentApplication.handleRedirectCallback(error => {
+        userAgentApplication = new UserAgentApplication(config);
+        userAgentApplication.handleRedirectCallback(error => {
             if (error) {
                 const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
-                this.setState({
-                    error: errorMessage
-                });
+                dispatch(loginEvent(false, errorMessage));
             }
         });
-
-        const account = this.userAgentApplication.getAccount();
-        if (account) {
-            this.setState({
-                account,
-                loggedIn: true
-            });
-        }
     }
 
-    render() {
-        if (this.state.loggedIn) {
-            return (
-                <div>
-                    <h1>Hi {this.state.account?.name}!</h1>
-                </div>
-            );
-        }
+    const selectorLoggedIn = (state: RootState) => state.loggedIn;
+    const selectorAccount = (state: RootState) => state.account;
 
+    const loggedIn = useTypedSelector(selectorLoggedIn);
+    const account = useTypedSelector(selectorAccount);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const getAccount = userAgentApplication.getAccount();
+        if (getAccount) {
+            dispatch(loginEvent(true, "", getAccount));
+        }
+    });
+
+    const onSignIn = () => {
+        const accessTokenRequest = {
+            scopes: [
+                props.applicationIdURI + "User.ReadWrite",
+                props.applicationIdURI + "Games.ReadWrite"
+            ]
+        };
+        return userAgentApplication.loginRedirect(accessTokenRequest);
+    }
+
+    if (loggedIn) {
         return (
             <div>
-                <button onClick={this.onSignIn}>Sign In</button>
+                <h1>Hi {account?.name}!</h1>
             </div>
         );
     }
 
-    onSignIn = () => {
-        if (!this.userAgentApplication) {
-            // Not loaded yet.
-            return;
-        }
-        return this.userAgentApplication.loginRedirect(this.accessTokenRequest);
-    }
+    return (
+        <div>
+            <button onClick={onSignIn}>Sign In</button>
+        </div>
+    );
 }

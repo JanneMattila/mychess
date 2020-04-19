@@ -1,3 +1,5 @@
+import { Account } from "msal";
+
 /*
  * Action event types
  */
@@ -7,10 +9,9 @@ export enum EventTypes {
     LOGOUT = "LOGOUT"
 };
 
-
 /*
  * Action creators
  */
-export function loginEvent(success: boolean) {
-    return { type: EventTypes.LOGIN, success };
+export function loginEvent(success: boolean, error?: string, account?: Account) {
+    return { type: EventTypes.LOGIN, success, error, account };
 }
