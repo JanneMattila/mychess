@@ -12,30 +12,6 @@ type AuthProps = {
 let userAgentApplication: UserAgentApplication;
 
 export function Auth(props: AuthProps) {
-    if (!userAgentApplication) {
-        const config: Configuration = {
-            auth: {
-                clientId: props.clientId,
-                authority: "https://login.microsoftonline.com/common",
-                navigateToLoginRequestUrl: false
-            },
-            cache: {
-                cacheLocation: "localStorage"
-            },
-            system: {
-                navigateFrameWait: 0
-            }
-        };
-
-        userAgentApplication = new UserAgentApplication(config);
-        userAgentApplication.handleRedirectCallback(error => {
-            if (error) {
-                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
-                dispatch(loginEvent(false, errorMessage));
-            }
-        });
-    }
-
     const selectorLoggedIn = (state: RootState) => state.loggedIn;
     const selectorAccount = (state: RootState) => state.account;
 
@@ -44,27 +20,65 @@ export function Auth(props: AuthProps) {
 
     const dispatch = useDispatch();
 
+    const accessTokenRequest = {
+        scopes: [
+            props.applicationIdURI + "User.ReadWrite",
+            props.applicationIdURI + "Games.ReadWrite"
+        ]
+    };
+
     useEffect(() => {
-        const getAccount = userAgentApplication.getAccount();
-        if (getAccount) {
-            dispatch(loginEvent(true, "", getAccount));
+        if (!userAgentApplication) {
+            const config: Configuration = {
+                auth: {
+                    clientId: props.clientId,
+                    authority: "https://login.microsoftonline.com/common",
+                    navigateToLoginRequestUrl: false
+                },
+                cache: {
+                    cacheLocation: "localStorage"
+                },
+                system: {
+                    navigateFrameWait: 0
+                }
+            };
+
+            userAgentApplication = new UserAgentApplication(config);
+            userAgentApplication.handleRedirectCallback((error, response) => {
+                if (error) {
+                    console.log("Auth error");
+                    console.log(error);
+                    const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
+                    dispatch(loginEvent(false, errorMessage));
+                }
+                else if (response) {
+                    const loggedInAccount = userAgentApplication.getAccount();
+                    if (loggedInAccount) {
+                        dispatch(loginEvent(true, "" /* Clear error message */, loggedInAccount));
+                    }
+                }
+            });
+
+            userAgentApplication.acquireTokenSilent(accessTokenRequest).then(function (accessTokenResponse) {
+                // Acquire token silent success
+                const loggedInAccount = userAgentApplication.getAccount();
+                if (loggedInAccount) {
+                    dispatch(loginEvent(true, "" /* Clear error message */, loggedInAccount));
+                }
+            }).catch(function (error) {
+                // Acquire token silent failure, wait for user sign in
+            });
         }
     });
 
     const onSignIn = () => {
-        const accessTokenRequest = {
-            scopes: [
-                props.applicationIdURI + "User.ReadWrite",
-                props.applicationIdURI + "Games.ReadWrite"
-            ]
-        };
         return userAgentApplication.loginRedirect(accessTokenRequest);
     }
 
     if (loggedIn) {
         return (
             <div>
-                <h1>Hi {account?.name}!</h1>
+                <h4>Hi {account?.name}!</h4>
             </div>
         );
     }
