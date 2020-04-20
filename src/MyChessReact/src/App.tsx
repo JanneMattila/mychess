@@ -3,12 +3,13 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Auth } from "./components/Auth";
 import { Home } from "./pages/Home";
 import "./App.css";
+import config from "./configuration.json";
 
 function App() {
   return (
     <Router>
       <div>
-        <Auth clientId="" applicationIdURI="" />
+        <Auth clientId={config.clientId} applicationIdURI={config.applicationIdURI} />
         <div className="App">
           <Link to="/" className="App-link">My Chess</Link>
 
