@@ -4,7 +4,11 @@ import { Game } from "../models/Game";
 import { useTypedSelector } from "../reducers";
 import { gamesLoadingEvent, RootState } from "../actions";
 
-export function GameList() {
+type GameListProps = {
+    endpoint: string;
+};
+
+export function GameList(props: GameListProps) {
     const selectorLoggedIn = (state: RootState) => state.loggedIn;
     const selectorAccessToken = (state: RootState) => state.accessToken;
     const selectorGamesLoaded = (state: RootState) => state.gamesLoaded;
@@ -33,7 +37,7 @@ export function GameList() {
         };
 
         try {
-            const response = await fetch("games", request);
+            const response = await fetch(props.endpoint + "/api/games", request);
             const data = await response.json();
 
             dispatch(gamesLoadingEvent(true, "" /* Clear error message */, data));
