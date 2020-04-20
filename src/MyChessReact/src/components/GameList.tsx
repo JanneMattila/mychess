@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { Game } from "../models/Game";
 import { useTypedSelector } from "../reducers";
 import { gamesLoadingEvent, RootState } from "../actions";
+import { getAppInsights } from "./TelemetryService";
 
 type GameListProps = {
     endpoint: string;
@@ -20,6 +21,7 @@ export function GameList(props: GameListProps) {
     const games = useTypedSelector(selectorGames);
 
     const dispatch = useDispatch();
+    const ai = getAppInsights();
 
     useEffect(() => {
         if (loggedIn && !gamesLoaded) {
@@ -42,6 +44,8 @@ export function GameList(props: GameListProps) {
 
             dispatch(gamesLoadingEvent(true, "" /* Clear error message */, data));
         } catch (error) {
+            ai.trackException(error);
+
             const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
             dispatch(gamesLoadingEvent(false, errorMessage));
         }

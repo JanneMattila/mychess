@@ -3,23 +3,26 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Auth } from "./components/Auth";
 import { Home } from "./pages/Home";
 import "./App.css";
+import TelemetryProvider from "./components/TelemetryProvider";
 import config from "./configuration.json";
 
 function App() {
   return (
     <Router>
-      <div>
-        <div className="App">
-          <Link to="/" className="App-link">My Chess</Link>
-          <Auth clientId={config.clientId} applicationIdURI={config.applicationIdURI} />
+      <TelemetryProvider>
+        <div>
+          <div className="App">
+            <Link to="/" className="App-link">My Chess</Link>
+            <Auth clientId={config.clientId} applicationIdURI={config.applicationIdURI} />
 
-          <Switch>
-            <Route exact path='/' component={Home} />
-            <Route path="/settings">
-            </Route>
-          </Switch>
+            <Switch>
+              <Route exact path='/' component={Home} />
+              <Route path="/settings">
+              </Route>
+            </Switch>
+          </div>
         </div>
-      </div>
+      </TelemetryProvider>
     </Router>
   );
 }
