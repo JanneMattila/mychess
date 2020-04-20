@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import logo from "./logo.svg";
+import { GameList } from "../components/GameList";
 import "./Home.css";
 
 export class Home extends Component {
@@ -11,6 +12,7 @@ export class Home extends Component {
                 <header className="Home-header">
                     <img src={logo} className="Home-logo" alt="My Chess" />
                     <br />My Chess is coming. Stay tuned.
+                    <GameList />
                 </header>
             </div>
         );

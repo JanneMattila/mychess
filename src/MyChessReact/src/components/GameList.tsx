@@ -2,16 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Game } from "../models/Game";
 import { useTypedSelector } from "../reducers";
-import { gamesLoadingEvent, RootState, RootAction } from "../actions";
-
-type GameListProps = {
-    filter: string;
-};
-
-type GameListState = {
-    games: Game[];
-    loading: boolean;
-};
+import { gamesLoadingEvent, RootState } from "../actions";
 
 export function GameList() {
     const selectorLoggedIn = (state: RootState) => state.loggedIn;

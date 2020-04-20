@@ -9,9 +9,9 @@ function App() {
   return (
     <Router>
       <div>
-        <Auth clientId={config.clientId} applicationIdURI={config.applicationIdURI} />
         <div className="App">
           <Link to="/" className="App-link">My Chess</Link>
+          <Auth clientId={config.clientId} applicationIdURI={config.applicationIdURI} />
 
           <Switch>
             <Route exact path='/' component={Home} />
