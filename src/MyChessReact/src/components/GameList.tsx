@@ -1,9 +1,8 @@
-import React from "react";
-
-type Game = {
-    id: string;
-    title: string;
-};
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { Game } from "../models/Game";
+import { useTypedSelector } from "../reducers";
+import { gamesLoadingEvent, RootState, RootAction } from "../actions";
 
 type GameListProps = {
     filter: string;
@@ -14,19 +13,46 @@ type GameListState = {
     loading: boolean;
 };
 
-export class GameList extends React.Component<GameListProps, GameListState> {
-    static displayName = GameList.name;
+export function GameList() {
+    const selectorLoggedIn = (state: RootState) => state.loggedIn;
+    const selectorAccessToken = (state: RootState) => state.accessToken;
+    const selectorGamesLoaded = (state: RootState) => state.gamesLoaded;
+    const selectorGames = (state: RootState) => state.games;
 
-    constructor(props: GameListProps) {
-        super(props);
-        this.state = { games: [], loading: true };
+    const loggedIn = useTypedSelector(selectorLoggedIn);
+    const accessToken = useTypedSelector(selectorAccessToken);
+    const gamesLoaded = useTypedSelector(selectorGamesLoaded);
+    const games = useTypedSelector(selectorGames);
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (loggedIn && !gamesLoaded) {
+            populateGames();
+        }
+    });
+
+    const populateGames = async () => {
+        const request: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "Authorization": "Bearer " + accessToken
+            }
+        };
+
+        try {
+            const response = await fetch("games", request);
+            const data = await response.json();
+
+            dispatch(gamesLoadingEvent(true, "" /* Clear error message */, data));
+        } catch (error) {
+            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
+            dispatch(gamesLoadingEvent(false, errorMessage));
+        }
     }
 
-    componentDidMount() {
-        this.populateGames();
-    }
-
-    static renderGames(games: Game[]) {
+    const renderGames = (games: Game[]) => {
         return (
             <table className='table table-striped' aria-labelledby="tabelLabel">
                 <thead>
@@ -45,10 +71,10 @@ export class GameList extends React.Component<GameListProps, GameListState> {
         );
     }
 
-    render() {
-        let contents = this.state.loading
+    if (loggedIn) {
+        let contents = gamesLoaded
             ? <p><em>Loading...</em></p>
-            : GameList.renderGames(this.state.games);
+            : renderGames(games ? games : []);
 
         return (
             <div>
@@ -57,10 +83,11 @@ export class GameList extends React.Component<GameListProps, GameListState> {
             </div>
         );
     }
-
-    async populateGames() {
-        const response = await fetch("games");
-        const data = await response.json();
-        this.setState({ games: data, loading: false });
+    else {
+        // Not logged in so render blank.
+        return (
+            <>
+            </>
+        );
     }
 }

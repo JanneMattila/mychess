@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { useTypedSelector, RootState } from "../reducers";
-import { loginEvent } from "../actions";
+import { useTypedSelector } from "../reducers";
+import { loginEvent, RootState } from "../actions";
 import { UserAgentApplication, Configuration } from "msal";
 
 type AuthProps = {
@@ -54,7 +54,7 @@ export function Auth(props: AuthProps) {
                 else if (response) {
                     const loggedInAccount = userAgentApplication.getAccount();
                     if (loggedInAccount) {
-                        dispatch(loginEvent(true, "" /* Clear error message */, loggedInAccount));
+                        dispatch(loginEvent(true, "" /* Clear error message */, loggedInAccount, response.accessToken));
                     }
                 }
             });
@@ -63,7 +63,7 @@ export function Auth(props: AuthProps) {
                 // Acquire token silent success
                 const loggedInAccount = userAgentApplication.getAccount();
                 if (loggedInAccount) {
-                    dispatch(loginEvent(true, "" /* Clear error message */, loggedInAccount));
+                    dispatch(loginEvent(true, "" /* Clear error message */, loggedInAccount, accessTokenResponse.accessToken));
                 }
             }).catch(function (error) {
                 // Acquire token silent failure, wait for user sign in
