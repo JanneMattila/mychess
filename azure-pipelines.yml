@@ -38,6 +38,9 @@ stages:
 
           - powershell: |
               cd src/MyChessReact
+              # Use placeholder for configuration (for now)
+              cp configuration.sample.json configuration.json
+
               yarn install
               # yarn test --watchAll false --verbose --ci true
               yarn build
