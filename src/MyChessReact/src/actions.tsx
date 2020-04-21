@@ -14,30 +14,35 @@ export enum EventTypes {
     GAMES_LOADING = "Games/Load"
 };
 
+type LoginAction = { type: EventTypes.AUTH_LOGIN, success: boolean, error?: string, account?: Account, accessToken?: string }
+type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
+type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
+type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesLoaded: boolean, error?: string, games?: Game[] }
+
 // Root action
 export type RootAction =
-    | { type: EventTypes.AUTH_LOGIN, success: boolean, error?: string, account?: Account, accessToken?: string }
-    | { type: EventTypes.AUTH_LOGOUT }
-    | { type: EventTypes.AUTH_LOGIN_EXPIRED }
-    | { type: EventTypes.GAMES_LOADING, loaded: boolean, error?: string, games?: Game[] }
+    | LoginAction
+    | LogoutAction
+    | LoginExpiredAction
+    | GamesLoadingAction
 
 export interface RootState {
-    readonly loggedIn: boolean
+    readonly loggedIn?: boolean
     readonly error?: string
     readonly account?: Account
     readonly accessToken?: string
 
-    readonly gamesLoaded: boolean
+    readonly gamesLoaded?: boolean
     readonly games?: Game[]
 }
 
 /*
  * Action creators
  */
-export function loginEvent(success: boolean, error?: string, account?: Account, accessToken?: string) {
+export function loginEvent(success: boolean, error?: string, account?: Account, accessToken?: string): LoginAction {
     return { type: EventTypes.AUTH_LOGIN, success, error, account, accessToken };
 }
 
-export function gamesLoadingEvent(loaded: boolean, error?: string, games?: Game[]) {
-    return { type: EventTypes.GAMES_LOADING, loaded, error, games };
+export function gamesLoadingEvent(gamesLoaded: boolean, error?: string, games?: Game[]): GamesLoadingAction {
+    return { type: EventTypes.GAMES_LOADING, gamesLoaded, error, games };
 }
