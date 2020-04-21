@@ -1,4 +1,6 @@
 export interface Game {
     id: string;
-    title: string;
+    name: string;
+    opponent: string;
+    updated: Date;
 }

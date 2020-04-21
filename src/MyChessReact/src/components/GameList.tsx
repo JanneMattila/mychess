@@ -51,18 +51,18 @@ export function GameList(props: GameListProps) {
         }
     }
 
-    const renderGames = (games: Game[]) => {
+    const renderGames = (games?: Game[]) => {
         return (
-            <table className='table table-striped' aria-labelledby="tabelLabel">
+            <table>
                 <thead>
                     <tr>
                         <th>Name</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {games.map(game =>
-                        <tr key={game.id}>
-                            <td>{game.title}</td>
+                    {games?.map(game =>
+                        <tr key={game?.id}>
+                            <td>{game?.name}</td>
                         </tr>
                     )}
                 </tbody>
@@ -72,8 +72,8 @@ export function GameList(props: GameListProps) {
 
     if (loggedIn) {
         let contents = gamesLoaded
-            ? <p><em>Loading...</em></p>
-            : renderGames(games ? games : []);
+            ? renderGames(games)
+            : <p><em>Loading...</em></p>;
 
         return (
             <div>
