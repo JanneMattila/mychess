@@ -1,7 +1,7 @@
 import { useSelector, TypedUseSelectorHook } from "react-redux";
 import { EventTypes, RootState, RootAction } from "./actions";
 
-const getInitialState = () => {
+export const getInitialState = () => {
     return {
         loggedIn: false,
         gamesLoaded: false

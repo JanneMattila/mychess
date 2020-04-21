@@ -27,7 +27,7 @@ export function GameList(props: GameListProps) {
         if (loggedIn && !gamesLoaded) {
             populateGames();
         }
-    });
+    }, [loggedIn, gamesLoaded]);
 
     const populateGames = async () => {
         const request: RequestInit = {
