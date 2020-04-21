@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+
+    "Storage": "UseDevelopmentStorage=true",
+    "AzureSignalRConnectionString": "<!-- Azure SignalR Connection string -->"
+  },
+  "Host": {
+    "CORS": "http://localhost:3000",
+    "CORSCredentials": true
+  }
+}
