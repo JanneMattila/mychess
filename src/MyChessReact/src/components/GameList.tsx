@@ -23,12 +23,6 @@ export function GameList(props: GameListProps) {
     const dispatch = useDispatch();
     const ai = getAppInsights();
 
-    useEffect(() => {
-        if (loggedIn && !gamesLoaded) {
-            populateGames();
-        }
-    }, [loggedIn, gamesLoaded]);
-
     const populateGames = async () => {
         const request: RequestInit = {
             method: "GET",
@@ -50,6 +44,12 @@ export function GameList(props: GameListProps) {
             dispatch(gamesLoadingEvent(false, errorMessage));
         }
     }
+
+    useEffect(() => {
+        if (loggedIn && !gamesLoaded) {
+            populateGames();
+        }
+    }, [loggedIn, gamesLoaded, populateGames]);
 
     const renderGames = (games?: Game[]) => {
         return (
