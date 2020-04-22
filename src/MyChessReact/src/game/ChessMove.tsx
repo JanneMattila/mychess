@@ -1,9 +1,11 @@
 import { ChessBoardLocation } from "./ChessBoardLocation";
 import { ChessPiece } from "./ChessPiece";
 import { ChessSpecialMove } from "./ChessSpecialMove";
+import { ChessPlayer } from "./ChessPlayer";
 
 export class ChessMove {
     piece: ChessPiece;
+    player: ChessPlayer;
 
     from: ChessBoardLocation;
     to: ChessBoardLocation;
@@ -14,8 +16,9 @@ export class ChessMove {
 
     time: string
 
-    constructor(piece: ChessPiece, horizontalLocationFrom: number, verticalLocationFrom: number, horizontalLocationTo: number, verticalLocationTo: number, specialMove?: ChessSpecialMove, comment?: string, time?: string) {
+    constructor(piece: ChessPiece, player: ChessPlayer, horizontalLocationFrom: number, verticalLocationFrom: number, horizontalLocationTo: number, verticalLocationTo: number, specialMove?: ChessSpecialMove, comment?: string, time?: string) {
         this.piece = piece;
+        this.player = player;
         this.from = new ChessBoardLocation(horizontalLocationFrom, verticalLocationFrom);
         this.to = new ChessBoardLocation(horizontalLocationTo, verticalLocationTo);
         this.specialMove = specialMove != null ? specialMove : ChessSpecialMove.None;
@@ -26,7 +29,13 @@ export class ChessMove {
     public compareTo(otherMove: ChessMove): number {
         let compare: number = this.from.compareTo(this.from);
         if (compare == 0) {
-            return this.to.compareTo(otherMove.to);
+            compare = this.to.compareTo(otherMove.to);
+            if (compare == 0) {
+                compare = this.player - otherMove.player;
+                if (compare == 0) {
+                    return this.piece - otherMove.piece;
+                }
+            }
         }
 
         return compare;
