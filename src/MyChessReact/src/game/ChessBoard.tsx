@@ -6,6 +6,7 @@ import { ChessBoardLocation } from "./ChessBoardLocation";
 import { ChessBoardState } from "./ChessBoardState";
 import { ChessPlayer } from "./ChessPlayer";
 import { ChessBoardPiece } from "./ChessBoardPiece";
+import { ChessPieceSelection } from "./ChessPieceSelection";
 
 export class ChessBoard {
     public static BOARD_SIZE: number = 8;
@@ -607,7 +608,7 @@ export class ChessBoard {
                 this.pieces[selectedMove.to.horizontalLocation][selectedMove.from.verticalLocation] = ChessBoardPiece.empty();
 
                 // Capture in board change (in en passant case):
-                boardChanges.push(new ChessBoardChange(selectedMove.to.horizontalLocation, selectedMove.from.verticalLocation, PieceSelection.Capture));
+                boardChanges.push(new ChessBoardChange(selectedMove.to.horizontalLocation, selectedMove.from.verticalLocation, ChessPieceSelection.Capture));
                 break;
 
             case ChessSpecialMove.Castling:
@@ -638,7 +639,7 @@ export class ChessBoard {
             case ChessSpecialMove.Promotion:
                 executedMoves.push(
                     new ChessMove(
-                        selectedMove.rank, selectedMove.player,
+                        selectedMove.piece, selectedMove.player,
                         selectedMove.from.horizontalLocation, selectedMove.from.verticalLocation,
                         ChessBoardLocation.OUTSIDE_BOARD, ChessBoardLocation.OUTSIDE_BOARD, ChessSpecialMove.PromotionOut));
 
@@ -674,18 +675,18 @@ export class ChessBoard {
                     ChessBoardLocation.OUTSIDE_BOARD, ChessBoardLocation.OUTSIDE_BOARD, ChessSpecialMove.Capture));
 
             // Capture in board change:
-            boardChanges.push(new ChessBoardChange(selectedMove.to.horizontalLocation, selectedMove.to.verticalLocation, PieceSelection.Capture));
+            boardChanges.push(new ChessBoardChange(selectedMove.to.horizontalLocation, selectedMove.to.verticalLocation, ChessPieceSelection.Capture));
         }
         else {
             // Move to as board change:
-            boardChanges.push(new ChessBoardChange(selectedMove.to.horizontalLocation, selectedMove.to.verticalLocation, PieceSelection.PreviousMoveTo));
+            boardChanges.push(new ChessBoardChange(selectedMove.to.horizontalLocation, selectedMove.to.verticalLocation, ChessPieceSelection.PreviousMoveTo));
         }
 
         this.pieces[selectedMove.to.horizontalLocation][selectedMove.to.verticalLocation] = this.pieces[selectedMove.from.horizontalLocation][selectedMove.from.verticalLocation];
         this.pieces[selectedMove.from.horizontalLocation][selectedMove.from.verticalLocation] = ChessBoardPiece.empty();
 
         // Move from as board change:
-        boardChanges.push(new ChessBoardChange(selectedMove.from.horizontalLocation, selectedMove.from.verticalLocation, PieceSelection.PreviousMoveFrom));
+        boardChanges.push(new ChessBoardChange(selectedMove.from.horizontalLocation, selectedMove.from.verticalLocation, ChessPieceSelection.PreviousMoveFrom));
 
         this.previousMove = selectedMove;
         this.currentPlayer = this.currentPlayer == ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White;
@@ -703,7 +704,7 @@ export class ChessBoard {
             for (let i: number = 0; i < undoMoves.length; i++) {
                 let undoMove: ChessMove = undoMoves[i];
                 if (undoMove.from.compareTo(ChessBoardLocation.outsideBoard()) != 0) {
-                    this.pieces[undoMove.from.horizontalLocation][undoMove.from.verticalLocation] = new ChessBoardPiece(undoMove.player, undoMove.rank);
+                    this.pieces[undoMove.from.horizontalLocation][undoMove.from.verticalLocation] = new ChessBoardPiece(undoMove.player, undoMove.piece);
                 }
 
                 if (undoMove.to.compareTo(ChessBoardLocation.outsideBoard()) != 0) {
