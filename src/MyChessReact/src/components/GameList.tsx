@@ -23,33 +23,33 @@ export function GameList(props: GameListProps) {
     const dispatch = useDispatch();
     const ai = getAppInsights();
 
-    const populateGames = async () => {
-        const request: RequestInit = {
-            method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "Authorization": "Bearer " + accessToken
-            }
-        };
-
-        try {
-            const response = await fetch(props.endpoint + "/api/games", request);
-            const data = await response.json();
-
-            dispatch(gamesLoadingEvent(true, "" /* Clear error message */, data));
-        } catch (error) {
-            ai.trackException(error);
-
-            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
-            dispatch(gamesLoadingEvent(false, errorMessage));
-        }
-    }
-
     useEffect(() => {
+        const populateGames = async () => {
+            const request: RequestInit = {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
+
+            try {
+                const response = await fetch(props.endpoint + "/api/games", request);
+                const data = await response.json();
+
+                dispatch(gamesLoadingEvent(true, "" /* Clear error message */, data));
+            } catch (error) {
+                ai.trackException(error);
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
+                dispatch(gamesLoadingEvent(false, errorMessage));
+            }
+        }
+
         if (loggedIn && !gamesLoaded) {
             populateGames();
         }
-    }, [loggedIn, gamesLoaded, populateGames]);
+    }, [loggedIn, gamesLoaded, accessToken, ai, props, dispatch]);
 
     const renderGames = (games?: Game[]) => {
         return (
