@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Game } from "../models/Game";
+import { GameModel } from "../models/GameModel";
 import { useTypedSelector } from "../reducers";
 import { gamesLoadingEvent, RootState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
@@ -51,7 +51,7 @@ export function GameList(props: GameListProps) {
         }
     }, [loggedIn, gamesLoaded, accessToken, ai, props, dispatch]);
 
-    const renderGames = (games?: Game[]) => {
+    const renderGames = (games?: GameModel[]) => {
         return (
             <table>
                 <thead>

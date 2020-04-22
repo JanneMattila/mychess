@@ -1,10 +1,10 @@
-import { Move } from "./Move";
+import { MoveModel } from "./MoveModel";
 
-export interface Game {
+export interface GameModel {
     id: string;
     name: string;
     opponent: string;
     updated: Date;
     time: string;
-    moves: Move[];
+    moves: MoveModel[];
 }

@@ -1,5 +1,5 @@
 import { Account } from "msal";
-import { Game } from "./models/Game";
+import { GameModel } from "./models/GameModel";
 
 /*
  * Action event types
@@ -17,7 +17,7 @@ export enum EventTypes {
 type LoginAction = { type: EventTypes.AUTH_LOGIN, success: boolean, error?: string, account?: Account, accessToken?: string }
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
-type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesLoaded: boolean, error?: string, games?: Game[] }
+type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesLoaded: boolean, error?: string, games?: GameModel[] }
 
 // Root action
 export type RootAction =
@@ -33,7 +33,7 @@ export interface RootState {
     readonly accessToken?: string
 
     readonly gamesLoaded?: boolean
-    readonly games?: Game[]
+    readonly games?: GameModel[]
 }
 
 /*
@@ -43,6 +43,6 @@ export function loginEvent(success: boolean, error?: string, account?: Account, 
     return { type: EventTypes.AUTH_LOGIN, success, error, account, accessToken };
 }
 
-export function gamesLoadingEvent(gamesLoaded: boolean, error?: string, games?: Game[]): GamesLoadingAction {
+export function gamesLoadingEvent(gamesLoaded: boolean, error?: string, games?: GameModel[]): GamesLoadingAction {
     return { type: EventTypes.GAMES_LOADING, gamesLoaded, error, games };
 }
