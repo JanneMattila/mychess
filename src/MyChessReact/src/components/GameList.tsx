@@ -4,6 +4,7 @@ import { GameModel } from "../models/GameModel";
 import { useTypedSelector } from "../reducers";
 import { gamesLoadingEvent, RootState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
+import "./GameList.css";
 
 type GameListProps = {
     endpoint: string;
@@ -53,20 +54,14 @@ export function GameList(props: GameListProps) {
 
     const renderGames = (games?: GameModel[]) => {
         return (
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {games?.map(game =>
-                        <tr key={game?.id}>
-                            <td>{game?.name}</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+            <div className="row">
+                {games?.map(game =>
+                    <div className="col-1">
+                        {game?.name}
+                    </div>
+                )
+                }
+            </div >
         );
     }
 

@@ -1,0 +1,43 @@
+* {
+  box-sizing: border-box;
+}
+
+.col-1 { width: 25%; }
+.col-2 { width: 50%; }
+.col-3 { width: 75%; }
+.col-4 { width: 100%; }
+
+[class*="col-"] {
+  float: left;
+  padding: 25px;
+  margin: 10px;
+  border: 1px solid white;
+  height: 200px;
+}
+
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+[class*="col-"] {
+  background-color: #454545;
+}
+
+[class*="col-"]:hover {
+  background-color: #656565;
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 768px) {
+  [class*="col-"] {
+    width: 95%;
+  }
+}
