@@ -1,10 +1,5 @@
-.Home-logo {
-  height: 10vmin;
-  pointer-events: none;
-}
-
-.Home-header {
-  min-height: 100vh;
+.Settings-header {
+  min-height: 10vh;
   display: flex;
   flex-direction: column;
   align-items: center;

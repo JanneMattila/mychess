@@ -73,11 +73,11 @@ export function GameList(props: GameListProps) {
     if (loggedIn) {
         let contents = gamesLoaded
             ? renderGames(games)
-            : <p><em>Loading...</em></p>;
+            : <h6><em>Loading...</em></h6>;
 
         return (
             <div>
-                <h1>Games</h1>
+                <h4>Games</h4>
                 {contents}
             </div>
         );

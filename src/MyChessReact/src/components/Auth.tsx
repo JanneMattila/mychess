@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { loginEvent, RootState } from "../actions";
 import { UserAgentApplication, Configuration } from "msal";
+import { Link } from "react-router-dom";
 
 type AuthProps = {
     clientId: string;
@@ -78,7 +79,7 @@ export function Auth(props: AuthProps) {
     if (loggedIn) {
         return (
             <div>
-                <h4>Hi {account?.name}!</h4>
+                <h4><Link to="/settings" className="App-link">Hi {account?.name}!</Link></h4>
             </div>
         );
     }
