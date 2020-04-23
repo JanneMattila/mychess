@@ -56,8 +56,16 @@ export function GameList(props: GameListProps) {
         return (
             <div className="row">
                 {games?.map(game =>
-                    <div className="col-1">
-                        {game?.name}
+                    <div className="template-1" key={game?.id}>
+                        <div className="nameTemplate">
+                            {game?.name}
+                        </div>
+                        <div className="commentTemplate">
+                            {game?.comment}
+                        </div>
+                        <div className="opponentTemplate">
+                            {game?.opponent}
+                        </div>
                     </div>
                 )
                 }

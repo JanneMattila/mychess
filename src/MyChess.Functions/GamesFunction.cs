@@ -19,14 +19,15 @@ namespace MyChess.Functions
             using var scope = log.BeginScope("Games");
             log.LogInformation("Games function processing request.");
 
-            var games = new List<Game>();
+            var games = new List<GameHeader>();
             for (int i = 0; i < 5; i++)
             {
-                games.Add(new Game()
+                games.Add(new GameHeader()
                 {
                     ID = Guid.NewGuid().ToString("B"),
                     Name = $"Game of name {i + 1}",
                     Opponent = $"User {i + 1}",
+                    Comment = "👍 Lorem ipsum dolor sit amet ❤ 😊, consectetur adipiscing elit. Ut sed mollis neque. Maecenas molestie nibh id elit gravida, quis placerat magna tempor. Morbi posuere orci sapien, eget dictum ligula tempor ut. Vivamus nec massa dolor. Sed fermentum ex non nunc dapibus blandit. Vivamus sollicitudin, libero rhoncus faucibus ullamcorper, velit dui finibus neque, sed placerat sapien urna id nunc. Aliquam ac consectetur elit.",
                     Updated = DateTimeOffset.UtcNow.AddHours(-i)
                 });
             }
