@@ -4,6 +4,7 @@ import { GameModel } from "../models/GameModel";
 import { useTypedSelector } from "../reducers";
 import { gamesLoadingEvent, RootState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
+import { Link } from "react-router-dom";
 import "./GameList.css";
 
 type GameListProps = {
@@ -56,17 +57,19 @@ export function GameList(props: GameListProps) {
         return (
             <div className="row">
                 {games?.map(game =>
-                    <div className="template-1" key={game?.id}>
-                        <div className="nameTemplate">
-                            {game?.name}
+                    <Link to={{ pathname: "/play/" + game?.id }} className="GameList-link">
+                        <div className="template-1" key={game?.id}>
+                            <div className="nameTemplate">
+                                {game?.name}
+                            </div>
+                            <div className="commentTemplate">
+                                {game?.comment}
+                            </div>
+                            <div className="opponentTemplate">
+                                {game?.opponent}
+                            </div>
                         </div>
-                        <div className="commentTemplate">
-                            {game?.comment}
-                        </div>
-                        <div className="opponentTemplate">
-                            {game?.opponent}
-                        </div>
-                    </div>
+                    </Link>
                 )
                 }
             </div >
