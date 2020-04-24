@@ -62,8 +62,8 @@ else
 {
     ######################
     # Setup functions app:
-    # - Expose API "Sales.Read"
-    # - Expose API "Sales.ReadWrite"
+    # - Expose API "User.ReadWrite"
+    # - Expose API "Games.ReadWrite"
     $permissions = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.OAuth2Permission]
 
     # Known identifiers of Microsoft Graph API
@@ -71,31 +71,31 @@ else
     $userRead = "e1fe6dd8-ba31-4d61-89e7-88639da4683d" # "User.Read"
 
     # Custom identifiers for our APIs
-    $permissionSalesRead = "d2dc4339-3161-4d78-a579-8b50f4c4da39" # "Sales.Read"
-    $permissionSalesReadWrite = "39579f07-da63-4735-850d-f802b0d08057" # "Sales.ReadWrite"
+    $permissionUserReadWrite = "74f7cc22-157a-4c09-9039-d03645fda085" # "User.ReadWrite"
+    $permissionGamesReadWrite = "e49b5223-2def-45c2-a632-b48b07c93124" # "Games.ReadWrite"
 
-    $readPermission = New-Object Microsoft.Open.AzureAD.Model.OAuth2Permission
-    $readPermission.Id = $permissionSalesRead
-    $readPermission.Value = "Sales.Read"
-    $readPermission.Type = "User"
-    $readPermission.AdminConsentDisplayName = "Admin consent for granting read access to sales data"
-    $readPermission.AdminConsentDescription = "Admin consent for granting read access to sales data"
-    $readPermission.UserConsentDisplayName = "Read access to sales data"
-    $readPermission.UserConsentDescription = "Read access to sales data"
-    $permissions.Add($readPermission)
+    $userReadWritePermission = New-Object Microsoft.Open.AzureAD.Model.OAuth2Permission
+    $userReadWritePermission.Id = $permissionUserReadWrite
+    $userReadWritePermission.Value = "User.ReadWrite"
+    $userReadWritePermission.Type = "User"
+    $userReadWritePermission.AdminConsentDisplayName = "Admin consent for granting read-write access to user data"
+    $userReadWritePermission.AdminConsentDescription = "Admin consent for granting read-write access to user data"
+    $userReadWritePermission.UserConsentDisplayName = "Read-write access to user data"
+    $userReadWritePermission.UserConsentDescription = "Read-write access to user data"
+    $permissions.Add($userReadWritePermission)
 
-    $readWritePermission = New-Object Microsoft.Open.AzureAD.Model.OAuth2Permission
-    $readWritePermission.Id = $permissionSalesReadWrite
-    $readWritePermission.Value = "Sales.ReadWrite"
-    $readWritePermission.Type = "User"
-    $readWritePermission.AdminConsentDisplayName = "Admin consent for granting read-write access to sales data"
-    $readWritePermission.AdminConsentDescription = "Admin consent for granting read-write access to sales data"
-    $readWritePermission.UserConsentDisplayName = "Read-write access to sales data"
-    $readWritePermission.UserConsentDescription = "Read-write access to sales data"
-    $permissions.Add($readWritePermission)
+    $gamesReadWritePermission = New-Object Microsoft.Open.AzureAD.Model.OAuth2Permission
+    $gamesReadWritePermission.Id = $permissionGamesReadWrite
+    $gamesReadWritePermission.Value = "Games.ReadWrite"
+    $gamesReadWritePermission.Type = "User"
+    $gamesReadWritePermission.AdminConsentDisplayName = "Admin consent for granting read-write access to games data"
+    $gamesReadWritePermission.AdminConsentDescription = "Admin consent for granting read-write access to games data"
+    $gamesReadWritePermission.UserConsentDisplayName = "Read-write access to games data"
+    $gamesReadWritePermission.UserConsentDescription = "Read-write access to games data"
+    $permissions.Add($gamesReadWritePermission)
 
     $apiApp = New-AzureADApplication -DisplayName $apiAppName `
-        -IdentifierUris "api://spa-func.$EnvironmentName" `
+        -IdentifierUris "api://mychess-func.$EnvironmentName" `
         -PublicClient $false `
         -Oauth2Permissions $permissions
     $apiApp
@@ -103,89 +103,51 @@ else
     $apiSpn = New-AzureADServicePrincipal -AppId $apiApp.AppId
 
     ###########################
-    # Setup SPASalesReader app:
-    $readerAccesses = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
+    # Setup SPA app:
+    $spaAccesses = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
 
     # API permission for "User.Read" in Microsoft Graph
-    $readerUserRead = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
-    $readerUserRead.Id = $userRead # "User.Read"
-    $readerUserRead.Type = "Scope"
+    $spaUserReadGraph = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
+    $spaUserReadGraph.Id = $userRead # "User.Read"
+    $spaUserReadGraph.Type = "Scope"
 
-    $readerGraph = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
-    $readerGraph.ResourceAppId = $microsoftGraphAPI # "Microsoft Graph API"
-    $readerGraph.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
-    $readerGraph.ResourceAccess.Add($readerUserRead)
+    $spaGraph = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
+    $spaGraph.ResourceAppId = $microsoftGraphAPI # "Microsoft Graph API"
+    $spaGraph.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
+    $spaGraph.ResourceAccess.Add($spaUserReadGraph)
 
-    # API permission for "Sales.Read" in SPA-FUNC
-    $readerSalesRead = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
-    $readerSalesRead.Id = $readPermission.Id # "Sales.Read"
-    $readerSalesRead.Type = "Scope"
+    # API permission for "User.ReadWrite" in backend app
+    $spaUserReadWrite = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
+    $spaUserReadWrite.Id = $userReadWritePermission.Id # "User.ReadWrite"
+    $spaUserReadWrite.Type = "Scope"
 
-    $readerApi = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
-    $readerApi.ResourceAppId = $apiApp.AppId # "SPA FUNC"
-    $readerApi.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
-    $readerApi.ResourceAccess.Add($readerSalesRead)
+    # API permission for "Games.ReadWrite" in backend app
+    $spaGamesReadWrite = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
+    $spaGamesReadWrite.Id = $gamesReadWritePermission.Id # "Games.ReadWrite"
+    $spaGamesReadWrite.Type = "Scope"   
+
+    $spaApi = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
+    $spaApi.ResourceAppId = $apiApp.AppId # Backend app
+    $spaApi.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
+    $spaApi.ResourceAccess.Add($spaUserReadWrite)
+    $spaApi.ResourceAccess.Add($spaGamesReadWrite)
 
     # Add required accesses
-    $readerAccesses.Add($readerGraph)
-    $readerAccesses.Add($readerApi)
+    $spaAccesses.Add($spaGraph)
+    $spaAccesses.Add($spaApi)
 
-    $spaReaderApp = New-AzureADApplication -DisplayName $spaReaderAppName `
+    $spaApp = New-AzureADApplication -DisplayName $spaAppName `
         -Oauth2AllowImplicitFlow $true `
-        -Homepage $SPAReaderUri `
-        -ReplyUrls $SPAReaderUri `
-        -RequiredResourceAccess $readerAccesses
+        -Homepage $SPAUri `
+        -ReplyUrls $SPAUri `
+        -RequiredResourceAccess $spaAccesses
     $spaReaderApp
 
-    $spaReaderSpn = New-AzureADServicePrincipal -AppId $spaReaderApp.AppId
-
-    ###########################
-    # Setup SPASalesWriter app:
-    $writerAccesses = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
-
-    # API permission for "User.Read" in Microsoft Graph
-    $writerUserRead = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
-    $writerUserRead.Id = $userRead # "User.Read"
-    $writerUserRead.Type = "Scope"
-
-    $writerGraph = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
-    $writerGraph.ResourceAppId = $microsoftGraphAPI # "Microsoft Graph API"
-    $writerGraph.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
-    $writerGraph.ResourceAccess.Add($writerUserRead)
-
-    # API permission for "Sales.Read" in SPA-FUNC
-    $writerSalesRead = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
-    $writerSalesRead.Id = $readPermission.Id # "Sales.Read"
-    $writerSalesRead.Type = "Scope"
-
-    # API permission for "Sales.Read" in SPA-FUNC
-    $writerSalesReadWrite = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
-    $writerSalesReadWrite.Id = $readWritePermission.Id # "Sales.ReadWrite"
-    $writerSalesReadWrite.Type = "Scope"
-
-    $writerApi = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
-    $writerApi.ResourceAppId = $apiApp.AppId # "SPA FUNC"
-    $writerApi.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
-    $writerApi.ResourceAccess.Add($writerSalesRead)
-    $writerApi.ResourceAccess.Add($writerSalesReadWrite)
-
-    # Add required accesses
-    $writerAccesses.Add($writerGraph)
-    $writerAccesses.Add($writerApi)
-
-    $spaWriterApp = New-AzureADApplication -DisplayName $spaWriterAppName `
-        -Oauth2AllowImplicitFlow $true `
-        -Homepage $SPAWriterUri `
-        -ReplyUrls $SPAWriterUri `
-        -RequiredResourceAccess $writerAccesses
-    $spaWriterApp
-
-    $spaWriterSpn = New-AzureADServicePrincipal -AppId $spaWriterApp.AppId
+    $spaSpn = New-AzureADServicePrincipal -AppId $spaApp.AppId
 }
 
 $values = new-object psobject -property @{
-    ReaderApp = $spaReaderApp.AppId;
-    WriterApp = $spaWriterApp.AppId;
+    SPAApp = $spaSpn.AppId;
     ApiApp = $apiApp.AppId;
     TenantId = $tenant;
     ApplicationIdURI = $apiApp.IdentifierUris[0];
