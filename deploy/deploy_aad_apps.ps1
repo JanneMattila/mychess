@@ -94,6 +94,10 @@ else
     $gamesReadWritePermission.UserConsentDescription = "Read-write access to games data"
     $permissions.Add($gamesReadWritePermission)
 
+    #
+    # Note: "New-AzureADApplication" does not yet support
+    # setting up "signInAudience" to "AzureADandPersonalMicrosoftAccount"
+    # 
     $apiApp = New-AzureADApplication -DisplayName $apiAppName `
         -AvailableToOtherTenants $true `
         -IdentifierUris "api://mychess-func.$EnvironmentName" `
@@ -137,6 +141,10 @@ else
     $spaAccesses.Add($spaGraph)
     $spaAccesses.Add($spaApi)
 
+    #
+    # Note: "New-AzureADApplication" does not yet support
+    # setting up "signInAudience" to "AzureADandPersonalMicrosoftAccount"
+    # 
     $spaApp = New-AzureADApplication -DisplayName $spaAppName `
         -AvailableToOtherTenants $true `
         -Oauth2AllowImplicitFlow $true `
