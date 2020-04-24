@@ -95,6 +95,7 @@ else
     $permissions.Add($gamesReadWritePermission)
 
     $apiApp = New-AzureADApplication -DisplayName $apiAppName `
+        -AvailableToOtherTenants $true `
         -IdentifierUris "api://mychess-func.$EnvironmentName" `
         -PublicClient $false `
         -Oauth2Permissions $permissions
@@ -137,6 +138,7 @@ else
     $spaAccesses.Add($spaApi)
 
     $spaApp = New-AzureADApplication -DisplayName $spaAppName `
+        -AvailableToOtherTenants $true `
         -Oauth2AllowImplicitFlow $true `
         -Homepage $SPAUri `
         -ReplyUrls $SPAUri `
