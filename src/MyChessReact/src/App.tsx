@@ -4,6 +4,7 @@ import { Auth } from "./components/Auth";
 import { Home } from "./pages/Home";
 import { Play } from "./pages/Play";
 import "./App.css";
+import logo from "./pages/logo.svg";
 import TelemetryProvider from "./components/TelemetryProvider";
 import config from "./configuration.json";
 
@@ -13,7 +14,11 @@ function App() {
       <TelemetryProvider>
         <div>
           <div className="App">
-            <Link to="/" className="App-link">My Chess</Link>
+            <div>
+              <Link to="/" className="App-link">
+                <img src={logo} alt="My Chess" className="App-link-image" /> My Chess
+              </Link>
+            </div>
             <Auth clientId={config.clientId} applicationIdURI={config.applicationIdURI} />
 
             <Switch>

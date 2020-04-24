@@ -4,6 +4,7 @@ import { useTypedSelector } from "../reducers";
 import { loginEvent, RootState } from "../actions";
 import { UserAgentApplication, Configuration } from "msal";
 import { Link } from "react-router-dom";
+import "./Auth.css";
 
 type AuthProps = {
     clientId: string;
@@ -76,17 +77,24 @@ export function Auth(props: AuthProps) {
         return userAgentApplication.loginRedirect(accessTokenRequest);
     }
 
+    const onSignOut = () => {
+        userAgentApplication.logout();
+    }
+
     if (loggedIn) {
         return (
             <div>
-                <h4><Link to="/settings" className="App-link">Hi {account?.name}!</Link></h4>
+                <h4>
+                    <Link to="/settings" className="Auth-link">{account?.name}</Link>
+                    <button onClick={onSignOut} className="Auth-button">Sign out</button>
+                </h4>
             </div>
         );
     }
 
     return (
         <div>
-            <button onClick={onSignIn}>Sign In</button>
+            <button onClick={onSignIn} className="Auth-button">Sign In</button>
         </div>
     );
 }
