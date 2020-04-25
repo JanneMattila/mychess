@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
-import { loginEvent, RootState } from "../actions";
+import { loginEvent, RootState, ProcessState } from "../actions";
 import { UserAgentApplication, Configuration } from "msal";
 import { Link } from "react-router-dom";
 import "./Auth.css";
@@ -14,10 +14,10 @@ type AuthProps = {
 let userAgentApplication: UserAgentApplication;
 
 export function Auth(props: AuthProps) {
-    const selectorLoggedIn = (state: RootState) => state.loggedIn;
+    const selectorLoginState = (state: RootState) => state.loginState;
     const selectorAccount = (state: RootState) => state.account;
 
-    const loggedIn = useTypedSelector(selectorLoggedIn);
+    const loginState = useTypedSelector(selectorLoginState);
     const account = useTypedSelector(selectorAccount);
 
     const dispatch = useDispatch();
@@ -51,12 +51,12 @@ export function Auth(props: AuthProps) {
                     console.log("Auth error");
                     console.log(error);
                     const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
-                    dispatch(loginEvent(false, errorMessage));
+                    dispatch(loginEvent(ProcessState.Error, errorMessage));
                 }
                 else if (response) {
                     const loggedInAccount = userAgentApplication.getAccount();
                     if (loggedInAccount) {
-                        dispatch(loginEvent(true, "" /* Clear error message */, loggedInAccount, response.accessToken));
+                        dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, response.accessToken));
                     }
                 }
             });
@@ -65,7 +65,7 @@ export function Auth(props: AuthProps) {
                 // Acquire token silent success
                 const loggedInAccount = userAgentApplication.getAccount();
                 if (loggedInAccount) {
-                    dispatch(loginEvent(true, "" /* Clear error message */, loggedInAccount, accessTokenResponse.accessToken));
+                    dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessTokenResponse.accessToken));
                 }
             }).catch(function (error) {
                 // Acquire token silent failure, wait for user sign in
@@ -81,7 +81,7 @@ export function Auth(props: AuthProps) {
         userAgentApplication.logout();
     }
 
-    if (loggedIn) {
+    if (loginState === ProcessState.Success) {
         return (
             <div>
                 <h4>
@@ -91,7 +91,6 @@ export function Auth(props: AuthProps) {
             </div>
         );
     }
-
     return (
         <div>
             <button onClick={onSignIn} className="Auth-button">Sign In</button>

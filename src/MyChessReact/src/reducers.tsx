@@ -1,10 +1,10 @@
 import { useSelector, TypedUseSelectorHook } from "react-redux";
-import { EventTypes, RootState, RootAction } from "./actions";
+import { EventTypes, RootState, RootAction, ProcessState } from "./actions";
 
 export const getInitialState = () => {
     return {
-        loggedIn: false,
-        gamesLoaded: false
+        loginState: ProcessState.NotStarted,
+        gamesState: ProcessState.NotStarted
     }
 }
 
@@ -14,7 +14,7 @@ export default function appReducer(state: RootState = getInitialState(), action:
     switch (action.type) {
         case EventTypes.AUTH_LOGIN: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
-                loggedIn: action.success,
+                loginState: action.loginState,
                 error: action.error,
                 account: action.account,
                 accessToken: action.accessToken
@@ -24,7 +24,7 @@ export default function appReducer(state: RootState = getInitialState(), action:
         // eslint-disable-next-line
         case EventTypes.AUTH_LOGIN_EXPIRED: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
-                loggedIn: false,
+                loginState: ProcessState.NotStarted,
                 account: undefined,
                 accessToken: undefined
             })
@@ -32,7 +32,7 @@ export default function appReducer(state: RootState = getInitialState(), action:
 
         case EventTypes.GAMES_LOADING: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
-                gamesLoaded: action.gamesLoaded,
+                gamesState: action.gamesState,
                 error: action.error,
                 games: action.games
             })

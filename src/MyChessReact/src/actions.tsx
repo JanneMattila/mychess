@@ -1,6 +1,13 @@
 import { Account } from "msal";
 import { GameModel } from "./models/GameModel";
 
+export enum ProcessState {
+    NotStarted,
+    Processing,
+    Success,
+    Error
+};
+
 /*
  * Action event types
  */
@@ -14,10 +21,10 @@ export enum EventTypes {
     GAMES_LOADING = "Games/Load"
 };
 
-type LoginAction = { type: EventTypes.AUTH_LOGIN, success: boolean, error?: string, account?: Account, accessToken?: string }
+type LoginAction = { type: EventTypes.AUTH_LOGIN, loginState: ProcessState, error?: string, account?: Account, accessToken?: string }
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
-type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesLoaded: boolean, error?: string, games?: GameModel[] }
+type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: GameModel[] }
 
 // Root action
 export type RootAction =
@@ -27,22 +34,22 @@ export type RootAction =
     | GamesLoadingAction
 
 export interface RootState {
-    readonly loggedIn?: boolean
+    readonly loginState?: ProcessState
     readonly error?: string
     readonly account?: Account
     readonly accessToken?: string
 
-    readonly gamesLoaded?: boolean
+    readonly gamesState?: ProcessState
     readonly games?: GameModel[]
 }
 
 /*
  * Action creators
  */
-export function loginEvent(success: boolean, error?: string, account?: Account, accessToken?: string): LoginAction {
-    return { type: EventTypes.AUTH_LOGIN, success, error, account, accessToken };
+export function loginEvent(loginState: ProcessState, error?: string, account?: Account, accessToken?: string): LoginAction {
+    return { type: EventTypes.AUTH_LOGIN, loginState, error, account, accessToken };
 }
 
-export function gamesLoadingEvent(gamesLoaded: boolean, error?: string, games?: GameModel[]): GamesLoadingAction {
-    return { type: EventTypes.GAMES_LOADING, gamesLoaded, error, games };
+export function gamesLoadingEvent(gamesState: ProcessState, error?: string, games?: GameModel[]): GamesLoadingAction {
+    return { type: EventTypes.GAMES_LOADING, gamesState, error, games };
 }

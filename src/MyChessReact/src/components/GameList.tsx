@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { GameModel } from "../models/GameModel";
 import { useTypedSelector } from "../reducers";
-import { gamesLoadingEvent, RootState } from "../actions";
+import { gamesLoadingEvent, RootState, ProcessState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { Link } from "react-router-dom";
 import "./GameList.css";
@@ -12,14 +12,14 @@ type GameListProps = {
 };
 
 export function GameList(props: GameListProps) {
-    const selectorLoggedIn = (state: RootState) => state.loggedIn;
+    const selectorLoginState = (state: RootState) => state.loginState;
     const selectorAccessToken = (state: RootState) => state.accessToken;
-    const selectorGamesLoaded = (state: RootState) => state.gamesLoaded;
+    const selectorGamesState = (state: RootState) => state.gamesState;
     const selectorGames = (state: RootState) => state.games;
 
-    const loggedIn = useTypedSelector(selectorLoggedIn);
+    const loginState = useTypedSelector(selectorLoginState);
     const accessToken = useTypedSelector(selectorAccessToken);
-    const gamesLoaded = useTypedSelector(selectorGamesLoaded);
+    const gamesState = useTypedSelector(selectorGamesState);
     const games = useTypedSelector(selectorGames);
 
     const dispatch = useDispatch();
@@ -39,19 +39,19 @@ export function GameList(props: GameListProps) {
                 const response = await fetch(props.endpoint + "/api/games", request);
                 const data = await response.json();
 
-                dispatch(gamesLoadingEvent(true, "" /* Clear error message */, data));
+                dispatch(gamesLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
             } catch (error) {
                 ai.trackException(error);
 
                 const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
-                dispatch(gamesLoadingEvent(false, errorMessage));
+                dispatch(gamesLoadingEvent(ProcessState.Error, errorMessage));
             }
         }
 
-        if (loggedIn && !gamesLoaded) {
+        if (loginState && !gamesState) {
             populateGames();
         }
-    }, [loggedIn, gamesLoaded, accessToken, ai, props, dispatch]);
+    }, [loginState, gamesState, accessToken, ai, props, dispatch]);
 
     const renderGames = (games?: GameModel[]) => {
         return (
@@ -76,10 +76,24 @@ export function GameList(props: GameListProps) {
         );
     }
 
-    if (loggedIn) {
-        let contents = gamesLoaded
-            ? renderGames(games)
-            : <h6><em>Loading...</em></h6>;
+    const refresh = () => {
+        dispatch(gamesLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
+    }
+
+    if (loginState === ProcessState.Success) {
+
+        let contents: JSX.Element;
+        switch (gamesState) {
+            case ProcessState.Success:
+                contents = renderGames(games);
+                break;
+            case ProcessState.Error:
+                contents = <h6>Oh no! Couldn't retrieve games. Click to <button onClick={refresh}>refresh</button></h6>;
+                break;
+            default:
+                contents = <h6><em>Loading...</em></h6>;
+                break;
+        }
 
         return (
             <div>
