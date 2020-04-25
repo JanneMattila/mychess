@@ -41,8 +41,8 @@ else
 
 Connect-AzureAD -AadAccessToken $accessToken -AccountId $accountId -TenantId $tenant | Out-Null
 
-$spaAppName = "$AppName $EnvironmentName"
-$apiAppName = "$AppName API $EnvironmentName"
+$spaAppName = "$AppName $EnvironmentName".Trim()
+$apiAppName = "$AppName API $EnvironmentName".Trim()
 
 $spaApp = Get-AzureADApplication -SearchString $spaAppName
 $apiApp = Get-AzureADApplication -SearchString $apiAppName
