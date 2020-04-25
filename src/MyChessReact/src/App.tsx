@@ -18,9 +18,8 @@ function App() {
               <Link to="/" className="App-link">
                 <img src={logo} alt="My Chess" className="App-link-image" /> My Chess
               </Link>
+              <Auth clientId={config.clientId} applicationIdURI={config.applicationIdURI} />
             </div>
-            <Auth clientId={config.clientId} applicationIdURI={config.applicationIdURI} />
-
             <Switch>
               <Route exact path='/' component={Home} />
               <Route exact path='/play/:id' component={Play} />
