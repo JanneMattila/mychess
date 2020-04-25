@@ -43,7 +43,7 @@ stages:
             inputs:
               azureSubscription: ${{ parameters.azureSubscription }}
               ScriptPath: '$(System.DefaultWorkingDirectory)/deploy/deploy.ps1'
-              ScriptArguments: '-ResourceGroupName ${{ parameters.resourceGroupName }} -CDN ${{ parameters.cdn }} -CustomDomain ${{ parameters.customDomain }} -AppRootFolder "$(System.DefaultWorkingDirectory)/web/"'
+              ScriptArguments: '-ResourceGroupName ${{ parameters.resourceGroupName }} -EnvironmentName ${{ parameters.environtName }} -CDN ${{ parameters.cdn }} -CustomDomain ${{ parameters.customDomain }} -AppRootFolder "$(System.DefaultWorkingDirectory)/web/"'
               azurePowerShellVersion: LatestVersion
 
           - task: AzureRmWebAppDeployment@4

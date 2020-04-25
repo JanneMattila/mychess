@@ -2,6 +2,24 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "clientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure AD ClientId of API application."
+      }
+    },
+    "tenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure AD Tenant Id."
+      }
+    },
+    "applicationIdURI": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure AD API Applications audience."
+      }
+    },
     "storageType": {
       "type": "string",
       "defaultValue": "Standard_LRS",
@@ -14,16 +32,16 @@
       ]
     },
     "cdn": {
-       "type": "string",
-       "metadata": {
-            "description": "CDN name (must be globally unique and map to custom domain name)"
-        }
+      "type": "string",
+      "metadata": {
+        "description": "CDN name (must be globally unique and map to custom domain name)"
+      }
     },
     "customDomain": {
-       "type": "string",
-       "metadata": {
-            "description": "Custom domain assigned to the CDN"
-        }
+      "type": "string",
+      "metadata": {
+        "description": "Custom domain assigned to the CDN"
+      }
     },
     "location": {
       "type": "string",
@@ -298,7 +316,11 @@
         "FUNCTIONS_WORKER_RUNTIME": "dotnet",
         "FUNCTIONS_EXTENSION_VERSION": "~3",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
-        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]"
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+
+        "AzureAD:ClientId": "[parameters('clientId')]",
+        "AzureAD:TenantId": "[parameters('tenantId')]",
+        "AzureAD:Audience": "[parameters('applicationIdURI')]"
       }
     },
     {
