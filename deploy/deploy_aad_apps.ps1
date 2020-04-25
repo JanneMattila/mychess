@@ -41,8 +41,17 @@ else
 
 Connect-AzureAD -AadAccessToken $accessToken -AccountId $accountId -TenantId $tenant | Out-Null
 
-$spaAppName = "$AppName $EnvironmentName".Trim()
-$apiAppName = "$AppName API $EnvironmentName".Trim()
+if ("Prod" -eq $EnvironmentName)
+{
+    # Remove production environment name from app names
+    $spaAppName = "$AppName"
+    $apiAppName = "$AppName API"
+}
+else
+{
+    $spaAppName = "$AppName $EnvironmentName"
+    $apiAppName = "$AppName API $EnvironmentName"
+}
 
 $spaApp = Get-AzureADApplication -SearchString $spaAppName
 $apiApp = Get-AzureADApplication -SearchString $apiAppName

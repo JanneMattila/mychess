@@ -109,8 +109,7 @@ stages:
     parameters:
       depends: "Dev"
       azureSubscription: AzureProdSubscription
-      # Blank since production names don't have environment name
-      environtName: ""
+      environtName: "Prod"
       resourceGroupName: "rg-mychess-prod"
       cdn: "$(CDN-Prod)"
       customDomain: "$(CustomDomain-Prod)"
