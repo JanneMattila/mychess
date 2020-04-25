@@ -4,14 +4,17 @@ Param (
 
     [Parameter(HelpMessage="Deployment target resource group location")] 
     [string] $Location = "North Europe",
-        
+
+    [Parameter(HelpMessage="Deployment environment name")] 
+    [string] $EnvironmentName = "local",
+
     [Parameter(HelpMessage="CDN name (must be globally unique and map to custom domain name)")] 
     [string] $CDN = "mychess-local",
 
     [Parameter(Mandatory=$true, HelpMessage="Custom domain name for the CDN")] 
     [string] $CustomDomain,
 
-    [Parameter(HelpMessage="App root folder path to publish e.g. ..\src\MyChessWeb\wwwroot\")] 
+    [Parameter(HelpMessage="App root folder path to publish e.g. ..\src\MyChessReact\build\")] 
     [string] $AppRootFolder,
 
     [string] $Template = "$PSScriptRoot\azuredeploy.json",
@@ -43,10 +46,15 @@ if ($null -eq (Get-AzResourceGroup -Name $ResourceGroupName -Location $Location 
     New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Verbose
 }
 
+$azureADdeployment = . $PSScriptRoot\deploy_aad_apps.ps1 -EnvironmentName $EnvironmentName
+
 # Additional parameters that we pass to the template deployment
 $additionalParameters = New-Object -TypeName hashtable
 $additionalParameters['cdn'] = $CDN
 $additionalParameters['customDomain'] = $CustomDomain
+$additionalParameters['clientId'] = $azureADdeployment.ApiApp
+$additionalParameters['tenantId'] = $azureADdeployment.TenantId
+$additionalParameters['applicationIdURI'] = $azureADdeployment.ApplicationIdURI
 
 $result = New-AzResourceGroupDeployment `
     -DeploymentName $deploymentName `
@@ -105,6 +113,11 @@ Write-Host "##vso[task.setvariable variable=Custom.WebStorageName;]$webStorageNa
 Write-Host "##vso[task.setvariable variable=Custom.WebStorageUri;]$webStorageUri"
 Write-Host "##vso[task.setvariable variable=Custom.WebAppName;]$webAppName"
 Write-Host "##vso[task.setvariable variable=Custom.WebAppUri;]https://$CustomDomain"
+
+$azureADdeployment = . $PSScriptRoot\deploy_aad_apps.ps1 `
+    -EnvironmentName $EnvironmentName `
+    -SPAUri $webStorageUri `
+    -UpdateReplyUrl # Update reply urls
 
 if (![string]::IsNullOrEmpty($AppRootFolder))
 {
