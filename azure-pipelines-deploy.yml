@@ -35,6 +35,7 @@ stages:
               azureSubscription: ${{ parameters.azureSubscription }}
               appType: functionApp
               WebAppName: '$(Custom.WebAppName)'
+              packageForLinux: '$(Pipeline.Workspace)/app/*.zip'
               enableCustomDeployment: true
               DeploymentType: runFromZip
 
