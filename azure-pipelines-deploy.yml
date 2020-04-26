@@ -26,7 +26,7 @@ stages:
             inputs:
               azureSubscription: ${{ parameters.azureSubscription }}
               ScriptPath: '$(Pipeline.Workspace)/deploy/deploy.ps1'
-              ScriptArguments: '-ResourceGroupName ${{ parameters.resourceGroupName }} -EnvironmentName ${{ parameters.environtName }} -CDN ${{ parameters.cdn }} -CustomDomain ${{ parameters.customDomain }} -AppRootFolder "$(System.DefaultWorkingDirectory)/web/"'
+              ScriptArguments: '-ResourceGroupName ${{ parameters.resourceGroupName }} -EnvironmentName ${{ parameters.environtName }} -CDN ${{ parameters.cdn }} -CustomDomain ${{ parameters.customDomain }} -AppRootFolder "$(Pipeline.Workspace)/web/"'
               azurePowerShellVersion: LatestVersion
 
           - task: AzureRmWebAppDeployment@4
