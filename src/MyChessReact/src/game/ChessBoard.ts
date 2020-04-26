@@ -796,9 +796,6 @@ export class ChessBoard {
             }
         }
 
-        console.log("Moves");
-        console.log(moves);
-
         throw new Error("Couldn't find available moves for given selection!");
     }
 
