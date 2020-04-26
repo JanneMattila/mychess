@@ -20,29 +20,12 @@ stages:
       runOnce:
         deploy:
           steps:
-          - task: DownloadBuildArtifacts@0
-            displayName: 'Download Build Artifacts: app'
-            inputs:
-              artifactName: app
-              downloadPath: '$(System.DefaultWorkingDirectory)'
-
-          - task: DownloadBuildArtifacts@0
-            displayName: 'Download Build Artifacts: deploy'
-            inputs:
-              artifactName: deploy
-              downloadPath: '$(System.DefaultWorkingDirectory)'
-
-          - task: DownloadBuildArtifacts@0
-            displayName: 'Download Build Artifacts: web'
-            inputs:
-              artifactName: web
-              downloadPath: '$(System.DefaultWorkingDirectory)'
-
+          - download:
           - task: AzurePowerShell@4
             displayName: 'Azure PowerShell script: FilePath'
             inputs:
               azureSubscription: ${{ parameters.azureSubscription }}
-              ScriptPath: '$(System.DefaultWorkingDirectory)/deploy/deploy.ps1'
+              ScriptPath: '$(Pipeline.Workspace)/deploy/deploy.ps1'
               ScriptArguments: '-ResourceGroupName ${{ parameters.resourceGroupName }} -EnvironmentName ${{ parameters.environtName }} -CDN ${{ parameters.cdn }} -CustomDomain ${{ parameters.customDomain }} -AppRootFolder "$(System.DefaultWorkingDirectory)/web/"'
               azurePowerShellVersion: LatestVersion
 
@@ -54,12 +37,6 @@ stages:
               WebAppName: '$(Custom.WebAppName)'
               enableCustomDeployment: true
               DeploymentType: runFromZip
-
-#          - task: DownloadBuildArtifacts@0
-#            displayName: 'Download Build Artifacts: releasetests'
-#            inputs:
-#              artifactName: releasetests
-#              downloadPath: '$(System.DefaultWorkingDirectory)'
 
 #          - task: VSTest@2
 #            displayName: 'Execute Release Tests'
