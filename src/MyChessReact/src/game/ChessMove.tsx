@@ -28,12 +28,11 @@ export class ChessMove {
 
     public compareTo(otherMove: ChessMove): number {
         let compare: number = this.from.compareTo(this.from);
-        if (compare == 0) {
+        if (compare === 0) {
             compare = this.to.compareTo(otherMove.to);
-            if (compare == 0) {
-                compare = this.player - otherMove.player;
-                if (compare == 0) {
-                    return this.piece - otherMove.piece;
+            if (compare === 0) {
+                if (this.player === otherMove.player) {
+                    return 0;
                 }
             }
         }

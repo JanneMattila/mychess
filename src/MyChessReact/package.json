@@ -5,16 +5,6 @@
   "dependencies": {
     "@microsoft/applicationinsights-react-js": "^2.5.4",
     "@microsoft/applicationinsights-web": "^2.5.4",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/jest": "^24.0.0",
-    "@types/node": "^12.0.0",
-    "@types/react": "^16.9.0",
-    "@types/react-dom": "^16.9.0",
-    "@types/react-redux": "^7.1.7",
-    "@types/react-router-dom": "^5.1.4",
-    "jest-fetch-mock": "^3.0.3",
     "msal": "^1.2.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -48,7 +38,19 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "@types/jest": "^24.0.0",
+    "@types/node": "^12.0.0",
+    "@types/react": "^16.9.0",
+    "@types/react-dom": "^16.9.0",
+    "@types/react-redux": "^7.1.7",
+    "@types/react-router-dom": "^5.1.4",
+    "jest-fetch-mock": "^3.0.3",
+    "@types/chai": "^4.2.11",
     "@types/redux-mock-store": "^1.0.2",
+    "chai": "^4.2.0",
     "redux-mock-store": "^1.5.4"
   }
 }

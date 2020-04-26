@@ -1,6 +1,6 @@
 export enum ChessBoardState {
-    Normal,
-    StaleMate,
-    Check,
-    CheckMate
+    Normal = "Normal",
+    StaleMate = "Stalemate",
+    Check = "Check",
+    CheckMate = "Checkmate"
 }

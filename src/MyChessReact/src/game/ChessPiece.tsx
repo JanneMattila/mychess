@@ -1,9 +1,9 @@
 export enum ChessPiece {
-    None,
-    Pawn,
-    Knight,
-    Bishop,
-    Rook,
-    Queen,
-    King
+    None = "None",
+    Pawn = "Pawn",
+    Knight = "Knight",
+    Bishop = "Bishop",
+    Rook = "Rook",
+    Queen = "Queen",
+    King = "King"
 }

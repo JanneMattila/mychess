@@ -1,5 +1,5 @@
 export enum ChessPlayer {
-    None,
-    White,
-    Black
+    None = "None",
+    White = "White",
+    Black = "Black"
 }
