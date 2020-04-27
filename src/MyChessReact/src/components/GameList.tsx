@@ -64,7 +64,7 @@ export function GameList(props: GameListProps) {
                                 {game?.name}
                             </div>
                             <div className="commentTemplate">
-                                {game?.moves[game?.moves.length - 1].comment}
+                                {(game?.moves.length > 0 ? game?.moves[game?.moves.length - 1].comment : "")}
                             </div>
                             <div className="opponentTemplate">
                                 {game?.opponent}
