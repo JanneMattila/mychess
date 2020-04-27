@@ -8,16 +8,16 @@ namespace MyChess
     public class ChessBoard
     {
         public static readonly int BOARD_SIZE = 8;
-        private ChessBoardPiece[,] _pieces = null;
+        private ChessBoardPiece[,] _pieces = new ChessBoardPiece[BOARD_SIZE, BOARD_SIZE];
 
-        private ChessMove _previousMove = null;
+        private ChessMove? _previousMove = null;
 
         public PiecePlayer CurrentPlayer { get; internal set; }
 
-        private Stack<List<ChessMove>> _moves = new Stack<List<ChessMove>>();
-        private Stack<List<ChessBoardChange>> _boardChanges = new Stack<List<ChessBoardChange>>();
+        private readonly Stack<List<ChessMove>> _moves = new Stack<List<ChessMove>>();
+        private readonly Stack<List<ChessBoardChange>> _boardChanges = new Stack<List<ChessBoardChange>>();
 
-        public ChessMove LastMoveCapture
+        public ChessMove? LastMoveCapture
         {
             get
             {
@@ -30,7 +30,7 @@ namespace MyChess
             }
         }
 
-        public ChessMove LastMovePromotion
+        public ChessMove? LastMovePromotion
         {
             get
             {
@@ -43,7 +43,7 @@ namespace MyChess
             }
         }
 
-        public ChessMove LastMove
+        public ChessMove? LastMove
         {
             get
             {
