@@ -28,8 +28,14 @@ Here is example game format:
   "state": "Normal",
   "stateText": "Normal",
   "players": {
-    "white": "123-abc-123",
-    "black": "123-cde-123",
+    "white": {
+      "id": "123-abc-123",
+      "name": "John Doe"
+    },
+    "black": {
+      "id": "123-def-123",
+      "name": "Jane Doe"
+    }
   },
   "moves": [
     {

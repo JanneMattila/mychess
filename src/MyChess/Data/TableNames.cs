@@ -1,6 +1,6 @@
 ﻿namespace MyChess.Data
 {
-    public class TableNames
+    public static class TableNames
     {
         public const string Players = "players";
         public const string Games = "games";
