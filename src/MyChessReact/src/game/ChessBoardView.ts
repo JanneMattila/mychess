@@ -152,8 +152,11 @@ export class ChessBoardView {
                 cell.appendChild(image);
 
                 cell.id = "" + row + "-" + column;
-                //cell.addEventListener('tap', this.onCellClick);
-                cell.addEventListener('click', this.onCellClick);
+                cell.addEventListener('click', (evt) => {
+                    console.log("onCellClick event");
+                    let element = evt.currentTarget as HTMLElement;
+                    this.pieceSelected(element.id);
+                });
 
                 let pieceColor: string = "";
                 let pieceRank: string = "";
@@ -379,13 +382,6 @@ export class ChessBoardView {
                 }
             }
         }
-    }
-
-    // DOM Events
-    private onCellClick(evt: MouseEvent) {
-        console.log("onCellClick event");
-        let element = evt.currentTarget as HTMLElement;
-        this.pieceSelected(element.id);
     }
 
     private changePromotionFromString(name: string): boolean {
