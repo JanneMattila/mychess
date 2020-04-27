@@ -15,8 +15,8 @@ export class ChessBoard {
 
     private pieces: ChessBoardPiece[][] = [];
     private previousMove?: ChessMove | null = null;
-    private moves = new Array();
-    private boardChanges = new Array();
+    private moves = new Array<ChessMove[]>();
+    private boardChanges = new Array<ChessBoardChange[]>();
 
     constructor() {
         this.initialize();
@@ -26,7 +26,7 @@ export class ChessBoard {
         if (this.moves.length > 0) {
             let lastIndex: number = this.moves.length - 1
             for (let i: number = 0; i < this.moves[lastIndex].length; i++) {
-                if (this.moves[lastIndex][i].specialMove == ChessSpecialMove.Capture) {
+                if (this.moves[lastIndex][i].specialMove === ChessSpecialMove.Capture) {
                     return this.moves[lastIndex][i];
                 }
             }
@@ -39,7 +39,7 @@ export class ChessBoard {
         if (this.moves.length > 0) {
             let lastIndex: number = this.moves.length - 1
             for (let i: number = 0; i < this.moves[lastIndex].length; i++) {
-                if (this.moves[lastIndex][i].specialMove == ChessSpecialMove.PromotionIn) {
+                if (this.moves[lastIndex][i].specialMove === ChessSpecialMove.PromotionIn) {
                     return this.moves[lastIndex][i];
                 }
             }
@@ -56,20 +56,20 @@ export class ChessBoard {
         return null;
     }
 
-    public lastBoardChanges(): ChessMove[] {
+    public lastBoardChanges(): ChessBoardChange[] {
         if (this.boardChanges.length > 0) {
             return this.boardChanges[this.boardChanges.length - 1];
         }
 
-        return new Array<ChessMove>();
+        return new Array<ChessBoardChange>();
     }
 
-    public previousBoardChanges(): ChessMove[] {
+    public previousBoardChanges(): ChessBoardChange[] {
         if (this.boardChanges.length > 1) {
             return this.boardChanges[this.boardChanges.length - 2];
         }
 
-        return new Array<ChessMove>();
+        return new Array<ChessBoardChange>();
     }
 
     public totalMoves(): number {
@@ -109,8 +109,8 @@ export class ChessBoard {
     private cleanUp() {
         this.currentPlayer = ChessPlayer.White;
         this.previousMove = null;
-        this.moves = new Array();
-        this.boardChanges = new Array();
+        this.moves = new Array<ChessMove[]>();
+        this.boardChanges = new Array<ChessBoardChange[]>();
 
         for (let i = 0; i < ChessBoard.BOARD_SIZE; i++) {
             this.pieces[i] = new Array<ChessBoardPiece>(ChessBoard.BOARD_SIZE);
@@ -126,7 +126,7 @@ export class ChessBoard {
             return false;
         }
 
-        return this.pieces[column][row].piece == ChessPiece.None;
+        return this.pieces[column][row].piece === ChessPiece.None;
     }
 
     private isOccupiedByOpponent(player: ChessPlayer, column: number, row: number): boolean {
@@ -135,7 +135,7 @@ export class ChessBoard {
             return false;
         }
 
-        return this.pieces[column][row].player != player && this.pieces[column][row].player != ChessPlayer.None;
+        return this.pieces[column][row].player !== player && this.pieces[column][row].player !== ChessPlayer.None;
     }
 
     public getPiece(column: number, row: number): ChessBoardPiece {
@@ -145,30 +145,30 @@ export class ChessBoard {
     private getBoardThreats(ownKingUnderThreat: any, playerToEvaluate: ChessPlayer = this.currentPlayer): ChessMove[] {
         let kingLocation: ChessBoardLocation = new ChessBoardLocation(-1, -1);
         let opponentMoves: ChessMove[] = [];
-        let player: ChessPlayer = playerToEvaluate == ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White;
+        let player: ChessPlayer = playerToEvaluate === ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White;
         for (let i: number = 0; i < ChessBoard.BOARD_SIZE; i++) {
             for (let j: number = 0; j < ChessBoard.BOARD_SIZE; j++) {
-                if (this.pieces[i][j].player == playerToEvaluate) {
+                if (this.pieces[i][j].player === playerToEvaluate) {
                     let moves = this.getAvailableMovesInternal(playerToEvaluate, i, j, false);
                     moves.forEach(function (move) {
                         opponentMoves.push(move);
                     });
                 }
-                else if (this.pieces[i][j].player == player && this.pieces[i][j].piece == ChessPiece.King) {
+                else if (this.pieces[i][j].player === player && this.pieces[i][j].piece === ChessPiece.King) {
                     kingLocation = new ChessBoardLocation(i, j);
                 }
             }
         }
 
         for (let i: number = 0; i < opponentMoves.length; i++) {
-            if (opponentMoves[i].to.horizontalLocation == kingLocation.horizontalLocation &&
-                opponentMoves[i].to.verticalLocation == kingLocation.verticalLocation) {
+            if (opponentMoves[i].to.horizontalLocation === kingLocation.horizontalLocation &&
+                opponentMoves[i].to.verticalLocation === kingLocation.verticalLocation) {
                 ownKingUnderThreat.value = true;
                 break;
             }
         }
 
-        if (ownKingUnderThreat.value == true) {
+        if (ownKingUnderThreat.value === true) {
             // Currently board has been verified as "check".
             // Now let's verify that is it also "checkmate".
         }
@@ -181,7 +181,7 @@ export class ChessBoard {
         let availableMoves: ChessMove[] = [];
         for (let x = 0; x < ChessBoard.BOARD_SIZE; x++) {
             for (let y = 0; y < ChessBoard.BOARD_SIZE; y++) {
-                if (this.pieces[x][y].player == this.currentPlayer) {
+                if (this.pieces[x][y].player === this.currentPlayer) {
                     let moves: ChessMove[] = this.getAvailableMovesInternal(this.currentPlayer, x, y, true);
 
                     moves.forEach(function (move) {
@@ -202,12 +202,12 @@ export class ChessBoard {
         let availableMoves: ChessMove[] = [];
         let validMoves: ChessMove[] = [];
 
-        if (player == ChessPlayer.None) {
+        if (player === ChessPlayer.None) {
             // Game over already
             return availableMoves;
         }
 
-        if (this.pieces[column][row].player == player) {
+        if (this.pieces[column][row].player === player) {
             switch (this.pieces[column][row].piece) {
                 case ChessPiece.Pawn:
                     this.getPawnMoves(player, availableMoves, column, row);
@@ -249,26 +249,26 @@ export class ChessBoard {
                     // Out of bounds
                     invalidMove = true;
                 }
-                else if (this.pieces[move.to.horizontalLocation][move.to.verticalLocation].player == player) {
+                else if (this.pieces[move.to.horizontalLocation][move.to.verticalLocation].player === player) {
                     // Already occupied by team mate
                     invalidMove = true;
                 }
 
-                if (invalidMove == false && validateCheck == true) {
+                if (invalidMove === false && validateCheck === true) {
                     // Let's see if this move would cause check
                     let ownKingUnderThreat: any = { value: false };
                     ownKingUnderThreat.value = false;
 
                     this.makeMove(move, false);
                     this.getBoardThreats(ownKingUnderThreat);
-                    if (ownKingUnderThreat.value == true) {
+                    if (ownKingUnderThreat.value === true) {
                         invalidMove = true;
                     }
 
                     this.undo();
                 }
 
-                if (invalidMove == false) {
+                if (invalidMove === false) {
                     validMoves.push(move);
                 }
             }
@@ -296,12 +296,12 @@ export class ChessBoard {
         // - The king may not be in check, nor may the king pass through squares
         //   that are under attack by enemy pieces, nor move to a square where it is in check.
         let kingStartColumn: number = 4;
-        let kingStartRow: number = player == ChessPlayer.White ? 7 : 0;
+        let kingStartRow: number = player === ChessPlayer.White ? 7 : 0;
 
-        if (column == kingStartColumn && row == kingStartRow) {
+        if (column === kingStartColumn && row === kingStartRow) {
             // King is at start location. Has it moved earlier?
             for (let i: number = 0; i < this.moves.length; i++) {
-                if (this.moves[i][0].player == player && this.moves[i][0].piece == ChessPiece.King) {
+                if (this.moves[i][0].player === player && this.moves[i][0].piece === ChessPiece.King) {
                     // King has already moved so castling is not anymore available
                     return;
                 }
@@ -317,19 +317,18 @@ export class ChessBoard {
 
     private getKingCastlingMove(player: ChessPlayer, moves: ChessMove[], column: number, row: number, rookColumn: number, validateCheck: boolean) {
         let rookPosition = this.pieces[rookColumn][row];
-        if (rookPosition.player != player || rookPosition.piece != ChessPiece.Rook) {
+        if (rookPosition.player !== player || rookPosition.piece !== ChessPiece.Rook) {
             // Not current players rook
             return;
         }
 
-        let rookRow = player == ChessPlayer.White ? 1 : 8;
+        let rookRow = player === ChessPlayer.White ? 1 : 8;
 
         // Rook is at start location. Has it moved earlier?
-        let rooksEarlierMove: boolean = false;
         for (let i: number = 0; i < this.moves.length; i++) {
-            if (this.moves[i][0].player == player && this.moves[i][0].piece == ChessPiece.King &&
-                this.moves[i][0].verticalLocation == rookRow &&
-                this.moves[i][0].horizontalLocation == rookColumn) {
+            if (this.moves[i][0].player === player && this.moves[i][0].piece === ChessPiece.King &&
+                this.moves[i][0].from.verticalLocation === rookRow &&
+                this.moves[i][0].from.horizontalLocation === rookColumn) {
                 // Rook has already moved so castling is not anymore available
                 return;
             }
@@ -339,13 +338,13 @@ export class ChessBoard {
         ownKingUnderThreat.value = false;
 
         let opponentMoves: ChessMove[] = [];
-        if (validateCheck == true) {
+        if (validateCheck === true) {
             opponentMoves = this.getBoardThreats(
                 ownKingUnderThreat,
-                this.currentPlayer == ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White);
+                this.currentPlayer === ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White);
         }
 
-        if (ownKingUnderThreat.value == false) {
+        if (ownKingUnderThreat.value === false) {
             // Set defaults to left hand side rook castling
             let delta: number = -2;
             let startColumn: number = 2;
@@ -358,12 +357,12 @@ export class ChessBoard {
             }
 
             for (let currentColumn: number = startColumn; currentColumn < endColumn; currentColumn++) {
-                if (this.pieces[currentColumn][row].player != ChessPlayer.None) {
+                if (this.pieces[currentColumn][row].player !== ChessPlayer.None) {
                     return;
                 }
 
                 opponentMoves.forEach(function (opponentMove) {
-                    if (opponentMove.to.horizontalLocation == currentColumn && opponentMove.to.verticalLocation == row) {
+                    if (opponentMove.to.horizontalLocation === currentColumn && opponentMove.to.verticalLocation === row) {
                         return;
                     }
                 });
@@ -376,25 +375,25 @@ export class ChessBoard {
 
     private getPawnMoves(player: ChessPlayer, moves: ChessMove[], column: number, row: number) {
         let specialMove = ChessSpecialMove.None;
-        if (player == ChessPlayer.White) {
-            if (row == 1) {
+        if (player === ChessPlayer.White) {
+            if (row === 1) {
                 specialMove = ChessSpecialMove.Promotion;
             }
 
-            if (this.isOccupiedByOpponent(player, column, row - 1) == false) {
+            if (this.isOccupiedByOpponent(player, column, row - 1) === false) {
                 moves.push(new ChessMove(ChessPiece.Pawn, player, column, row, column, row - 1, specialMove));
             }
 
-            if (row == 6 && this.isEmpty(column, row - 1) == true && this.isEmpty(column, row - 2) == true) {
+            if (row === 6 && this.isEmpty(column, row - 1) === true && this.isEmpty(column, row - 2) === true) {
                 moves.push(new ChessMove(ChessPiece.Pawn, player, column, row, column, row - 2));
             }
 
             // Move only available for pawn if there is opponent piece:
-            if (this.isOccupiedByOpponent(player, column + 1, row - 1) == true) {
+            if (this.isOccupiedByOpponent(player, column + 1, row - 1) === true) {
                 moves.push(new ChessMove(ChessPiece.Pawn, player, column, row, column + 1, row - 1, specialMove));
             }
 
-            if (this.isOccupiedByOpponent(player, column - 1, row - 1) == true) {
+            if (this.isOccupiedByOpponent(player, column - 1, row - 1) === true) {
                 moves.push(new ChessMove(ChessPiece.Pawn, player, column, row, column - 1, row - 1, specialMove));
             }
 
@@ -402,24 +401,24 @@ export class ChessBoard {
             this.getPawnMovesEnPassant(player, moves, column, row, 1, -1);
         }
         else {
-            if (row == 6) {
+            if (row === 6) {
                 specialMove = ChessSpecialMove.Promotion;
             }
 
-            if (this.isOccupiedByOpponent(player, column, row + 1) == false) {
+            if (this.isOccupiedByOpponent(player, column, row + 1) === false) {
                 moves.push(new ChessMove(ChessPiece.Pawn, player, column, row, column, row + 1, specialMove));
             }
 
-            if (row == 1 && this.isEmpty(column, row + 1) == true && this.isEmpty(column, row + 2) == true) {
+            if (row === 1 && this.isEmpty(column, row + 1) === true && this.isEmpty(column, row + 2) === true) {
                 moves.push(new ChessMove(ChessPiece.Pawn, player, column, row, column, row + 2));
             }
 
             // Move only available for pawn if there is opponent piece:
-            if (this.isOccupiedByOpponent(player, column + 1, row + 1) == true) {
+            if (this.isOccupiedByOpponent(player, column + 1, row + 1) === true) {
                 moves.push(new ChessMove(ChessPiece.Pawn, player, column, row, column + 1, row + 1, specialMove));
             }
 
-            if (this.isOccupiedByOpponent(player, column - 1, row + 1) == true) {
+            if (this.isOccupiedByOpponent(player, column - 1, row + 1) === true) {
                 moves.push(new ChessMove(ChessPiece.Pawn, player, column, row, column - 1, row + 1, specialMove));
             }
 
@@ -430,10 +429,11 @@ export class ChessBoard {
 
     private getPawnMovesEnPassant(player: ChessPlayer, moves: ChessMove[], column: number, row: number, columnDelta: number, rowDelta: number) {
         // En passant move:
-        if (this.previousMove != null && this.isOccupiedByOpponent(player, column + columnDelta, row) == true) {
+        if (this.previousMove !== null && this.previousMove !== undefined &&
+            this.isOccupiedByOpponent(player, column + columnDelta, row) === true) {
             let piece = this.getPiece(column + columnDelta, row);
-            if (piece.piece == ChessPiece.Pawn && piece.player != player) {
-                if (this.previousMove.to.horizontalLocation == column + columnDelta && this.previousMove.to.verticalLocation == row && Math.abs(this.previousMove.to.verticalLocation - this.previousMove.from.verticalLocation) == 2) {
+            if (piece.piece === ChessPiece.Pawn && piece.player !== player) {
+                if (this.previousMove.to.horizontalLocation === column + columnDelta && this.previousMove.to.verticalLocation === row && Math.abs(this.previousMove.to.verticalLocation - this.previousMove.from.verticalLocation) === 2) {
                     moves.push(new ChessMove(ChessPiece.Pawn, player, column, row, column + columnDelta, row + rowDelta, ChessSpecialMove.EnPassant));
                 }
             }
@@ -470,10 +470,10 @@ export class ChessBoard {
     private getDiagonalMoves(piece: ChessPiece, player: ChessPlayer, moves: ChessMove[], column: number, row: number) {
         // To north-east
         for (let i: number = 1; i <= ChessBoard.BOARD_SIZE; i++) {
-            if (this.isOccupiedByOpponent(player, column + i, row - i) == true) {
+            if (this.isOccupiedByOpponent(player, column + i, row - i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column + i, row - i));
             }
-            else if (this.isEmpty(column + i, row - i) == true) {
+            else if (this.isEmpty(column + i, row - i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column + i, row - i));
                 continue;
             }
@@ -483,10 +483,10 @@ export class ChessBoard {
 
         // To south-east
         for (let i: number = 1; i <= ChessBoard.BOARD_SIZE; i++) {
-            if (this.isOccupiedByOpponent(player, column + i, row + i) == true) {
+            if (this.isOccupiedByOpponent(player, column + i, row + i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column + i, row + i));
             }
-            else if (this.isEmpty(column + i, row + i) == true) {
+            else if (this.isEmpty(column + i, row + i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column + i, row + i));
                 continue;
             }
@@ -496,10 +496,10 @@ export class ChessBoard {
 
         // To north-west
         for (let i: number = 1; i <= ChessBoard.BOARD_SIZE; i++) {
-            if (this.isOccupiedByOpponent(player, column - i, row - i) == true) {
+            if (this.isOccupiedByOpponent(player, column - i, row - i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column - i, row - i));
             }
-            else if (this.isEmpty(column - i, row - i) == true) {
+            else if (this.isEmpty(column - i, row - i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column - i, row - i));
                 continue;
             }
@@ -509,10 +509,10 @@ export class ChessBoard {
 
         // To south-west
         for (let i: number = 1; i <= ChessBoard.BOARD_SIZE; i++) {
-            if (this.isOccupiedByOpponent(player, column - i, row + i) == true) {
+            if (this.isOccupiedByOpponent(player, column - i, row + i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column - i, row + i));
             }
-            else if (this.isEmpty(column - i, row + i) == true) {
+            else if (this.isEmpty(column - i, row + i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column - i, row + i));
                 continue;
             }
@@ -524,10 +524,10 @@ export class ChessBoard {
     private getHorizontalAndVerticalMoves(piece: ChessPiece, player: ChessPlayer, moves: ChessMove[], column: number, row: number) {
         // To left
         for (let i: number = column - 1; i >= 0; i--) {
-            if (this.isOccupiedByOpponent(player, i, row) == true) {
+            if (this.isOccupiedByOpponent(player, i, row) === true) {
                 moves.push(new ChessMove(piece, player, column, row, i, row));
             }
-            else if (this.isEmpty(i, row) == true) {
+            else if (this.isEmpty(i, row) === true) {
                 moves.push(new ChessMove(piece, player, column, row, i, row));
                 continue;
             }
@@ -537,10 +537,10 @@ export class ChessBoard {
 
         // To right
         for (let i: number = column + 1; i < ChessBoard.BOARD_SIZE; i++) {
-            if (this.isOccupiedByOpponent(player, i, row) == true) {
+            if (this.isOccupiedByOpponent(player, i, row) === true) {
                 moves.push(new ChessMove(piece, player, column, row, i, row));
             }
-            else if (this.isEmpty(i, row) == true) {
+            else if (this.isEmpty(i, row) === true) {
                 moves.push(new ChessMove(piece, player, column, row, i, row));
                 continue;
             }
@@ -550,10 +550,10 @@ export class ChessBoard {
 
         // To up
         for (let i: number = row - 1; i >= 0; i--) {
-            if (this.isOccupiedByOpponent(player, column, i) == true) {
+            if (this.isOccupiedByOpponent(player, column, i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column, i));
             }
-            else if (this.isEmpty(column, i) == true) {
+            else if (this.isEmpty(column, i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column, i));
                 continue;
             }
@@ -563,10 +563,10 @@ export class ChessBoard {
 
         // To down
         for (let i: number = row + 1; i < ChessBoard.BOARD_SIZE; i++) {
-            if (this.isOccupiedByOpponent(player, column, i) == true) {
+            if (this.isOccupiedByOpponent(player, column, i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column, i));
             }
-            else if (this.isEmpty(column, i) == true) {
+            else if (this.isEmpty(column, i) === true) {
                 moves.push(new ChessMove(piece, player, column, row, column, i));
                 continue;
             }
@@ -584,13 +584,13 @@ export class ChessBoard {
 
         for (let index = 0; index < availableMoves.length; index++) {
             const element = availableMoves[index];
-            if (element.compareTo(move) == 0) {
+            if (element.compareTo(move) === 0) {
                 selectedMove = move;
                 break;
             }
         }
 
-        if (selectedMove == null) {
+        if (selectedMove === null) {
             throw new Error("Invalid move!");
         }
 
@@ -666,7 +666,7 @@ export class ChessBoard {
                 break;
         }
 
-        if (this.pieces[selectedMove.to.horizontalLocation][selectedMove.to.verticalLocation].piece != ChessPiece.None) {
+        if (this.pieces[selectedMove.to.horizontalLocation][selectedMove.to.verticalLocation].piece !== ChessPiece.None) {
             // Capture so let's store it
             let capturePiece = this.pieces[selectedMove.to.horizontalLocation][selectedMove.to.verticalLocation];
             executedMoves.push(
@@ -690,7 +690,7 @@ export class ChessBoard {
         boardChanges.push(new ChessBoardChange(selectedMove.from.horizontalLocation, selectedMove.from.verticalLocation, ChessPieceSelection.PreviousMoveFrom));
 
         this.previousMove = selectedMove;
-        this.currentPlayer = this.currentPlayer == ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White;
+        this.currentPlayer = this.currentPlayer === ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White;
 
         this.moves.push(executedMoves);
         this.boardChanges.push(boardChanges);
@@ -700,20 +700,20 @@ export class ChessBoard {
 
     public undo(): ChessMove[] {
         if (this.moves.length > 0) {
-            let undoMoves: ChessMove[] = this.moves.pop();
+            let undoMoves: ChessMove[] = this.moves.pop() as ChessMove[];
 
             for (let i: number = 0; i < undoMoves.length; i++) {
                 let undoMove: ChessMove = undoMoves[i];
-                if (undoMove.from.compareTo(ChessBoardLocation.outsideBoard()) != 0) {
+                if (undoMove.from.compareTo(ChessBoardLocation.outsideBoard()) !== 0) {
                     this.pieces[undoMove.from.horizontalLocation][undoMove.from.verticalLocation] = new ChessBoardPiece(undoMove.player, undoMove.piece);
                 }
 
-                if (undoMove.to.compareTo(ChessBoardLocation.outsideBoard()) != 0) {
+                if (undoMove.to.compareTo(ChessBoardLocation.outsideBoard()) !== 0) {
                     this.pieces[undoMove.to.horizontalLocation][undoMove.to.verticalLocation] = ChessBoardPiece.empty();
                 }
             }
 
-            this.currentPlayer = this.currentPlayer == ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White;
+            this.currentPlayer = this.currentPlayer === ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White;
             if (this.moves.length > 0) {
                 this.previousMove = this.moves[this.moves.length - 1][0];
             }
@@ -766,7 +766,7 @@ export class ChessBoard {
                         break;
                 }
 
-                if (this.pieces[j][i].player == ChessPlayer.Black) {
+                if (this.pieces[j][i].player === ChessPlayer.Black) {
                     pieceString = pieceString.toLowerCase();
                 }
 
@@ -790,8 +790,8 @@ export class ChessBoard {
     private makeMoveInternal(horizontalFrom: number, verticalFrom: number, horizontalTo: number, verticalTo: number): ChessMove[] {
         let moves: ChessMove[] = this.getAvailableMoves(horizontalFrom, verticalFrom);
         for (let i: number = 0; i < moves.length; i++) {
-            if (moves[i].to.horizontalLocation == horizontalTo &&
-                moves[i].to.verticalLocation == verticalTo) {
+            if (moves[i].to.horizontalLocation === horizontalTo &&
+                moves[i].to.verticalLocation === verticalTo) {
                 return this.makeMove(moves[i]);
             }
         }
@@ -807,7 +807,7 @@ export class ChessBoard {
     }
 
     public changePromotion(promotionPiece: ChessPiece) {
-        if (promotionPiece == ChessPiece.King || promotionPiece == ChessPiece.None || promotionPiece == ChessPiece.Pawn) {
+        if (promotionPiece === ChessPiece.King || promotionPiece === ChessPiece.None || promotionPiece === ChessPiece.Pawn) {
             // Not valid promotion.
             return;
         }
@@ -816,7 +816,7 @@ export class ChessBoard {
             let lastIndex: number = this.moves.length - 1
             for (let i: number = 0; i < this.moves[lastIndex].length; i++) {
                 let promotionMove: ChessMove = this.moves[lastIndex][i];
-                if (promotionMove.specialMove == ChessSpecialMove.PromotionIn) {
+                if (promotionMove.specialMove === ChessSpecialMove.PromotionIn) {
                     this.moves[lastIndex][i] = new ChessMove(promotionPiece, promotionMove.player,
                         promotionMove.from.horizontalLocation, promotionMove.from.verticalLocation,
                         promotionMove.to.horizontalLocation, promotionMove.to.verticalLocation,
@@ -836,18 +836,18 @@ export class ChessBoard {
         ownKingUnderThreat.value = false;
         this.getBoardThreats(
             ownKingUnderThreat,
-            this.currentPlayer == ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White);
+            this.currentPlayer === ChessPlayer.White ? ChessPlayer.Black : ChessPlayer.White);
         let movesAvailable: number = this.getAllAvailableMoves().length;
 
-        if (ownKingUnderThreat.value == true) {
-            if (movesAvailable == 0) {
+        if (ownKingUnderThreat.value === true) {
+            if (movesAvailable === 0) {
                 state = ChessBoardState.CheckMate;
             }
             else {
                 state = ChessBoardState.Check;
             }
         }
-        else if (movesAvailable == 0) {
+        else if (movesAvailable === 0) {
             state = ChessBoardState.StaleMate;
         }
         return state;

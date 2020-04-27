@@ -1,16 +1,23 @@
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import "./Play.css";
+import { ChessBoardView } from "../game/ChessBoardView";
+import "../images/BishopBlack.svg";
+import "../images/BishopWhite.svg";
 
-export class Play extends Component {
-    static displayName = Play.name;
+export function Play() {
 
-    render() {
-        return (
-            <div>
-                <header className="Play-header">
-                    <h4>Render board here</h4>
-                </header>
-            </div>
-        );
-    }
+    let board = new ChessBoardView();
+
+    useEffect(() => {
+        board.load("/new", "");
+    });
+
+    return (
+        <div>
+            <header className="Play-header">
+                <h4>Render board here</h4>
+                <table className="table" id="table-game"></table>
+            </header>
+        </div>
+    );
 }

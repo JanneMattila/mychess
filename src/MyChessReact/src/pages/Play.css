@@ -7,3 +7,58 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
+#table-game {
+    margin: 0;
+    border-spacing: 0;
+}
+
+#table-game .lightCell {
+    background-color: #FFFFFF;
+    padding: 0;
+}
+
+#table-game .darkCell {
+    background-color: #A9A9A9;
+    padding: 0;
+}
+
+#table-game .darkCell.highlightSelected {
+    background: #f00;
+}
+
+#table-game .lightCell.highlightSelected {
+    background: #f00;
+}
+
+#table-game .darkCell.highlightCapture {
+    background: #ffd800;
+}
+
+#table-game .lightCell.highlightCapture {
+    background: #ffd800;
+}
+
+#table-game .darkCell.highlightPreviousFrom {
+    background: rgb(195, 140, 140);
+}
+
+#table-game .lightCell.highlightPreviousFrom {
+    background: rgb(195, 140, 140);
+}
+
+#table-game .darkCell.highlightPreviousTo {
+    background: rgb(140, 195, 140);
+}
+
+#table-game .lightCell.highlightPreviousTo {
+    background: rgb(140, 195, 140);
+}
+
+#table-game .darkCell.highlightMoveAvailable {
+    background: rgb(0, 150, 0);
+}
+
+#table-game .lightCell.highlightMoveAvailable {
+    background: rgb(0, 250, 0);
+}
