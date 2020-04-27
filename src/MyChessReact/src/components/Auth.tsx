@@ -83,16 +83,14 @@ export function Auth(props: AuthProps) {
 
     if (loginState === ProcessState.Success) {
         return (
-            <div>
-                <h4>
-                    <Link to="/settings" className="Auth-link">{account?.name}</Link>
-                    <button onClick={onSignOut} className="Auth-button">Sign out</button>
-                </h4>
+            <div className="Auth">
+                <Link to="/settings" className="Auth-link">{account?.name}</Link>
+                <button onClick={onSignOut} className="Auth-button">Sign out</button>
             </div>
         );
     }
     return (
-        <div>
+        <div className="Auth">
             Want to play? Please
             <button onClick={onSignIn} className="Auth-button">sign In</button>
         </div>

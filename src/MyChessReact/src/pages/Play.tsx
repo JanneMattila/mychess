@@ -8,7 +8,7 @@ export class Play extends Component {
         return (
             <div>
                 <header className="Play-header">
-                    <br />Render board here.
+                    <h4>Render board here</h4>
                 </header>
             </div>
         );

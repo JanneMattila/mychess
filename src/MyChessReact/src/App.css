@@ -4,12 +4,11 @@
 }
 
 .App-link-image {
-  vertical-align: middle;
+  margin-top: 5px;
+  margin-left: 10px;
 }
 
 .App-link {
-  color: #ffffff;
-  text-decoration: none;
   float: left;
 }
 

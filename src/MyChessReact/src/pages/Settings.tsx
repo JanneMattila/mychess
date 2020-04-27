@@ -8,7 +8,7 @@ export class Settings extends Component {
         return (
             <div>
                 <header className="Settings-header">
-                    <br />Render settings here.
+                    <h4>Settings here</h4>
                 </header>
             </div>
         );
