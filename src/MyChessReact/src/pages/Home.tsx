@@ -11,7 +11,7 @@ export class Home extends Component {
             <div>
                 <header className="Home-header">
                     My Chess is coming. Stay tuned.
-                    <GameList endpoint={config.endpoint} />
+                    <GameList title="Games waiting for you" endpoint={config.endpoint} />
                 </header>
             </div>
         );

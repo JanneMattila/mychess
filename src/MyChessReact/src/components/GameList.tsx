@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import "./GameList.css";
 
 type GameListProps = {
+    title: string;
     endpoint: string;
 };
 
@@ -97,7 +98,7 @@ export function GameList(props: GameListProps) {
 
         return (
             <div>
-                <h4>Games</h4>
+                <h4>{props.title}</h4>
                 {contents}
             </div>
         );
