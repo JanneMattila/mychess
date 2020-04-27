@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
 import "./Play.css";
 import { ChessBoardView } from "../game/ChessBoardView";
-import "../images/BishopBlack.svg";
-import "../images/BishopWhite.svg";
 
 export function Play() {
 
