@@ -22,7 +22,7 @@ Here is example game format:
 ```json
 {
   "id": "123-abc-123",
-  "title": "Example game",
+  "name": "Example game",
   "created": "2020-04-05T15:48:57.484Z",
   "updated": "2020-04-06T15:48:57.484Z",
   "state": "Normal",
@@ -54,6 +54,28 @@ Here is example game format:
 }
 ```
 
+**Note**: Element `players`:
+
+```json
+"players": {
+  "white": {
+    "id": "123-abc-123",
+    "name": "John Doe"
+  },
+  "black": {
+    "id": "123-def-123",
+    "name": "Jane Doe"
+  }
+}
+```
+
+Will be converted into more approriate data
+for the user interface at the backend:
+
+```json
+"opponent": "John Doe"
+```
+
 ### Move
 
 Here is example move format:
@@ -70,6 +92,10 @@ Here is example move format:
 ## Table Storage structure
 
 ### Player
+
+TBD
+
+### Settings
 
 TBD
 

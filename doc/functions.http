@@ -5,18 +5,3 @@
 GET {{endpoint}}/api/games HTTP/1.1
 Content-type: application/json
 Authorization: Bearer {{auth}}
-
-[
-  {
-    "id": "123-abc-123",
-    "title": "Example game",
-    "updated": "2020-04-06T15:48:57.484Z",
-    "state": "Normal"
-  },
-  {
-    "id": "123-abc-123",
-    "title": "Example game 2",
-    "updated": "2020-03-06T15:48:57.484Z",
-    "state": "Normal"
-  }
-]

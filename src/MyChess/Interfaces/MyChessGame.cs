@@ -9,14 +9,17 @@ namespace MyChess.Interfaces
         [JsonPropertyName("id")]
         public string ID { get; set; } = string.Empty;
 
-        [JsonPropertyName("title")]
-        public string Title { get; set; } = string.Empty;
+        [JsonPropertyName("name")]
+        public string Name { get; set; } = string.Empty;
 
         [JsonPropertyName("create")]
         public DateTimeOffset Created { get; set; }
 
         [JsonPropertyName("updated")]
         public DateTimeOffset Updated { get; set; }
+
+        [JsonPropertyName("opponent")]
+        public string Opponent { get; set; } = string.Empty;
 
         [JsonPropertyName("players")]
         public MyChessGamePlayers Players { get; set; } = new MyChessGamePlayers();

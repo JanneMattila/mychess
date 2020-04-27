@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using MyChess.Functions.Interfaces;
+using MyChess.Interfaces;
 
 namespace MyChess.Functions
 {
@@ -19,17 +19,24 @@ namespace MyChess.Functions
             using var scope = log.BeginScope("Games");
             log.LogInformation("Games function processing request.");
 
-            var games = new List<GameHeader>();
+            var games = new List<MyChessGame>();
             for (int i = 0; i < 5; i++)
             {
-                games.Add(new GameHeader()
+                var game = new MyChessGame()
                 {
                     ID = Guid.NewGuid().ToString("D"),
                     Name = $"Game of name {i + 1}",
                     Opponent = $"User {i + 1}",
-                    Comment = "👍 Lorem ipsum dolor sit amet ❤ 😊, consectetur adipiscing elit. Ut sed mollis neque. Maecenas molestie nibh id elit gravida, quis placerat magna tempor. Morbi posuere orci sapien, eget dictum ligula tempor ut. Vivamus nec massa dolor. Sed fermentum ex non nunc dapibus blandit. Vivamus sollicitudin, libero rhoncus faucibus ullamcorper, velit dui finibus neque, sed placerat sapien urna id nunc. Aliquam ac consectetur elit.",
                     Updated = DateTimeOffset.UtcNow.AddHours(-i)
+                };
+                game.Moves.Add(new MyChessGameMove()
+                {
+                    Comment = "👍 Lorem ipsum dolor sit amet ❤ 😊, consectetur adipiscing elit. Ut sed mollis neque. Maecenas molestie nibh id elit gravida, quis placerat magna tempor. Morbi posuere orci sapien, eget dictum ligula tempor ut. Vivamus nec massa dolor. Sed fermentum ex non nunc dapibus blandit. Vivamus sollicitudin, libero rhoncus faucibus ullamcorper, velit dui finibus neque, sed placerat sapien urna id nunc. Aliquam ac consectetur elit.",
+                    Move = "A2A4",
+                    Start = DateTimeOffset.UtcNow.AddHours(-i),
+                    End = DateTimeOffset.UtcNow,
                 });
+                games.Add(game);
             }
 
             return new OkObjectResult(games);

@@ -9,7 +9,7 @@ GET `https://{host}/api/games`
 - Returns array of **all** users games
 - Fields limited to header level
   - `"id"`
-  - `"title"`
+  - `"name"`
   - `"opponent"`
   - `"updated"`
 
