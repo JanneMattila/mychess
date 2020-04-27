@@ -10,7 +10,6 @@ export class Home extends Component {
         return (
             <div>
                 <header className="Home-header">
-                    My Chess is coming. Stay tuned.
                     <GameList title="Games waiting for you" endpoint={config.endpoint} />
                 </header>
             </div>

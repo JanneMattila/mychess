@@ -1,9 +1,5 @@
-.Home-logo {
-  height: 10vmin;
-  pointer-events: none;
-}
-
 .Home-header {
+  height: 10vmin;
   display: flex;
   flex-direction: column;
   align-items: center;

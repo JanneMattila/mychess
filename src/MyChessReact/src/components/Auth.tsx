@@ -93,7 +93,8 @@ export function Auth(props: AuthProps) {
     }
     return (
         <div>
-            <button onClick={onSignIn} className="Auth-button">Sign In</button>
+            Want to play? Please
+            <button onClick={onSignIn} className="Auth-button">sign In</button>
         </div>
     );
 }
