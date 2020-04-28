@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -9,15 +10,35 @@ using MyChess.Interfaces;
 
 namespace MyChess.Functions
 {
-    public static class GamesFunction
+    public class GamesFunction
     {
+        private readonly ISecurityValidator _securityValidator;
+
+        public GamesFunction(
+            ISecurityValidator securityValidator)
+        {
+            _securityValidator = securityValidator;
+        }
+
         [FunctionName("Games")]
-        public static IActionResult Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             using var scope = log.BeginScope("Games");
             log.LogInformation("Games function processing request.");
+
+            var principal = await _securityValidator.GetClaimsPrincipalAsync(req, log);
+            if (principal == null)
+            {
+                return new UnauthorizedResult();
+            }
+
+            if (!principal.HasPermission(PermissionConstants.GamesReadWrite))
+            {
+                log.LogWarning("User {user} does not have permission {permission}", principal.Identity.Name, PermissionConstants.GamesReadWrite);
+                return new UnauthorizedResult();
+            }
 
             var games = new List<MyChessGame>();
             for (int i = 0; i < 5; i++)
