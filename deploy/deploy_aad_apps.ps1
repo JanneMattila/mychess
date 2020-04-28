@@ -107,7 +107,7 @@ else {
         -Oauth2Permissions $permissions
     $apiApp
 
-    $apiSpn = New-AzureADServicePrincipal -AppId $apiApp.AppId
+    New-AzureADServicePrincipal -AppId $apiApp.AppId
 
     ###########################
     # Setup SPA app:
@@ -155,7 +155,7 @@ else {
         -RequiredResourceAccess $spaAccesses
     $spaReaderApp
 
-    $spaSpn = New-AzureADServicePrincipal -AppId $spaApp.AppId
+    New-AzureADServicePrincipal -AppId $spaApp.AppId
 }
 
 $values = new-object psobject -property @{

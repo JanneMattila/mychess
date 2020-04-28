@@ -1,20 +1,20 @@
 Param (
-    [Parameter(HelpMessage="Deployment target resource group")] 
+    [Parameter(HelpMessage = "Deployment target resource group")] 
     [string] $ResourceGroupName = "rg-mychess-local",
 
-    [Parameter(HelpMessage="Deployment target resource group location")] 
+    [Parameter(HelpMessage = "Deployment target resource group location")] 
     [string] $Location = "North Europe",
 
-    [Parameter(HelpMessage="Deployment environment name")] 
+    [Parameter(HelpMessage = "Deployment environment name")] 
     [string] $EnvironmentName = "local",
 
-    [Parameter(HelpMessage="CDN name (must be globally unique and map to custom domain name)")] 
+    [Parameter(HelpMessage = "CDN name (must be globally unique and map to custom domain name)")] 
     [string] $CDN = "mychess-local",
 
-    [Parameter(Mandatory=$true, HelpMessage="Custom domain name for the CDN")] 
+    [Parameter(Mandatory = $true, HelpMessage = "Custom domain name for the CDN")] 
     [string] $CustomDomain,
 
-    [Parameter(HelpMessage="App root folder path to publish e.g. ..\src\MyChessReact\build\")] 
+    [Parameter(HelpMessage = "App root folder path to publish e.g. ..\src\MyChessReact\build\")] 
     [string] $AppRootFolder,
 
     [string] $Template = "$PSScriptRoot\azuredeploy.json",
@@ -26,8 +26,7 @@ $ErrorActionPreference = "Stop"
 $date = (Get-Date).ToString("yyyy-MM-dd-HH-mm-ss")
 $deploymentName = "Local-$date"
 
-if ([string]::IsNullOrEmpty($env:BUILD_BUILDNUMBER))
-{
+if ([string]::IsNullOrEmpty($env:BUILD_BUILDNUMBER)) {
     Write-Host (@"
 Not executing inside Azure DevOps Release Management.
 Make sure you have done "Login-AzAccount" and
@@ -35,13 +34,11 @@ Make sure you have done "Login-AzAccount" and
 so that script continues to work correctly for you.
 "@)
 }
-else
-{
+else {
     $deploymentName = $env:BUILD_BUILDNUMBER
 }
 
-if ($null -eq (Get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue))
-{
+if ($null -eq (Get-AzResourceGroup -Name $ResourceGroupName -Location $Location -ErrorAction SilentlyContinue)) {
     Write-Warning "Resource group '$ResourceGroupName' doesn't exist and it will be created."
     New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Verbose
 }
@@ -71,8 +68,7 @@ if ($null -eq $result.Outputs.webStorageName -or
     $null -eq $result.Outputs.webAppUri -or
     $null -eq $result.Outputs.instrumentationKey -or
     $null -eq $result.Outputs.cdnName -or
-    $null -eq $result.Outputs.cdnCustomDomainName)
-{
+    $null -eq $result.Outputs.cdnCustomDomainName) {
     Throw "Template deployment didn't return web app information correctly and therefore deployment is cancelled."
 }
 
@@ -88,8 +84,7 @@ $cdnCustomDomainName = $result.Outputs.cdnCustomDomainName.value
 
 # Enable CDN managed certificate to enable https on custom domain
 $cdnCustomDomain = Get-AzCdnCustomDomain -ResourceGroupName $ResourceGroupName -ProfileName $cdnName -EndpointName $cdn -CustomDomainName $cdnCustomDomainName
-if ("Disabled" -eq $cdnCustomDomain.CustomHttpsProvisioningState)
-{
+if ("Disabled" -eq $cdnCustomDomain.CustomHttpsProvisioningState) {
     Enable-AzCdnCustomDomainHttps -ResourceGroupName $ResourceGroupName -ProfileName $cdnName -EndpointName $cdn -CustomDomainName $cdnCustomDomainName
 }
 
@@ -101,8 +96,7 @@ Write-Host "Static website endpoint: $webStorageUri"
 # Create table to the storage if it does not exist
 $tableName = "games"
 $appStorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName -AccountName $appStorageName
-if ($null -eq (Get-AzStorageTable -Context $appStorageAccount.Context -Name $tableName -ErrorAction SilentlyContinue))
-{
+if ($null -eq (Get-AzStorageTable -Context $appStorageAccount.Context -Name $tableName -ErrorAction SilentlyContinue)) {
     Write-Warning "Table '$tableName' doesn't exist and it will be created."
     New-AzStorageTable -Context $appStorageAccount.Context -Name $tableName
 }
@@ -119,8 +113,7 @@ $azureADdeployment = . $PSScriptRoot\deploy_aad_apps.ps1 `
     -SPAUri $webStorageUri `
     -UpdateReplyUrl # Update reply urls
 
-if (![string]::IsNullOrEmpty($AppRootFolder))
-{
+if (![string]::IsNullOrEmpty($AppRootFolder)) {
     . $PSScriptRoot\deploy_web.ps1 `
         -ResourceGroupName $ResourceGroupName `
         -FunctionsUri $webAppUri `

@@ -53,10 +53,12 @@ $storageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName -Ac
 $webStorageUri = $storageAccount.PrimaryEndpoints.Web
 Write-Host "Static website endpoint: $webStorageUri"
 
-"{ `"endpoint`": `"$FunctionsUri`", `
+"window.configuration = `
+{ `"endpoint`": `"$FunctionsUri`", `
    `"clientId`": `"$SPAAppAppID`", `
    `"applicationIdURI`": `"$ApiApplicationIdURI`", `
-   `"instrumentationKey`": `"$IntrumentationKey`" }" | Set-Content (Join-Path -Path $AppRootFolder -ChildPath configuration.json)
+   `"instrumentationKey`": `"$IntrumentationKey`"`
+}" | Set-Content (Join-Path -Path $AppRootFolder -ChildPath configuration.js)
 
 Get-ChildItem -File -Recurse $AppRootFolder `
 | ForEach-Object { 
