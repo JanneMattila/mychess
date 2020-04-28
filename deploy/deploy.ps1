@@ -117,6 +117,9 @@ if (![string]::IsNullOrEmpty($AppRootFolder)) {
     . $PSScriptRoot\deploy_web.ps1 `
         -ResourceGroupName $ResourceGroupName `
         -FunctionsUri $webAppUri `
+        -SPAAppAppID $azureADdeployment.SPAApp `
+        -ApiAppAppID $azureADdeployment.ApiApp `
+        -ApiApplicationIdURI $azureADdeployment.ApplicationIdURI `
         -IntrumentationKey $instrumentationKey `
         -WebStorageName $webStorageAccount.StorageAccountName `
         -AppRootFolder $AppRootFolder
