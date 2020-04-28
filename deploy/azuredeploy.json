@@ -8,12 +8,6 @@
         "description": "Azure AD ClientId of API application."
       }
     },
-    "tenantId": {
-      "type": "string",
-      "metadata": {
-        "description": "Azure AD Tenant Id."
-      }
-    },
     "applicationIdURI": {
       "type": "string",
       "metadata": {
@@ -325,7 +319,6 @@
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
 
         "AzureAD:ClientId": "[parameters('clientId')]",
-        "AzureAD:TenantId": "[parameters('tenantId')]",
         "AzureAD:Audience": "[parameters('applicationIdURI')]"
       }
     },

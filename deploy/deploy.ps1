@@ -50,7 +50,6 @@ $additionalParameters = New-Object -TypeName hashtable
 $additionalParameters['cdn'] = $CDN
 $additionalParameters['customDomain'] = $CustomDomain
 $additionalParameters['clientId'] = $azureADdeployment.ApiApp
-$additionalParameters['tenantId'] = $azureADdeployment.TenantId
 $additionalParameters['applicationIdURI'] = $azureADdeployment.ApplicationIdURI
 
 $result = New-AzResourceGroupDeployment `
