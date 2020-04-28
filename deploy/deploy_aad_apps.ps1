@@ -113,9 +113,10 @@ else {
     # Note: "New-AzureADApplication" does not yet support
     # setting up "signInAudience" to "AzureADandPersonalMicrosoftAccount"
     # 
+    $postfix = $EnvironmentName.ToLower()
     $apiApp = New-AzureADApplication -DisplayName $apiAppName `
         -AvailableToOtherTenants $true `
-        -IdentifierUris "api://mychess-func.$EnvironmentName" `
+        -IdentifierUris "api://mychess-backend.$postfix" `
         -PublicClient $false `
         -Oauth2Permissions $permissions
     $apiApp
