@@ -1,17 +1,17 @@
 Param (
-    [Parameter(HelpMessage="Application name")] 
+    [Parameter(HelpMessage = "Application name")] 
     [string] $AppName = "My Chess",
 
-    [Parameter(HelpMessage="Deployment environment name")] 
+    [Parameter(HelpMessage = "Deployment environment name")] 
     [string] $EnvironmentName = "local",
     
-    [Parameter(HelpMessage="Flag to indicate if AzureAD applications reply urls should be updated")] 
+    [Parameter(HelpMessage = "Flag to indicate if AzureAD applications reply urls should be updated")] 
     [switch] $UpdateReplyUrl,
 
-    [Parameter(HelpMessage="SPA Uri")] 
+    [Parameter(HelpMessage = "SPA Uri")] 
     [string] $SPAUri = "http://localhost:5000/",
     
-    [Parameter(HelpMessage="API Backend Uri")] 
+    [Parameter(HelpMessage = "API Backend Uri")] 
     [string] $APIUri = "http://localhost:7071/"
 )
 
@@ -30,25 +30,21 @@ $azureSession = [Microsoft.Azure.Commands.Common.Authentication.AzureSession]::I
 $accessToken = $azureSession.AccessToken
 
 $aadInstalledModule = Get-Module -Name "AzureAD" -ListAvailable
-if ($null -eq $aadInstalledModule)
-{
+if ($null -eq $aadInstalledModule) {
     Install-Module AzureAD -Scope CurrentUser -Force
 }
-else
-{
+else {
     Import-Module AzureAD
 }
 
 Connect-AzureAD -AadAccessToken $accessToken -AccountId $accountId -TenantId $tenant | Out-Null
 
-if ("Prod" -eq $EnvironmentName)
-{
-    # Remove production environment name from app names
-    $spaAppName = "$AppName"
-    $apiAppName = "$AppName API"
+if ("Prod" -eq $EnvironmentName) {
+    # Remove production environment name from app names (after migration)
+    $spaAppName = "$AppName $EnvironmentName"
+    $apiAppName = "$AppName API $EnvironmentName"
 }
-else
-{
+else {
     $spaAppName = "$AppName $EnvironmentName"
     $apiAppName = "$AppName API $EnvironmentName"
 }
@@ -56,19 +52,16 @@ else
 $spaApp = Get-AzureADApplication -SearchString $spaAppName
 $apiApp = Get-AzureADApplication -SearchString $apiAppName
 
-if ($null -ne $spaApp)
-{
+if ($null -ne $spaApp) {
     # Applications have been already created
     Write-Host "Applications have been already created"
 
-    if ($UpdateReplyUrl)
-    {
+    if ($UpdateReplyUrl) {
         Set-AzureADApplication -ObjectId $spaApp.ObjectId -ReplyUrls $SPAUri
         Set-AzureADApplication -ObjectId $apiApp.ObjectId -ReplyUrls $APIUri
     }
 }
-else
-{
+else {
     ######################
     # Setup functions app:
     # - Expose API "User.ReadWrite"
@@ -166,9 +159,9 @@ else
 }
 
 $values = new-object psobject -property @{
-    SPAApp = $spaSpn.AppId;
-    ApiApp = $apiApp.AppId;
-    TenantId = $tenant;
+    SPAApp           = $spaSpn.AppId;
+    ApiApp           = $apiApp.AppId;
+    TenantId         = $tenant;
     ApplicationIdURI = $apiApp.IdentifierUris[0];
 }
 return $values
