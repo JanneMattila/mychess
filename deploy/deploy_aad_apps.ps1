@@ -159,7 +159,7 @@ else {
 }
 
 $values = new-object psobject -property @{
-    SPAApp           = $spaSpn.AppId;
+    SPAApp           = $spaApp.AppId;
     ApiApp           = $apiApp.AppId;
     TenantId         = $tenant;
     ApplicationIdURI = $apiApp.IdentifierUris[0];
