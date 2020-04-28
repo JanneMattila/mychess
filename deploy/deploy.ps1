@@ -123,4 +123,11 @@ if (![string]::IsNullOrEmpty($AppRootFolder)) {
         -IntrumentationKey $instrumentationKey `
         -WebStorageName $webStorageAccount.StorageAccountName `
         -AppRootFolder $AppRootFolder
+
+    # Purge the CDN cache
+    Unpublish-AzCdnEndpointContent `
+        -ResourceGroupName $ResourceGroupName `
+        -ProfileName $cdnName `
+        -EndpointName $cdn `
+        -PurgeContent "/*"
 }
