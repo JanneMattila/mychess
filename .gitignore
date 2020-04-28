@@ -350,4 +350,4 @@ MigrationBackup/
 .ionide/
 
 # Exclude local configuration file
-src/MyChessReact/src/configuration.json
+src/MyChessReact/public/configuration.js

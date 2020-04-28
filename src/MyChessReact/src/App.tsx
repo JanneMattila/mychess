@@ -7,7 +7,9 @@ import { Settings } from "./pages/Settings";
 import "./App.css";
 import logo from "./pages/logo.svg";
 import TelemetryProvider from "./components/TelemetryProvider";
-import config from "./configuration.json";
+import { GetConfiguration } from "./ConfigurationManager";
+
+let configuration = GetConfiguration();
 
 function App() {
   return (
@@ -20,7 +22,7 @@ function App() {
                 <img src={logo} alt="My Chess" className="App-link-image" />
               </Link>
               <div className="App-auth">
-                <Auth clientId={config.clientId} applicationIdURI={config.applicationIdURI} />
+                <Auth clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} />
               </div>
             </div>
             <Switch>

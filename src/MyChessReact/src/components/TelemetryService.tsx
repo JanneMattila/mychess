@@ -3,7 +3,9 @@
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import { ReactPlugin } from '@microsoft/applicationinsights-react-js';
 import { createBrowserHistory } from "history";
-import config from "../configuration.json";
+import { GetConfiguration } from "../ConfigurationManager";
+
+let configuration = GetConfiguration();
 
 const browserHistory = createBrowserHistory({ basename: '' });
 let reactPlugin: ReactPlugin;
@@ -14,7 +16,7 @@ const createTelemetryService = () => {
         reactPlugin = new ReactPlugin();
         appInsights = new ApplicationInsights({
             config: {
-                instrumentationKey: config.instrumentationKey,
+                instrumentationKey: configuration.instrumentationKey,
                 maxBatchInterval: 0,
                 disableFetchTracking: false,
                 enableCorsCorrelation: true,
