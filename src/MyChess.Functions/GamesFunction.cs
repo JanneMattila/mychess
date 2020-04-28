@@ -26,7 +26,7 @@ namespace MyChess.Functions
             ILogger log)
         {
             using var scope = log.BeginScope("Games");
-            log.LogInformation("Games function processing request.");
+            log.LogInformation(LoggingEvents.FuncGamesStarted, "Games function processing request.");
 
             var principal = await _securityValidator.GetClaimsPrincipalAsync(req, log);
             if (principal == null)
@@ -36,7 +36,8 @@ namespace MyChess.Functions
 
             if (!principal.HasPermission(PermissionConstants.GamesReadWrite))
             {
-                log.LogWarning("User {user} does not have permission {permission}", principal.Identity.Name, PermissionConstants.GamesReadWrite);
+                log.LogWarning(LoggingEvents.FuncGamesUserDoesNotHavePermission,
+                    "User {user} does not have permission {permission}", principal.Identity.Name, PermissionConstants.GamesReadWrite);
                 return new UnauthorizedResult();
             }
 

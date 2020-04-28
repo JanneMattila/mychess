@@ -25,7 +25,7 @@ namespace MyChess.Functions
             _securityValidatorOptions = securityValidatorOptions.Value;
         }
 
-        private async Task InitializeAsync()
+        private async Task InitializeAsync(ILogger log)
         {
             var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                 $"https://login.microsoftonline.com/{_securityValidatorOptions.TenantId}/v2.0/.well-known/openid-configuration",
@@ -34,24 +34,42 @@ namespace MyChess.Functions
             var configuration = await configurationManager.GetConfigurationAsync();
             _tokenValidationParameters = new TokenValidationParameters
             {
+                IssuerSigningKeys = configuration.SigningKeys,
                 ValidAudiences = new[]
                 {
                     _securityValidatorOptions.Audience,
                     _securityValidatorOptions.ClientId
                 },
-                ValidIssuers = new[]
+                ValidateIssuer = true,
+                IssuerValidator = (issuer, securityToken, validationParameters) =>
                 {
-                    $"https://sts.windows.net/{_securityValidatorOptions.TenantId}/"
-                },
-                IssuerSigningKeys = configuration.SigningKeys
+                    return IssuerValidationLogic(log, issuer) ? issuer : null;
+                }
             };
+        }
+
+        private bool IssuerValidationLogic(ILogger log, string issuer)
+        {
+            const string start = "https://login.microsoftonline.com/";
+            const string end = "/v2.0";
+            if (!issuer.StartsWith(start) || !issuer.EndsWith(end))
+            {
+                log.LogWarning(LoggingEvents.FuncSecInvalidIssuer,
+                    "Invalid issuer {issuer}", issuer);
+                return false;
+            }
+
+            var tenant = issuer.Replace(start, string.Empty).Replace(end, string.Empty);
+            log.LogInformation(LoggingEvents.FuncSecIssuer, "Issuer tenant {issuer}", tenant);
+            return true;
         }
 
         public async Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(HttpRequest req, ILogger log)
         {
             if (!req.Headers.ContainsKey(HeaderNames.Authorization))
             {
-                log.LogTrace("Request does not contain authorization header");
+                log.LogTrace(LoggingEvents.FuncSecNoAuthHeader,
+                    "Request does not contain authorization header");
                 return null;
             }
 
@@ -59,7 +77,8 @@ namespace MyChess.Functions
             if (authorizationValue.Length != 2 &&
                 authorizationValue[0] != JwtBearerDefaults.AuthenticationScheme)
             {
-                log.LogTrace("Request does not contain Bearer token");
+                log.LogTrace(LoggingEvents.FuncSecNoBearerToken,
+                    "Request does not contain Bearer token");
                 return null;
             }
 
@@ -73,13 +92,16 @@ namespace MyChess.Functions
                 {
                     try
                     {
-                        log.LogTrace("Initializing OpenID configuration");
-                        await InitializeAsync();
-                        log.LogTrace("Initialized OpenID configuration successfully");
+                        log.LogTrace(LoggingEvents.FuncSecInitializing,
+                            "Initializing OpenID configuration");
+                        await InitializeAsync(log);
+                        log.LogTrace(LoggingEvents.FuncSecInitialized,
+                            "Initialized OpenID configuration successfully");
                     }
                     catch (Exception ex)
                     {
-                        log.LogError(ex, "Could not initialize OpenID configuration");
+                        log.LogError(LoggingEvents.FuncSecInitializingFailed,
+                            ex, "Could not initialize OpenID configuration");
                         return null;
                     }
                     finally
@@ -99,7 +121,8 @@ namespace MyChess.Functions
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Token validation failed");
+                log.LogError(LoggingEvents.FuncSecTokenValidationFailed,
+                    ex, "Token validation failed");
                 return null;
             }
         }

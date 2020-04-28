@@ -5,7 +5,10 @@
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
 
     "Storage": "UseDevelopmentStorage=true",
-    "AzureSignalRConnectionString": "<!-- Azure SignalR Connection string -->"
+    "AzureSignalRConnectionString": "<!-- Azure SignalR Connection string -->",
+
+    "AzureAD:Audience": "",
+    "AzureAD:ClientId": ""
   },
   "Host": {
     "CORS": "http://localhost:3000",
