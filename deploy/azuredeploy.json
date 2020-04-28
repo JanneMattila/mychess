@@ -77,8 +77,10 @@
       "sku": {
         "name": "[parameters('storageType')]"
       },
-      "dependsOn": [],
-      "tags": {},
+      "dependsOn": [
+      ],
+      "tags": {
+      },
       "kind": "StorageV2",
       "properties": {
         "supportsHttpsTrafficOnly": true,
@@ -103,7 +105,8 @@
       "sku": {
         "name": "Standard_Microsoft"
       },
-      "properties": {},
+      "properties": {
+      },
       "resources": [
         {
           "name": "[parameters('cdn')]",
@@ -174,33 +177,33 @@
             "deliveryPolicy": {
               "description": "Rewrite and Redirect",
               "rules": [
-                  {
-                    "name" :  "HttpsRedirect",
-                    "order": "1",
-                    "conditions": [
-                      {
-                        "name": "RequestScheme",
-                        "parameters": {
-                            "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleRequestSchemeConditionParameters",
-                            "operator": "Equal",
-                            "matchValues": [
-                                "HTTP"
-                            ]
-                        }
+                {
+                  "name": "HttpsRedirect",
+                  "order": "1",
+                  "conditions": [
+                    {
+                      "name": "RequestScheme",
+                      "parameters": {
+                        "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleRequestSchemeConditionParameters",
+                        "operator": "Equal",
+                        "matchValues": [
+                          "HTTP"
+                        ]
                       }
-                    ],
-                    "actions": [
-                      {
-                        "name": "UrlRedirect",
-                        "parameters": {
-                          "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleUrlRedirectActionParameters",
-                          "redirectType": "PermanentRedirect",
-                          "destinationProtocol": "Https",
-                          "customHostname": "[parameters('customDomain')]"
-                        }
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "name": "UrlRedirect",
+                      "parameters": {
+                        "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleUrlRedirectActionParameters",
+                        "redirectType": "PermanentRedirect",
+                        "destinationProtocol": "Https",
+                        "customHostname": "[parameters('customDomain')]"
                       }
-                    ]
-                  }
+                    }
+                  ]
+                }
               ]
             }
           },
@@ -210,10 +213,10 @@
               "type": "customdomains",
               "apiVersion": "2016-04-02",
               "dependsOn": [
-                  "[parameters('cdn')]"
+                "[parameters('cdn')]"
               ],
               "properties": {
-                  "hostName": "[parameters('customDomain')]"
+                "hostName": "[parameters('customDomain')]"
               }
             }
           ]
@@ -226,7 +229,8 @@
       "location": "[parameters('location')]",
       "apiVersion": "2015-05-01",
       "kind": "web",
-      "dependsOn": [],
+      "dependsOn": [
+      ],
       "tags": {
         "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', variables('appServiceName'))]": "Resource"
       },
@@ -253,8 +257,10 @@
       "sku": {
         "name": "[parameters('storageType')]"
       },
-      "dependsOn": [],
-      "tags": {},
+      "dependsOn": [
+      ],
+      "tags": {
+      },
       "kind": "StorageV2",
       "properties": {
         "supportsHttpsTrafficOnly": true,
@@ -331,15 +337,24 @@
       "properties": {
         "groupShortName": "webAppAG",
         "enabled": true,
-        "emailReceivers": [],
-        "smsReceivers": [],
-        "webhookReceivers": [],
-        "itsmReceivers": [],
-        "azureAppPushReceivers": [],
-        "automationRunbookReceivers": [],
-        "voiceReceivers": [],
-        "logicAppReceivers": [],
-        "azureFunctionReceivers": [],
+        "emailReceivers": [
+        ],
+        "smsReceivers": [
+        ],
+        "webhookReceivers": [
+        ],
+        "itsmReceivers": [
+        ],
+        "azureAppPushReceivers": [
+        ],
+        "automationRunbookReceivers": [
+        ],
+        "voiceReceivers": [
+        ],
+        "logicAppReceivers": [
+        ],
+        "azureFunctionReceivers": [
+        ],
         "armRoleReceivers": [
           {
             /*
@@ -352,7 +367,8 @@
           }
         ]
       },
-      "dependsOn": []
+      "dependsOn": [
+      ]
     },
     {
       "name": "[variables('appInsightsExceptionQueryName')]",
@@ -368,7 +384,8 @@
         "enabled": "true",
         "source": {
           "query": "exceptions",
-          "authorizedResources": [],
+          "authorizedResources": [
+          ],
           "dataSourceId": "[resourceId('microsoft.insights/components', variables('appInsightsName'))]",
           "queryType": "ResultCount"
         },
@@ -407,7 +424,9 @@
         "description": "High usage of our Company Web App.",
         "enabled": true,
         "severity": 4,
-        "scopes": [ "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]" ],
+        "scopes": [
+          "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+        ],
         "evaluationFrequency": "PT1M",
         "windowSize": "PT1M",
         "criteria": {
@@ -416,7 +435,8 @@
             {
               "name": "CPU Percentage",
               "metricName": "CpuPercentage",
-              "dimensions": [],
+              "dimensions": [
+              ],
               "operator": "GreaterThan",
               "threshold": "50",
               "timeAggregation": "Total"
@@ -600,8 +620,12 @@
       "value": "[variables('cdnName')]"
     },
     "cdnCustomDomainName": {
-       "type": "string",
-       "value": "[variables('cdnCustomDomainName')]"
+      "type": "string",
+      "value": "[variables('cdnCustomDomainName')]"
+    },
+    "cdnCustomDomainUri": {
+      "type": "string",
+      "value": "[variables('customDomainUri')]"
     }
   }
 }

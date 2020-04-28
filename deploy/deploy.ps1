@@ -68,7 +68,8 @@ if ($null -eq $result.Outputs.webStorageName -or
     $null -eq $result.Outputs.webAppUri -or
     $null -eq $result.Outputs.instrumentationKey -or
     $null -eq $result.Outputs.cdnName -or
-    $null -eq $result.Outputs.cdnCustomDomainName) {
+    $null -eq $result.Outputs.cdnCustomDomainName -or
+    $null -eq $result.Outputs.cdnCustomDomainUri) {
     Throw "Template deployment didn't return web app information correctly and therefore deployment is cancelled."
 }
 
@@ -81,6 +82,7 @@ $webAppUri = $result.Outputs.webAppUri.value
 $instrumentationKey = $result.Outputs.instrumentationKey.value
 $cdnName = $result.Outputs.cdnName.value
 $cdnCustomDomainName = $result.Outputs.cdnCustomDomainName.value
+$cdnCustomDomainUri = $result.Outputs.cdnCustomDomainUri.value
 
 # Enable CDN managed certificate to enable https on custom domain
 $cdnCustomDomain = Get-AzCdnCustomDomain -ResourceGroupName $ResourceGroupName -ProfileName $cdnName -EndpointName $cdn -CustomDomainName $cdnCustomDomainName
@@ -110,7 +112,7 @@ Write-Host "##vso[task.setvariable variable=Custom.WebAppUri;]https://$CustomDom
 
 $azureADdeployment = . $PSScriptRoot\deploy_aad_apps.ps1 `
     -EnvironmentName $EnvironmentName `
-    -SPAUri $webStorageUri `
+    -SPAUri $cdnCustomDomainUri `
     -UpdateReplyUrl # Update reply urls
 
 if (![string]::IsNullOrEmpty($AppRootFolder)) {

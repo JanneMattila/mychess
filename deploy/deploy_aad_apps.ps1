@@ -57,8 +57,8 @@ if ($null -ne $spaApp) {
     Write-Host "Applications have been already created"
 
     if ($UpdateReplyUrl) {
-        Set-AzureADApplication -ObjectId $spaApp.ObjectId -ReplyUrls $SPAUri
-        Set-AzureADApplication -ObjectId $apiApp.ObjectId -ReplyUrls $APIUri
+        Set-AzureADApplication -ObjectId $spaApp.ObjectId -ReplyUrls $SPAUri -Homepage $SPAUri
+        Set-AzureADApplication -ObjectId $apiApp.ObjectId -ReplyUrls $APIUri -Homepage $APIUri
     }
 }
 else {
