@@ -67,7 +67,7 @@ if ($null -ne $spaApp) {
 
         if ($apiApp.Homepage -ne $APIUri) {
             Write-Host "Updating API urls"
-            Set-AzureADApplication -ObjectId $apiApp.ObjectId -ReplyUrls $APIUri -Homepage $APIUri
+            Set-AzureADApplication -ObjectId $apiApp.ObjectId -Homepage $APIUri
         }
         else {
             Write-Host "No need to update API urls"
