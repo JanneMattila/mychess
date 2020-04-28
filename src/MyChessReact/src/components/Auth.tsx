@@ -24,8 +24,8 @@ export function Auth(props: AuthProps) {
 
     const accessTokenRequest = {
         scopes: [
-            props.applicationIdURI + "User.ReadWrite",
-            props.applicationIdURI + "Games.ReadWrite"
+            props.applicationIdURI + "/User.ReadWrite",
+            props.applicationIdURI + "/Games.ReadWrite"
         ]
     };
 
