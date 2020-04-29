@@ -161,6 +161,11 @@ else {
     # Note: "New-AzureADApplication" does not yet support
     # setting up "signInAudience" to "AzureADandPersonalMicrosoftAccount"
     # 
+    Write-Warning @"
+You need to *manually* update these two properties:
+- "signInAudience" to value "AzureADandPersonalMicrosoftAccount"
+- "accessTokenAcceptedVersion" to value 2
+"@
     $spaApp = New-AzureADApplication -DisplayName $spaAppName `
         -AvailableToOtherTenants $true `
         -Oauth2AllowImplicitFlow $true `
