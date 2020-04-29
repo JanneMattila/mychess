@@ -28,7 +28,7 @@ namespace MyChess.Functions
         private async Task InitializeAsync(ILogger log)
         {
             var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-                $"https://login.microsoftonline.com/{_securityValidatorOptions.TenantId}/v2.0/.well-known/openid-configuration",
+                $"https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration",
                 new OpenIdConnectConfigurationRetriever());
 
             var configuration = await configurationManager.GetConfigurationAsync();
