@@ -167,7 +167,7 @@ You need to *manually* update these two properties:
     Write-Host "Updating SPA icon"
     Set-AzureADApplicationLogo `
         -ObjectId $spaApp.ObjectId `
-        -FilePath Logo_48x48.png
+        -FilePath $PSScriptRoot\Logo_48x48.png
 }
 
 $values = new-object psobject -property @{
