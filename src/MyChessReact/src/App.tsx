@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Auth } from "./components/Auth";
 import { Home } from "./pages/Home";
 import { Play } from "./pages/Play";
+import { Privacy } from "./pages/Privacy";
 import { Settings } from "./pages/Settings";
 import "./App.css";
 import logo from "./pages/logo.svg";
@@ -24,9 +25,15 @@ function App() {
               <div className="App-auth">
                 <Auth clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} />
               </div>
+              <div className="App-privacy-container">
+                <Link to="/privacy" className="App-privacy">
+                  Privacy
+              </Link>
+              </div>
             </div>
             <Switch>
               <Route exact path="/" component={Home} />
+              <Route exact path="/privacy" component={Privacy} />
               <Route exact path="/play/:id" component={Play} />
               <Route path="/settings" component={Settings} />
             </Switch>
