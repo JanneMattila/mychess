@@ -122,6 +122,11 @@ else {
 
     New-AzureADServicePrincipal -AppId $apiApp.AppId
 
+    Write-Host "Updating API icon"
+    Set-AzureADApplicationLogo `
+        -ObjectId $apiApp.ObjectId `
+        -FilePath $PSScriptRoot\Logo_48x48.png
+
     ###########################
     # Setup SPA app:
     $spaAccesses = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
