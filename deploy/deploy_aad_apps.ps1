@@ -62,8 +62,7 @@ if ($null -ne $spaApp) {
             Set-AzureADApplication `
                 -ObjectId $spaApp.ObjectId `
                 -ReplyUrls $SPAUri `
-                -Homepage $SPAUri `
-                -AppLogoUrl $SPAUri/favicon.ico
+                -Homepage $SPAUri
         }
         else {
             Write-Host "No need to update SPA urls"
@@ -164,6 +163,11 @@ You need to *manually* update these two properties:
     $spaReaderApp
 
     New-AzureADServicePrincipal -AppId $spaApp.AppId
+
+    Write-Host "Updating SPA icon"
+    Set-AzureADApplicationLogo `
+        -ObjectId $spaApp.ObjectId `
+        -FilePath Logo_48x48.png
 }
 
 $values = new-object psobject -property @{
