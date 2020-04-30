@@ -17,6 +17,10 @@ Param (
 
 $ErrorActionPreference = "Stop"
 
+# Custom identifiers for our APIs
+$permissionUserReadWrite = "74f7cc22-157a-4c09-9039-d03645fda085" # "User.ReadWrite"
+$permissionGamesReadWrite = "e49b5223-2def-45c2-a632-b48b07c93124" # "Games.ReadWrite"
+
 # Use existing Azure context to login to Azure AD
 $context = Get-AzContext
 $accountId = $context.Account.Id
@@ -70,7 +74,9 @@ if ($null -ne $spaApp) {
 
         if ($apiApp.Homepage -ne $APIUri) {
             Write-Host "Updating API urls"
-            Set-AzureADApplication -ObjectId $apiApp.ObjectId -Homepage $APIUri
+            Set-AzureADApplication `
+                -ObjectId $apiApp.ObjectId `
+                -Homepage $APIUri
         }
         else {
             Write-Host "No need to update API urls"
@@ -78,15 +84,31 @@ if ($null -ne $spaApp) {
     }
 }
 else {
+    ###########################
+    # Setup SPA app:
+    #
+    # Note: "New-AzureADApplication" does not yet support
+    # setting up "signInAudience" to "AzureADandPersonalMicrosoftAccount"
+    # 
+    Write-Warning @"
+You need to *manually* update these two properties:
+- "signInAudience" to value "AzureADandPersonalMicrosoftAccount"
+- "accessTokenAcceptedVersion" to value 2
+"@
+    $spaApp = New-AzureADApplication -DisplayName $spaAppName `
+        -AvailableToOtherTenants $true `
+        -Oauth2AllowImplicitFlow $true `
+        -Homepage $SPAUri `
+        -ReplyUrls $SPAUri
+    $spaReaderApp
+
+    New-AzureADServicePrincipal -AppId $spaApp.AppId
+
     ######################
     # Setup functions app:
     # - Expose API "User.ReadWrite"
     # - Expose API "Games.ReadWrite"
     $permissions = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.OAuth2Permission]
-
-    # Custom identifiers for our APIs
-    $permissionUserReadWrite = "74f7cc22-157a-4c09-9039-d03645fda085" # "User.ReadWrite"
-    $permissionGamesReadWrite = "e49b5223-2def-45c2-a632-b48b07c93124" # "Games.ReadWrite"
 
     $userReadWritePermission = New-Object Microsoft.Open.AzureAD.Model.OAuth2Permission
     $userReadWritePermission.Id = $permissionUserReadWrite
@@ -108,6 +130,21 @@ else {
     $gamesReadWritePermission.UserConsentDescription = "Read-write access to games data"
     $permissions.Add($gamesReadWritePermission)
 
+    # Define SPA app to be pre-authorized app of API app
+    $preAuthorizedApplicationPermission = New-Object Microsoft.Open.AzureAD.Model.PreAuthorizedApplicationPermission
+    $preAuthorizedApplicationPermission.DirectAccessGrant = $false
+    $preAuthorizedApplicationPermission.AccessGrants = New-Object System.Collections.Generic.List[string]
+    $preAuthorizedApplicationPermission.AccessGrants.Add($permissionUserReadWrite)
+    $preAuthorizedApplicationPermission.AccessGrants.Add($permissionGamesReadWrite)
+
+    $preAuthorizedApp = New-Object Microsoft.Open.AzureAD.Model.PreAuthorizedApplication
+    $preAuthorizedApp.AppId = $spaApp.AppId
+    $preAuthorizedApp.Permissions = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.PreAuthorizedApplicationPermission]
+    $preAuthorizedApp.Permissions.Add($preAuthorizedApplicationPermission)
+
+    $preAuthorizedApps = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.PreAuthorizedApplication]
+    $preAuthorizedApps.Add($preAuthorizedApp)    
+
     #
     # Note: "New-AzureADApplication" does not yet support
     # setting up "signInAudience" to "AzureADandPersonalMicrosoftAccount"
@@ -117,7 +154,8 @@ else {
         -AvailableToOtherTenants $true `
         -IdentifierUris "api://mychess.backend.$postfix" `
         -PublicClient $false `
-        -Oauth2Permissions $permissions
+        -Oauth2Permissions $permissions #`
+    #-PreAuthorizedApplications $preAuthorizedApps
     $apiApp
 
     New-AzureADServicePrincipal -AppId $apiApp.AppId
@@ -128,7 +166,7 @@ else {
         -FilePath $PSScriptRoot\Logo_48x48.png
 
     ###########################
-    # Setup SPA app:
+    # Finalize Setup of SPA app:
     $spaAccesses = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
 
     # API permission for "User.ReadWrite" in backend app
@@ -150,24 +188,10 @@ else {
     # Add required accesses
     $spaAccesses.Add($spaApi)
 
-    #
-    # Note: "New-AzureADApplication" does not yet support
-    # setting up "signInAudience" to "AzureADandPersonalMicrosoftAccount"
-    # 
-    Write-Warning @"
-You need to *manually* update these two properties:
-- "signInAudience" to value "AzureADandPersonalMicrosoftAccount"
-- "accessTokenAcceptedVersion" to value 2
-"@
-    $spaApp = New-AzureADApplication -DisplayName $spaAppName `
-        -AvailableToOtherTenants $true `
-        -Oauth2AllowImplicitFlow $true `
-        -Homepage $SPAUri `
-        -ReplyUrls $SPAUri `
+    Write-Host "Updating SPA API Permissions"
+    Set-AzureADApplication `
+        -ObjectId $spaApp.ObjectId `
         -RequiredResourceAccess $spaAccesses
-    $spaReaderApp
-
-    New-AzureADServicePrincipal -AppId $spaApp.AppId
 
     Write-Host "Updating SPA icon"
     Set-AzureADApplicationLogo `
