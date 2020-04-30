@@ -40,17 +40,17 @@ else {
 Connect-AzureAD -AadAccessToken $accessToken -AccountId $accountId -TenantId $tenant | Out-Null
 
 if ("Prod" -eq $EnvironmentName) {
-    # Remove production environment name from app names (after migration)
-    $spaAppName = "$AppName $EnvironmentName"
-    $apiAppName = "$AppName API $EnvironmentName"
+    $spaAppName = "$AppName"
+    $apiAppName = "$AppName Backend"
 }
 else {
     $spaAppName = "$AppName $EnvironmentName"
-    $apiAppName = "$AppName API $EnvironmentName"
+    $apiAppName = "$AppName Backend $EnvironmentName"
 }
 
-$spaApp = Get-AzureADApplication -SearchString $spaAppName
-$apiApp = Get-AzureADApplication -SearchString $apiAppName
+Get-AzureADApplication -Filter "DisplayName eq '$spaAppName'"
+$spaApp = Get-AzureADApplication -Filter "DisplayName eq '$spaAppName'"
+$apiApp = Get-AzureADApplication -Filter "DisplayName eq '$apiAppName'"
 
 if ($null -ne $spaApp) {
     # Applications have been already created
@@ -59,7 +59,11 @@ if ($null -ne $spaApp) {
     if ($UpdateReplyUrl) {
         if ($spaApp.Homepage -ne $SPAUri) {
             Write-Host "Updating SPA urls"
-            Set-AzureADApplication -ObjectId $spaApp.ObjectId -ReplyUrls $SPAUri -Homepage $SPAUri
+            Set-AzureADApplication `
+                -ObjectId $spaApp.ObjectId `
+                -ReplyUrls $SPAUri `
+                -Homepage $SPAUri `
+                -AppLogoUrl $SPAUri/favicon.ico
         }
         else {
             Write-Host "No need to update SPA urls"
@@ -80,10 +84,6 @@ else {
     # - Expose API "User.ReadWrite"
     # - Expose API "Games.ReadWrite"
     $permissions = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.OAuth2Permission]
-
-    # Known identifiers of Microsoft Graph API
-    $microsoftGraphAPI = "00000003-0000-0000-c000-000000000000"
-    $userRead = "e1fe6dd8-ba31-4d61-89e7-88639da4683d" # "User.Read"
 
     # Custom identifiers for our APIs
     $permissionUserReadWrite = "74f7cc22-157a-4c09-9039-d03645fda085" # "User.ReadWrite"
@@ -116,7 +116,7 @@ else {
     $postfix = $EnvironmentName.ToLower()
     $apiApp = New-AzureADApplication -DisplayName $apiAppName `
         -AvailableToOtherTenants $true `
-        -IdentifierUris "api://mychess-backend.$postfix" `
+        -IdentifierUris "api://mychess.backend.$postfix" `
         -PublicClient $false `
         -Oauth2Permissions $permissions
     $apiApp
@@ -126,16 +126,6 @@ else {
     ###########################
     # Setup SPA app:
     $spaAccesses = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
-
-    # API permission for "User.Read" in Microsoft Graph
-    $spaUserReadGraph = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
-    $spaUserReadGraph.Id = $userRead # "User.Read"
-    $spaUserReadGraph.Type = "Scope"
-
-    $spaGraph = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
-    $spaGraph.ResourceAppId = $microsoftGraphAPI # "Microsoft Graph API"
-    $spaGraph.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
-    $spaGraph.ResourceAccess.Add($spaUserReadGraph)
 
     # API permission for "User.ReadWrite" in backend app
     $spaUserReadWrite = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
@@ -154,7 +144,6 @@ else {
     $spaApi.ResourceAccess.Add($spaGamesReadWrite)
 
     # Add required accesses
-    $spaAccesses.Add($spaGraph)
     $spaAccesses.Add($spaApi)
 
     #
