@@ -44,12 +44,12 @@ else {
 Connect-AzureAD -AadAccessToken $accessToken -AccountId $accountId -TenantId $tenant | Out-Null
 
 if ("Prod" -eq $EnvironmentName) {
-    $spaAppName = "$AppName"
+    $spaAppName = "$AppName App"
     $apiAppName = "$AppName Backend"
 }
 else {
-    $spaAppName = "$AppName $EnvironmentName"
-    $apiAppName = "$AppName Backend $EnvironmentName"
+    $spaAppName = "$AppName App ($EnvironmentName)"
+    $apiAppName = "$AppName Backend ($EnvironmentName)"
 }
 
 Get-AzureADApplication -Filter "DisplayName eq '$spaAppName'"
