@@ -1,23 +1,16 @@
 import { ChessBoard } from "./ChessBoard";
-// import { ChessBoardChange } from "./ChessBoardChange";
 import { ChessMove } from "./ChessMove";
-// import { ChessSpecialMove } from "./ChessSpecialMove";
 import { ChessBoardPiece } from "./ChessBoardPiece";
 import { ChessPiece } from "./ChessPiece";
-// import { ChessBoardLocation } from "./ChessBoardLocation";
-// import { ChessPieceSelection } from "./ChessPieceSelection";
 import { ChessBoardState } from "./ChessBoardState";
 import { GameModel } from "../models/GameModel";
-// import { MoveModel } from "../models/MoveModel";
 import { setTimeout } from "timers";
 import { ChessPlayer } from "./ChessPlayer";
 
 export class ChessBoardLocalView {
     private board: ChessBoard = new ChessBoard();
     private previousAvailableMoves: ChessMove[] = []
-    private currentPlayerTurn: boolean = false;
     private game: GameModel = new GameModel();
-    private url: string = "";
     private currentMoveNumber: number = 0;
 
     public initialize(currentPlayerTurn: boolean = false) {
@@ -25,7 +18,6 @@ export class ChessBoardLocalView {
         this.board = new ChessBoard();
         this.board.initialize();
         this.previousAvailableMoves = [];
-        this.currentPlayerTurn = currentPlayerTurn;
 
         // Update game board to the screen
         this.drawBoard();
@@ -33,8 +25,7 @@ export class ChessBoardLocalView {
 
     public async load() {
         this.initialize();
-        console.log("new game");
-        this.currentPlayerTurn = true;
+        console.log("local game");
         this.game = new GameModel();
     }
 
@@ -162,8 +153,6 @@ export class ChessBoardLocalView {
         if (promotion.length > 0) {
             this.changePromotionFromString(promotion);
         }
-
-        this.currentPlayerTurn = !this.currentPlayerTurn;
     }
 
     public pieceSelected(id: string) {
@@ -175,10 +164,6 @@ export class ChessBoardLocalView {
             return;
         }
 
-        if (this.currentPlayerTurn === false) {
-            console.log("Current player cannot make move");
-            return;
-        }
         let rowIndex: number = parseInt(id[0]);
         let columnIndex: number = parseInt(id[2]);
         let identifier = rowIndex + "-" + columnIndex;
@@ -210,36 +195,11 @@ export class ChessBoardLocalView {
 
                     let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
                     queenPromotionElement.checked = true;
-                    /*
-                    setTimeout(() => {
-                        $("#promotionDialog").dialog({
-                            beforeClose: function (event, ui) {
-                                if (event.cancelable === true) {
-                                    this.changePromotion('Promotion');
-                                    this.showCommentDialog();
-                                }
-                            },
-                            buttons: [
-                                {
-                                    text: "Promote",
-                                    icon: "ui-icon-mail-closed",
-                                    click: function () {
-                                        $(this).dialog("close");
-                                        this.changePromotion('Promotion');
-                                        this.showCommentDialog();
-                                    }
-                                }
-                            ]
-                        });
-                        $("#promotionDialog").dialog({ position: { my: "center top", at: "center top", of: "#table-game" } });
-                    }, 1000);
-                    */
                 }
-                else if (this.currentPlayerTurn) {
-                    this.currentPlayerTurn = false;
+                else {
                     this.setBoardStatus(0, 0);
 
-                    this.showCommentDialog();
+                    this.showConfirmationDialog("inline");
                 }
 
                 return;
@@ -258,60 +218,21 @@ export class ChessBoardLocalView {
         }
     }
 
-    private showCommentDialog() {
-        let commentDialogElement = document.getElementById("commentDialog");
+    public confirm = (): void => {
+        console.log("confirmed");
+        this.showConfirmationDialog("none");
+    }
 
-        /*
-        setTimeout(() => {
-            $("#commentDialog").dialog({
-                beforeClose: function (event, ui) {
-                    if (event.cancelable === true) {
-                        this.undo();
-                    }
-                },
-                buttons: [
-                    {
-                        text: "Submit",
-                        icon: "ui-icon-mail-closed",
-                        click: function () {
-                            $(this).dialog("close");
-                            this.post();
-                        }
-                    },
-                    {
-                        text: "Cancel",
-                        icon: "ui-icon-cancel",
-                        click: function () {
-                            $(this).dialog("close");
-                            this.undo();
-                        }
-                    }
-                ]
-            });
-            $("#commentDialog").dialog({ position: { my: "center top", at: "center top", of: "#table-game" } });
-        }, 1000);
-        */
-        let totalMoves = this.board.totalMoves();
-        console.log("pieceSelected with moves " + totalMoves);
+    public cancel = (): void => {
+        console.log("cancel");
+        this.showConfirmationDialog("none");
+        this.undo();
+    }
 
-        if (totalMoves === 1) {
-            // First move of the game
-            let newGameDialogElement = document.getElementById("newGameDialog");
-            if (newGameDialogElement !== null) {
-                newGameDialogElement.style.display = "inline";
-                let gameNameElement = document.getElementById("gameName");
-                if (gameNameElement !== null) {
-                    gameNameElement.focus();
-                }
-            }
-        }
-        else {
-            if (commentDialogElement !== null) {
-                let textAreaElement = document.getElementById("comment");
-                if (textAreaElement !== null) {
-                    textAreaElement.focus();
-                }
-            }
+    private showConfirmationDialog(display: string) {
+        let confirmationDialogElement = document.getElementById("confirmation");
+        if (confirmationDialogElement !== null) {
+            confirmationDialogElement.style.display = display;
         }
     }
 
@@ -343,8 +264,6 @@ export class ChessBoardLocalView {
             for (let i: number = 0; i < nodes.length; i++) {
                 let radioElement = nodes[i] as HTMLInputElement;
                 if (radioElement.checked === true) {
-                    this.currentPlayerTurn = false;
-
                     if (this.changePromotionFromString(radioElement.value)) {
                         this.drawBoard();
                     }
@@ -362,7 +281,6 @@ export class ChessBoardLocalView {
         }
 
         this.board.undo();
-        this.currentPlayerTurn = true;
         this.drawBoard();
     }
 
@@ -405,13 +323,13 @@ export class ChessBoardLocalView {
     }
 
     public setBoardStatus(currentMoveIndex: number, moves: number) {
-        let statusElement = document.getElementById("Status") as HTMLDivElement;
+        let statusElement = document.getElementById("status") as HTMLDivElement;
         let status = this.board.GetBoardState();
-        let gameStatusMessage = this.currentPlayerTurn ? "Your turn" : "Waiting for opponent";
+        let gameStatusMessage = "";
 
         console.log("currentMoveIndex: " + currentMoveIndex + ", moves: " + moves);
         if (currentMoveIndex !== moves) {
-            gameStatusMessage = this.currentPlayerTurn ? "Opponent's move " : "Your move ";
+            gameStatusMessage = "Move ";
             gameStatusMessage += currentMoveIndex;
         }
 
@@ -425,12 +343,7 @@ export class ChessBoardLocalView {
                 break;
 
             case ChessBoardState.CheckMate:
-                if (this.currentPlayerTurn === true) {
-                    gameStatusMessage = "Opponent won!";
-                }
-                else {
-                    gameStatusMessage = "You won!";
-                }
+                gameStatusMessage = "Checkmate!";
                 break;
 
             default:
