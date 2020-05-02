@@ -1,5 +1,5 @@
 import { useSelector, TypedUseSelectorHook } from "react-redux";
-import { EventTypes, RootState, RootAction, ProcessState } from "./actions";
+import { EventTypes, RootState, RootAction, ProcessState, DialogType } from "./actions";
 
 export const getInitialState = () => {
     return {
@@ -35,6 +35,12 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 gamesState: action.gamesState,
                 error: action.error,
                 games: action.games
+            })
+        }
+
+        case EventTypes.PLAY_SHOW_DIALOG: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                activeDialog: action.show ? action.dialog : DialogType.None,
             })
         }
         default:

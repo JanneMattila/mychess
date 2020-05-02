@@ -8,6 +8,13 @@ export enum ProcessState {
     Error
 };
 
+export enum DialogType {
+    None,
+    NewGame,
+    Promotion,
+    MakeMove
+};
+
 /*
  * Action event types
  */
@@ -18,13 +25,18 @@ export enum EventTypes {
     AUTH_LOGOUT = "Auth/Logout",
 
     // Game loading related events
-    GAMES_LOADING = "Games/Load"
+    GAMES_LOADING = "Games/Load",
+
+    // Game playing related events
+    PLAY_LOADING = "Play/Load",
+    PLAY_SHOW_DIALOG = "Play/Dialog",
 };
 
 type LoginAction = { type: EventTypes.AUTH_LOGIN, loginState: ProcessState, error?: string, account?: Account, accessToken?: string }
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: GameModel[] }
+type PlayShowDialogAction = { type: EventTypes.PLAY_SHOW_DIALOG, dialog: DialogType, show: boolean }
 
 // Root action
 export type RootAction =
@@ -32,6 +44,7 @@ export type RootAction =
     | LogoutAction
     | LoginExpiredAction
     | GamesLoadingAction
+    | PlayShowDialogAction
 
 export interface RootState {
     readonly loginState?: ProcessState
@@ -41,6 +54,8 @@ export interface RootState {
 
     readonly gamesState?: ProcessState
     readonly games?: GameModel[]
+
+    readonly activeDialog?: DialogType
 }
 
 /*
@@ -52,4 +67,8 @@ export function loginEvent(loginState: ProcessState, error?: string, account?: A
 
 export function gamesLoadingEvent(gamesState: ProcessState, error?: string, games?: GameModel[]): GamesLoadingAction {
     return { type: EventTypes.GAMES_LOADING, gamesState, error, games };
+}
+
+export function showDialogEvent(dialog: DialogType, show: boolean): PlayShowDialogAction {
+    return { type: EventTypes.PLAY_SHOW_DIALOG, dialog, show };
 }
