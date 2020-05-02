@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Auth } from "./components/Auth";
 import { Home } from "./pages/Home";
 import { Play } from "./pages/Play";
+import { PlayLocal } from "./pages/PlayLocal";
 import { Privacy } from "./pages/Privacy";
 import { Settings } from "./pages/Settings";
 import "./App.css";
@@ -34,6 +35,7 @@ function App() {
             <Switch>
               <Route exact path="/" component={Home} />
               <Route exact path="/privacy" component={Privacy} />
+              <Route exact path="/play/local" component={PlayLocal} />
               <Route exact path="/play/:id" component={Play} />
               <Route path="/settings" component={Settings} />
             </Switch>
