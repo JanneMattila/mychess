@@ -12,6 +12,7 @@ export class ChessBoardLocalView {
     private previousAvailableMoves: ChessMove[] = []
     private game: GameModel = new GameModel();
     private currentMoveNumber: number = 0;
+    private waitingForConfirmation = false;
 
     private imagesLoaded = 0;
     private imagesToLoad = -1;
@@ -99,7 +100,6 @@ export class ChessBoardLocalView {
 
                 let piece: ChessBoardPiece = this.board.getPiece(column, row);
                 let cell: HTMLTableCellElement = document.createElement("td") as HTMLTableCellElement;
-                let image: HTMLImageElement = document.createElement("img") as HTMLImageElement;
 
                 rowElement.appendChild(cell);
                 // cell.appendChild(image);
@@ -178,6 +178,11 @@ export class ChessBoardLocalView {
     public pieceSelected(id: string) {
         console.log("pieceSelected to " + id);
 
+        if (this.waitingForConfirmation) {
+            console.log("Waiting for confirmation");
+            return;
+        }
+
         if (this.game !== null && this.game.moves !== null &&
             this.game.moves.length !== this.currentMoveNumber) {
             console.log("Not in last move");
@@ -219,7 +224,7 @@ export class ChessBoardLocalView {
                 else {
                     this.setBoardStatus(0, 0);
 
-                    this.showConfirmationDialog("inline");
+                    this.showConfirmationDialog(true);
                 }
 
                 return;
@@ -240,19 +245,20 @@ export class ChessBoardLocalView {
 
     public confirm = (): void => {
         console.log("confirmed");
-        this.showConfirmationDialog("none");
+        this.showConfirmationDialog(false);
     }
 
     public cancel = (): void => {
         console.log("cancel");
-        this.showConfirmationDialog("none");
+        this.showConfirmationDialog(false);
         this.undo();
     }
 
-    private showConfirmationDialog(display: string) {
+    private showConfirmationDialog(show: boolean) {
+        this.waitingForConfirmation = show;
         let confirmationDialogElement = document.getElementById("confirmation");
         if (confirmationDialogElement !== null) {
-            confirmationDialogElement.style.display = display;
+            confirmationDialogElement.style.display = show ? "inline" : "none";
         }
     }
 
