@@ -26,6 +26,13 @@ export class ChessBoardLocalView {
 
         // Update game board to the screen
         this.drawBoard();
+
+        // Add "de-selection" when clicking outside the board
+        document.addEventListener("click", (event: MouseEvent) => {
+            if (!event.defaultPrevented) {
+                this.pieceSelected("9-9");
+            }
+        });
     }
 
     private loadImages() {
@@ -102,13 +109,13 @@ export class ChessBoardLocalView {
                 let cell: HTMLTableCellElement = document.createElement("td") as HTMLTableCellElement;
 
                 rowElement.appendChild(cell);
-                // cell.appendChild(image);
 
                 cell.id = "" + row + "-" + column;
                 cell.addEventListener('click', (evt) => {
                     console.log("onCellClick event");
                     let element = evt.currentTarget as HTMLElement;
                     this.pieceSelected(element.id);
+                    evt.preventDefault();
                 });
 
                 let imageIndex;
@@ -229,6 +236,12 @@ export class ChessBoardLocalView {
 
                 return;
             }
+        }
+
+        if (columnIndex >= ChessBoard.BOARD_SIZE ||
+            rowIndex >= ChessBoard.BOARD_SIZE) {
+            console.log("Only de-select the current selection");
+            return;
         }
 
         let moves: ChessMove[] = this.board.getAvailableMoves(columnIndex, rowIndex);
