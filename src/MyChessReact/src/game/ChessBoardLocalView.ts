@@ -13,6 +13,10 @@ export class ChessBoardLocalView {
     private game: GameModel = new GameModel();
     private currentMoveNumber: number = 0;
 
+    private imagesLoaded = 0;
+    private imagesToLoad = -1;
+    private images: HTMLImageElement[] = [];
+
     public initialize(currentPlayerTurn: boolean = false) {
         // Start preparing the board
         this.board = new ChessBoard();
@@ -23,9 +27,32 @@ export class ChessBoardLocalView {
         this.drawBoard();
     }
 
+    private loadImages() {
+        const files = [
+            "Empty",
+            "PawnWhite", "BishopWhite", "KnightWhite", "RookWhite", "QueenWhite", "KingWhite",
+            "PawnBlack", "BishopBlack", "KnightBlack", "RookBlack", "QueenBlack", "KingBlack",
+        ];
+        this.imagesToLoad = files.length;
+
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            let img = new Image();
+            img.onload = (evt) => {
+                this.imagesLoaded++;
+                if (this.imagesLoaded === this.imagesToLoad) {
+                    this.drawBoard();
+                }
+            };
+            img.src = "/images/" + file + ".svg";
+            this.images[i] = img;
+        }
+    }
+
     public async load() {
         this.initialize();
         console.log("local game");
+        this.loadImages();
         this.game = new GameModel();
     }
 
@@ -50,6 +77,10 @@ export class ChessBoardLocalView {
     }
 
     public drawBoard() {
+        if (this.imagesLoaded !== this.imagesToLoad) {
+            console.log(`images not yet loaded: ${this.imagesLoaded} / ${this.imagesToLoad}`);
+            return;
+        }
         console.log("drawBoard");
 
         // Update game board table
@@ -71,7 +102,7 @@ export class ChessBoardLocalView {
                 let image: HTMLImageElement = document.createElement("img") as HTMLImageElement;
 
                 rowElement.appendChild(cell);
-                cell.appendChild(image);
+                // cell.appendChild(image);
 
                 cell.id = "" + row + "-" + column;
                 cell.addEventListener('click', (evt) => {
@@ -80,46 +111,35 @@ export class ChessBoardLocalView {
                     this.pieceSelected(element.id);
                 });
 
-                let pieceColor: string = "";
-                let pieceRank: string = "";
-
+                let imageIndex;
                 switch (piece.piece) {
-                    case ChessPiece.Bishop:
-                        pieceRank = "Bishop";
+                    case ChessPiece.Pawn:
+                        imageIndex = 1;
                         break;
-                    case ChessPiece.King:
-                        pieceRank = "King";
+                    case ChessPiece.Bishop:
+                        imageIndex = 2;
                         break;
                     case ChessPiece.Knight:
-                        pieceRank = "Knight";
-                        break;
-                    case ChessPiece.Queen:
-                        pieceRank = "Queen";
+                        imageIndex = 3;
                         break;
                     case ChessPiece.Rook:
-                        pieceRank = "Rook";
+                        imageIndex = 4;
                         break;
-                    case ChessPiece.Pawn:
-                        pieceRank = "Pawn";
+                    case ChessPiece.Queen:
+                        imageIndex = 5;
+                        break;
+                    case ChessPiece.King:
+                        imageIndex = 6;
                         break;
                     default:
-                        pieceRank = "Empty";
+                        imageIndex = 0;
                         break;
                 }
-
-                if (piece.player === ChessPlayer.None) {
-                    image.src = "/images/Empty.svg";
+                if (piece.player === ChessPlayer.Black) {
+                    imageIndex += 6;
                 }
-                else {
-                    if (piece.player === ChessPlayer.White) {
-                        pieceColor = "White";
-                    }
-                    else if (piece.player === ChessPlayer.Black) {
-                        pieceColor = "Black";
-                    }
 
-                    image.src = "/images/" + pieceRank + pieceColor + ".svg";
-                }
+                cell.appendChild(this.images[imageIndex].cloneNode());
 
                 if ((row + column) % 2 === 0) {
                     cell.classList.add("lightCell");
