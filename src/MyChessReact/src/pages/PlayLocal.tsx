@@ -38,6 +38,15 @@ export function PlayLocal() {
                     <button onClick={confirm}><span role="img" aria-label="OK">✔</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
+                <div id="promotion" style={hidden}>
+                    Promote pawn to:<br />
+                    <input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} /> Queen<br />
+                    <input id="promotionRadioKnight" type="radio" name="Promotion" value="Knight" title="Knight" /> Knight<br />
+                    <input id="promotionRadioRook" type="radio" name="Promotion" value="Rook" title="Rook" /> Rook<br />
+                    <input id="promotionRadioBishop" type="radio" name="Promotion" value="Bishop" title="Bishop" /> Bishop<br />
+                    <button onClick={confirm}><span role="img" aria-label="OK">✔</span> Confirm</button>
+                    <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+                </div>
                 <div id="status" style={hidden}></div>
                 <ReactModal isOpen={isOpen} contentLabel="Promotion">
                     <button onClick={closeModal}>Undo</button>
