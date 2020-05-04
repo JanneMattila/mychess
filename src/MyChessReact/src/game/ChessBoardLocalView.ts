@@ -60,14 +60,14 @@ export class ChessBoardLocalView {
 
         document.addEventListener('touchstart', (event) => {
             this.touch = undefined;
-            if (event.changedTouches.length == 1) {
+            if (event.changedTouches.length === 1) {
                 this.touch = event.changedTouches[0];
             }
         });
 
         document.addEventListener('touchend', (event) => {
             if (this.touch !== undefined &&
-                event.changedTouches.length == 1) {
+                event.changedTouches.length === 1) {
                 const delta = 40;
                 let touchEnd = event.changedTouches[0];
                 if (Math.abs(touchEnd.clientY - this.touch.clientY) > delta) {
