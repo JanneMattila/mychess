@@ -27,24 +27,36 @@ export function PlayLocal() {
     }
 
     const hidden = {
-        display: "none"
+        display: "none",
     }
 
     return (
         <div>
             <header className="Play-header">
                 <table className="table" id="table-game"></table>
-                <div id="confirmation" style={hidden}>
-                    <button onClick={confirm}><span role="img" aria-label="OK">✔</span> Confirm</button>
+                <div id="confirmation" className="Play-Form">
+                    <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
-                <div id="promotion" style={hidden}>
+                <div id="promotion" className="Play-Form">
                     Promote pawn to:<br />
-                    <input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} /> Queen<br />
-                    <input id="promotionRadioKnight" type="radio" name="Promotion" value="Knight" title="Knight" /> Knight<br />
-                    <input id="promotionRadioRook" type="radio" name="Promotion" value="Rook" title="Rook" /> Rook<br />
-                    <input id="promotionRadioBishop" type="radio" name="Promotion" value="Bishop" title="Bishop" /> Bishop<br />
-                    <button onClick={confirm}><span role="img" aria-label="OK">✔</span> Confirm</button>
+                    <label>
+                        <input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} />
+                        Queen
+                    </label><br />
+                    <label>
+                        <input id="promotionRadioKnight" type="radio" name="Promotion" value="Knight" title="Knight" />
+                        Knight
+                    </label><br />
+                    <label>
+                        <input id="promotionRadioRook" type="radio" name="Promotion" value="Rook" title="Rook" />
+                        Rook
+                    </label><br />
+                    <label>
+                        <input id="promotionRadioBishop" type="radio" name="Promotion" value="Bishop" title="Bishop" />
+                        Bishop
+                    </label><br />
+                    <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
                 <div id="status" style={hidden}></div>
