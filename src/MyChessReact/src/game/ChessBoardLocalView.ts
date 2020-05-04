@@ -25,12 +25,34 @@ export class ChessBoardLocalView {
         this.previousAvailableMoves = [];
 
         // Update game board to the screen
-        this.drawBoard();
+        this.drawBoard();   
 
         // Add "de-selection" when clicking outside the board
         document.addEventListener("click", (event: MouseEvent) => {
             if (!event.defaultPrevented) {
                 this.pieceSelected("9-9");
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            console.log(event.keyCode);
+            switch (event.keyCode) {
+                case 36: // Home
+                    this.firstMove();
+                    break;
+                case 37: // LeftArrow
+                case 40: // DownArrow
+                    this.previousMove();
+                    break;
+                case 39: // RightArrow
+                case 38: // UpArrow
+                    this.nextMove();
+                    break;
+                case 35: // End
+                    this.lastMove();
+                    break;
+                default:
+                    break;
             }
         });
     }
