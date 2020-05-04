@@ -18,6 +18,8 @@ export class ChessBoardLocalView {
     private imagesToLoad = -1;
     private images: HTMLImageElement[] = [];
 
+    private touch?: Touch;
+
     public initialize(currentPlayerTurn: boolean = false) {
         // Start preparing the board
         this.board = new ChessBoard();
@@ -25,7 +27,7 @@ export class ChessBoardLocalView {
         this.previousAvailableMoves = [];
 
         // Update game board to the screen
-        this.drawBoard();   
+        this.drawBoard();
 
         // Add "de-selection" when clicking outside the board
         document.addEventListener("click", (event: MouseEvent) => {
@@ -53,6 +55,37 @@ export class ChessBoardLocalView {
                     break;
                 default:
                     break;
+            }
+        });
+
+        document.addEventListener('touchstart', (event) => {
+            this.touch = undefined;
+            if (event.changedTouches.length == 1) {
+                this.touch = event.changedTouches[0];
+            }
+        });
+
+        document.addEventListener('touchend', (event) => {
+            if (this.touch !== undefined &&
+                event.changedTouches.length == 1) {
+                const delta = 40;
+                let touchEnd = event.changedTouches[0];
+                if (Math.abs(touchEnd.clientY - this.touch.clientY) > delta) {
+                    if (touchEnd.clientY < this.touch.clientY - delta) {
+                        this.firstMove();
+                    }
+                    else {
+                        this.lastMove();
+                    }
+                }
+                else if (Math.abs(touchEnd.clientX - this.touch.clientX) > delta) {
+                    if (touchEnd.clientX < this.touch.clientX - delta) {
+                        this.previousMove();
+                    }
+                    else {
+                        this.nextMove();
+                    }
+                }
             }
         });
     }
