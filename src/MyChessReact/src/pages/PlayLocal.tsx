@@ -21,6 +21,12 @@ export function PlayLocal() {
         board.confirm();
     }
 
+    const confirmPromotion = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        board.changePromotion("Promotion");
+        board.confirm();
+    }
+
     const cancel = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         board.cancel();
@@ -38,7 +44,7 @@ export function PlayLocal() {
                     <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
-                <div id="promotion" className="Play-Form">
+                <div id="promotionDialog" className="Play-Form">
                     Promote pawn to:<br />
                     <label>
                         <input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} />
@@ -56,7 +62,7 @@ export function PlayLocal() {
                         <input id="promotionRadioBishop" type="radio" name="Promotion" value="Bishop" title="Bishop" />
                         Bishop
                     </label><br />
-                    <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Confirm</button>
+                    <button onClick={confirmPromotion}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
                 <div id="status" style={hidden}></div>

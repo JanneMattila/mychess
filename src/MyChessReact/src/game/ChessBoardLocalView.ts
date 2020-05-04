@@ -227,6 +227,8 @@ export class ChessBoardLocalView {
 
                     let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
                     queenPromotionElement.checked = true;
+
+                    this.showPromotionDialog(true);
                 }
                 else {
                     this.setBoardStatus(0, 0);
@@ -259,11 +261,13 @@ export class ChessBoardLocalView {
     public confirm = (): void => {
         console.log("confirmed");
         this.showConfirmationDialog(false);
+        this.showPromotionDialog(false);
     }
 
     public cancel = (): void => {
         console.log("cancel");
         this.showConfirmationDialog(false);
+        this.showPromotionDialog(false);
         this.undo();
     }
 
@@ -272,6 +276,14 @@ export class ChessBoardLocalView {
         let confirmationDialogElement = document.getElementById("confirmation");
         if (confirmationDialogElement !== null) {
             confirmationDialogElement.style.display = show ? "inline" : "none";
+        }
+    }
+
+    private showPromotionDialog(show: boolean) {
+        this.waitingForConfirmation = show;
+        let promotionDialogElement = document.getElementById("promotionDialog");
+        if (promotionDialogElement !== null) {
+            promotionDialogElement.style.display = show ? "inline" : "none";
         }
     }
 
