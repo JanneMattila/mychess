@@ -32,6 +32,10 @@ export function PlayLocal() {
         board.cancel();
     }
 
+    const toggleEllipse = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+    }
+
     const hidden = {
         display: "none",
     }
@@ -66,6 +70,9 @@ export function PlayLocal() {
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
                 <div id="status" style={hidden}></div>
+                <div id="ellipse">
+                    <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
+                </div>
                 <ReactModal isOpen={isOpen} contentLabel="Promotion">
                     <button onClick={closeModal}>Undo</button>
                 </ReactModal>
