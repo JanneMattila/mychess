@@ -7,6 +7,7 @@ export function PlayLocal() {
 
     let board = new ChessBoardLocalView();
     let isOpen = false;
+    let isEllipse = false;
 
     useEffect(() => {
         board.load();
@@ -34,6 +35,11 @@ export function PlayLocal() {
 
     const toggleEllipse = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
+        isEllipse = !isEllipse;
+        const element = document.getElementById("ellipseContent");
+        if (element) {
+            element.style.display = isEllipse ? "inline" : "none";
+        }
     }
 
     const hidden = {
@@ -72,6 +78,9 @@ export function PlayLocal() {
                 <div id="status" style={hidden}></div>
                 <div id="ellipse">
                     <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
+                </div>
+                <div id="ellipseContent" style={hidden}>
+                    No content yet
                 </div>
                 <ReactModal isOpen={isOpen} contentLabel="Promotion">
                     <button onClick={closeModal}>Undo</button>
