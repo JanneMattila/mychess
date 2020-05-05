@@ -1,10 +1,13 @@
-import React, { useEffect, MouseEvent } from "react";
+import React, { useEffect, MouseEvent, useState } from "react";
+import Switch from "react-switch";
 import "./Settings.css";
 
 export function Settings() {
 
+    const [isNotificationsEnabled, setNotifications] = useState(false);
+
     useEffect(() => {
-        
+
     });
 
     const confirm = (event: MouseEvent<HTMLButtonElement>) => {
@@ -13,6 +16,10 @@ export function Settings() {
 
     const cancel = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
+    }
+
+    const handleNotificationChange = (checked: boolean): void => {
+        setNotifications(!isNotificationsEnabled);
     }
 
     return (
@@ -24,9 +31,16 @@ export function Settings() {
                     Username<br />
                     <input type="text" />
                 </label>
+                <br />
+                <label>
+                    Notifications<br />
+                    <Switch onChange={handleNotificationChange} checked={isNotificationsEnabled} />
+                </label>
 
-                <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Save</button>
-                <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+                <div>
+                    <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Save</button>
+                    <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+                </div>
             </header>
         </div>
     );
