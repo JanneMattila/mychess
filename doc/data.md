@@ -100,9 +100,9 @@ Here is example move format:
 Contains information about authenticated users. Only required
 information for uniquely identify them are stored:
 
-| PartitionKey | RowKey | Created | Updated | Name | UserID | 
+| PartitionKey | RowKey | Created | Updated | Name | UserID |  Enabled |
 |---|---|---|---|
-| [1] | [2] | 2020-04-03T15:51:05.000Z | 2020-05-03T15:51:05.000Z | John Doe | [3] |
+| [1] | [2] | 2020-04-03T15:51:05.000Z | 2020-05-03T15:51:05.000Z | John Doe | [3] | true |
 
 [1] `"oid"`: The immutable identifier for an object in the Microsoft identity system.
 
@@ -111,10 +111,11 @@ Note: For personal accounts, the value is 9188040d-6c67-4c5b-b112-36a304b66dad.
 
 [3] Unique identifier of user used in other data elements e.g. games.
 
+Note: `Enabled` field is used only if for some reason we need to disable login of certain user.
+
 ### Mapping tables
 
 TBD: Map from UserID into User record.
-
 
 ### Settings
 
