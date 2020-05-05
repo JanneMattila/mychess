@@ -2,7 +2,7 @@
 
 ## JSON schemas
 
-### Player
+### Player schema
 
 Here is example game format:
 
@@ -15,7 +15,7 @@ Here is example game format:
 }
 ```
 
-### Game
+### Game schema
 
 Here is example game format:
 
@@ -80,7 +80,7 @@ for the user interface at the backend:
 }
 ```
 
-### Move
+### Move schema
 
 Here is example move format:
 
@@ -95,13 +95,13 @@ Here is example move format:
 
 ## Table Storage structure
 
-### Users
+### Users table
 
-Contains information about authenticated users. Only required
-information for uniquely identify them are stored:
+Contains information about authenticated users.
+Only required elements are stored:
 
 | PartitionKey | RowKey | Created | Updated | Name | UserID |  Enabled |
-|---|---|---|---|
+|---|---|---|---|---|---|---|
 | [1] | [2] | 2020-04-03T15:51:05.000Z | 2020-05-03T15:51:05.000Z | John Doe | [3] | true |
 
 [1] `"oid"`: The immutable identifier for an object in the Microsoft identity system.
@@ -113,21 +113,29 @@ Note: For personal accounts, the value is 9188040d-6c67-4c5b-b112-36a304b66dad.
 
 Note: `Enabled` field is used only if for some reason we need to disable login of certain user.
 
-### Mapping tables
+### UserID2User table
 
-TBD: Map from UserID into User record.
+Map from UserID into User record.
 
-### Settings
-
-TBD
-
-### Game
-
-TBD
-
-| PartitionKey | RowKey | Updated |Data* | 
+| PartitionKey | RowKey | UserPrimaryKey | UserRowKey |
 |---|---|---|---|
-| user123 | 123-abc-123 | 2020-04-03T15:51:05.000Z | ... |
-| user123 | 123-abc-123 | 2020-04-04T15:51:05.000Z | ... |
+| [1] | [1] | [2] | [3] |
+
+[1] Unique identifier of user
+
+### Settings table
+
+TBD
+
+### Game table
+
+TBD
+
+| PartitionKey | RowKey | Updated | Data* |
+|---|---|---|---|
+| [1] | 123-abc-123 | 2020-04-03T15:51:05.000Z | ... |
+| [1] | 123-abc-123 | 2020-04-04T15:51:05.000Z | ... |
+
+[1] Unique identifier of user
 
 *) Compressed game data object.
