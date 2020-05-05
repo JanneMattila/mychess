@@ -91,9 +91,26 @@ Here is example move format:
 
 ## Table Storage structure
 
-### Player
+### Users
 
-TBD
+Contains information about authenticated users. Only required
+information for uniquely identify them are stored:
+
+| PartitionKey | RowKey | Created | Updated | Name | UserID | 
+|---|---|---|---|
+| [1] | [2] | 2020-04-03T15:51:05.000Z | 2020-05-03T15:51:05.000Z | John Doe | [3] |
+
+[1] `"oid"`: The immutable identifier for an object in the Microsoft identity system.
+
+[2] `"tid"`: A GUID that represents the Azure AD tenant that the user is from.
+Note: For personal accounts, the value is 9188040d-6c67-4c5b-b112-36a304b66dad.
+
+[3] Unique identifier of user used in other data elements e.g. games.
+
+### Mapping tables
+
+TBD: Map from UserID into User record.
+
 
 ### Settings
 
