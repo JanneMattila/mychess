@@ -7,7 +7,7 @@ import { ChessPiece } from "./ChessPiece";
 // import { ChessBoardLocation } from "./ChessBoardLocation";
 // import { ChessPieceSelection } from "./ChessPieceSelection";
 import { ChessBoardState } from "./ChessBoardState";
-import { GameModel } from "../models/GameModel";
+import { MyChessGame } from "../models/MyChessGame";
 // import { MoveModel } from "../models/MoveModel";
 import { setTimeout } from "timers";
 import { ChessPlayer } from "./ChessPlayer";
@@ -16,7 +16,7 @@ export class ChessBoardView {
     private board: ChessBoard = new ChessBoard();
     private previousAvailableMoves: ChessMove[] = []
     private currentPlayerTurn: boolean = false;
-    private game: GameModel = new GameModel();
+    private game: MyChessGame = new MyChessGame();
     private url: string = "";
     private currentMoveNumber: number = 0;
 
@@ -40,7 +40,7 @@ export class ChessBoardView {
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-                this.game = JSON.parse(data) as GameModel;
+                this.game = JSON.parse(data) as MyChessGame;
 
                 let animatedMoves = Math.min(3, this.game.moves.length);
                 let moves = this.game.moves.length - animatedMoves;
@@ -57,11 +57,11 @@ export class ChessBoardView {
         else {
             console.log("new game");
             this.currentPlayerTurn = true;
-            this.game = new GameModel();
+            this.game = new MyChessGame();
         }
     }
 
-    private makeNumberOfMoves(game: GameModel, movesCount: number): number {
+    private makeNumberOfMoves(game: MyChessGame, movesCount: number): number {
         this.initialize(true /* game.currentPlayerStarted*/);
         this.game = game;
 

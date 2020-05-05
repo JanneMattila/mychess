@@ -1,4 +1,4 @@
-export class MoveModel {
+export class MyChessGameMove {
     move: string;
     comment: string;
     capture: string;

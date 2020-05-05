@@ -48,9 +48,9 @@ namespace MyChess.Functions
                 {
                     ID = Guid.NewGuid().ToString("D"),
                     Name = $"Game of name {i + 1}",
-                    Opponent = $"User {i + 1}",
                     Updated = DateTimeOffset.UtcNow.AddHours(-i)
                 };
+                game.Players.Black.Name = $"User {i + 1}";
                 game.Moves.Add(new MyChessGameMove()
                 {
                     Comment = "👍 Lorem ipsum dolor sit amet ❤ 😊, consectetur adipiscing elit. Ut sed mollis neque. Maecenas molestie nibh id elit gravida, quis placerat magna tempor. Morbi posuere orci sapien, eget dictum ligula tempor ut. Vivamus nec massa dolor. Sed fermentum ex non nunc dapibus blandit. Vivamus sollicitudin, libero rhoncus faucibus ullamcorper, velit dui finibus neque, sed placerat sapien urna id nunc. Aliquam ac consectetur elit.",

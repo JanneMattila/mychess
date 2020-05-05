@@ -73,7 +73,11 @@ Will be converted into more approriate data
 for the user interface at the backend:
 
 ```json
-"opponent": "John Doe"
+"players": {
+  "black": {
+    "name": "Jane Doe"
+  }
+}
 ```
 
 ### Move

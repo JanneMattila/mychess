@@ -1,5 +1,5 @@
 import { Account } from "msal";
-import { GameModel } from "./models/GameModel";
+import { MyChessGame } from "./models/MyChessGame";
 
 export enum ProcessState {
     NotStarted,
@@ -35,7 +35,7 @@ export enum EventTypes {
 type LoginAction = { type: EventTypes.AUTH_LOGIN, loginState: ProcessState, error?: string, account?: Account, accessToken?: string }
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
-type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: GameModel[] }
+type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
 type PlayShowDialogAction = { type: EventTypes.PLAY_SHOW_DIALOG, dialog: DialogType, show: boolean }
 
 // Root action
@@ -53,7 +53,7 @@ export interface RootState {
     readonly accessToken?: string
 
     readonly gamesState?: ProcessState
-    readonly games?: GameModel[]
+    readonly games?: MyChessGame[]
 
     readonly activeDialog?: DialogType
 }
@@ -65,7 +65,7 @@ export function loginEvent(loginState: ProcessState, error?: string, account?: A
     return { type: EventTypes.AUTH_LOGIN, loginState, error, account, accessToken };
 }
 
-export function gamesLoadingEvent(gamesState: ProcessState, error?: string, games?: GameModel[]): GamesLoadingAction {
+export function gamesLoadingEvent(gamesState: ProcessState, error?: string, games?: MyChessGame[]): GamesLoadingAction {
     return { type: EventTypes.GAMES_LOADING, gamesState, error, games };
 }
 

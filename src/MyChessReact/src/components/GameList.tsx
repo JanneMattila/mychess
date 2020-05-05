@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { GameModel } from "../models/GameModel";
+import { MyChessGame } from "../models/MyChessGame";
 import { useTypedSelector } from "../reducers";
 import { gamesLoadingEvent, RootState, ProcessState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
@@ -54,7 +54,14 @@ export function GameList(props: GameListProps) {
         }
     }, [loginState, gamesState, accessToken, ai, props, dispatch]);
 
-    const renderGames = (games?: GameModel[]) => {
+    const getOpponent = (game: MyChessGame) => {
+        if (game.players.white.name) {
+            return game.players.white.name;
+        }
+        return game.players.black.name;
+    }
+
+    const renderGames = (games?: MyChessGame[]) => {
         return (
             <div className="row">
                 {games?.map(game =>
@@ -67,7 +74,7 @@ export function GameList(props: GameListProps) {
                                 {(game?.moves.length > 0 ? game?.moves[game?.moves.length - 1].comment : "")}
                             </div>
                             <div className="opponentTemplate">
-                                {game?.opponent}
+                                {getOpponent(game)}
                             </div>
                         </div>
                     </Link>

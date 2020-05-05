@@ -3,14 +3,14 @@ import { ChessMove } from "./ChessMove";
 import { ChessBoardPiece } from "./ChessBoardPiece";
 import { ChessPiece } from "./ChessPiece";
 import { ChessBoardState } from "./ChessBoardState";
-import { GameModel } from "../models/GameModel";
+import { MyChessGame } from "../models/MyChessGame";
 import { setTimeout } from "timers";
 import { ChessPlayer } from "./ChessPlayer";
 
 export class ChessBoardLocalView {
     private board: ChessBoard = new ChessBoard();
     private previousAvailableMoves: ChessMove[] = []
-    private game: GameModel = new GameModel();
+    private game: MyChessGame = new MyChessGame();
     private currentMoveNumber: number = 0;
     private waitingForConfirmation = false;
 
@@ -116,10 +116,10 @@ export class ChessBoardLocalView {
         this.initialize();
         console.log("local game");
         this.loadImages();
-        this.game = new GameModel();
+        this.game = new MyChessGame();
     }
 
-    private makeNumberOfMoves(game: GameModel, movesCount: number): number {
+    private makeNumberOfMoves(game: MyChessGame, movesCount: number): number {
         this.initialize(true);
         this.game = game;
 

@@ -18,9 +18,6 @@ namespace MyChess.Interfaces
         [JsonPropertyName("updated")]
         public DateTimeOffset Updated { get; set; }
 
-        [JsonPropertyName("opponent")]
-        public string Opponent { get; set; } = string.Empty;
-
         [JsonPropertyName("players")]
         public MyChessGamePlayers Players { get; set; } = new MyChessGamePlayers();
 
