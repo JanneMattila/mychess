@@ -35,7 +35,9 @@ export function Auth(props: AuthProps) {
                 auth: {
                     clientId: props.clientId,
                     authority: "https://login.microsoftonline.com/common",
-                    navigateToLoginRequestUrl: false
+                    navigateToLoginRequestUrl: false,
+                    redirectUri: window.location.origin,
+                    postLogoutRedirectUri: window.location.origin
                 },
                 cache: {
                     cacheLocation: "localStorage"
