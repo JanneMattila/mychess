@@ -112,9 +112,9 @@ In case of promotion then additional `promotion` property will be added:
 Contains information about authenticated users.
 Only required elements are stored:
 
-| PartitionKey | RowKey | Created | Updated | Name | UserID* |  Enabled |
-|--------------|--------|---------|---------|------|--------|----------|
-| [1] | [2] | 2020-04-03T15:51:05.000Z | 2020-05-03T15:51:05.000Z | John Doe | user-abc-123 | true |
+| PartitionKey | RowKey | Created                  | Updated                  | Name     | UserID*      | Enabled |
+|--------------|--------|--------------------------|--------------------------|----------|--------------|---------|
+| [1]          | [2]    | 2020-04-03T15:51:05.000Z | 2020-05-03T15:51:05.000Z | John Doe | user-abc-123 | true    |
 
 [1] `"oid"`: The immutable identifier for an object in the Microsoft identity system.
 
@@ -127,17 +127,17 @@ Note: `Enabled` field is used only if for some reason we need to disable login o
 
 ### UserNotifications table
 
-| PartitionKey | RowKey | Enabled | Url |
-|--------------|--------|---------|-----|
-| user-abc-123 | browser1 | true | https://fcm.googleapis.com/fcm/send/aZu.../ |
-| user-abc-123 | browser2 | true | https://fcm.googleapis.com/fcm/send/eZu.../ |
+| PartitionKey | RowKey   | Enabled | Url                                         |
+|--------------|----------|---------|---------------------------------------------|
+| user-abc-123 | browser1 | true    | https://fcm.googleapis.com/fcm/send/aZu.../ |
+| user-abc-123 | browser2 | true    | https://fcm.googleapis.com/fcm/send/eZu.../ |
 
 ### UserFriends table
 
-| PartitionKey | RowKey | Name* |
-|--------------|--------|------|
-| user-abc-123 | user-def-123 | John |
-| user-abc-123 | user-fgh-456 | Jane |
+| PartitionKey | RowKey       | Name* |
+|--------------|--------------|-------|
+| user-abc-123 | user-def-123 | John  |
+| user-abc-123 | user-fgh-456 | Jane  |
 
 *) Default value from friend name when friend is added but can be updated.
 
@@ -145,24 +145,24 @@ Note: `Enabled` field is used only if for some reason we need to disable login o
 
 Map from UserID into User record.
 
-| PartitionKey | RowKey | UserPrimaryKey | UserRowKey |
-|---|---|---|---|
-| [1] | [1] | [2] | [3] |
-
-[1] Unique identifier of user
+| PartitionKey | RowKey       | UserPrimaryKey | UserRowKey |
+|--------------|--------------|----------------|------------|
+| user-abc-123 | user-abc-123 | [2]            | [3]        |
 
 ### Settings table
 
-TBD
+| PartitionKey | RowKey       | PlayAlwaysUp |
+|--------------|--------------|--------------|
+| user-abc-123 | user-abc-123 | false        |
 
 ### Game table
 
 TBD
 
-| PartitionKey | RowKey | Updated | Data* |
-|---|---|---|---|
-| [1] | 123-abc-123 | 2020-04-03T15:51:05.000Z | ... |
-| [1] | 123-abc-123 | 2020-04-04T15:51:05.000Z | ... |
+| PartitionKey | RowKey      | Updated                  | Data* | State  |
+|--------------|-------------|--------------------------|-------|--------|
+| [1]          | 123-abc-123 | 2020-04-03T15:51:05.000Z | ...   | Normal |
+| [1]          | 123-abc-123 | 2020-04-04T15:51:05.000Z | ...   | Normal |
 
 [1] Unique identifier of user
 
