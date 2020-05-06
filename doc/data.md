@@ -112,18 +112,34 @@ In case of promotion then additional `promotion` property will be added:
 Contains information about authenticated users.
 Only required elements are stored:
 
-| PartitionKey | RowKey | Created | Updated | Name | UserID |  Enabled |
-|---|---|---|---|---|---|---|
-| [1] | [2] | 2020-04-03T15:51:05.000Z | 2020-05-03T15:51:05.000Z | John Doe | [3] | true |
+| PartitionKey | RowKey | Created | Updated | Name | UserID* |  Enabled |
+|--------------|--------|---------|---------|------|--------|----------|
+| [1] | [2] | 2020-04-03T15:51:05.000Z | 2020-05-03T15:51:05.000Z | John Doe | user-abc-123 | true |
 
 [1] `"oid"`: The immutable identifier for an object in the Microsoft identity system.
 
 [2] `"tid"`: A GUID that represents the Azure AD tenant that the user is from.
 Note: For personal accounts, the value is 9188040d-6c67-4c5b-b112-36a304b66dad.
 
-[3] Unique identifier of user used in other data elements e.g. games.
+*) Unique identifier of user used in other data elements e.g. games.
 
 Note: `Enabled` field is used only if for some reason we need to disable login of certain user.
+
+### UserNotifications table
+
+| PartitionKey | RowKey | Enabled | Url |
+|--------------|--------|---------|-----|
+| user-abc-123 | browser1 | true | https://fcm.googleapis.com/fcm/send/aZu.../ |
+| user-abc-123 | browser2 | true | https://fcm.googleapis.com/fcm/send/eZu.../ |
+
+### UserFriends table
+
+| PartitionKey | RowKey | Name* |
+|--------------|--------|------|
+| user-abc-123 | user-def-123 | John |
+| user-abc-123 | user-fgh-456 | Jane |
+
+*) Default value from friend name when friend is added but can be updated.
 
 ### UserID2User table
 
