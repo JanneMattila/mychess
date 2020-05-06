@@ -93,6 +93,18 @@ Here is example move format:
 }
 ```
 
+In case of promotion then additional `promotion` property will be added:
+
+```json
+{
+  "move": "A1A2",
+  "comment": "Here we go!",
+  "promotion": "Queen",
+  "start": "2020-04-05T15:48:57.484Z",
+  "end": "2020-04-05T15:49:05.000Z"
+}
+```
+
 ## Table Storage structure
 
 ### Users table
