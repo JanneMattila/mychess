@@ -1,10 +1,10 @@
 # Data
 
-## JSON schemas
+## JSON payload examples
 
-### User schema
+### User
 
-Here is example user format:
+Here is example user payload:
 
 ```json
 {
@@ -15,9 +15,9 @@ Here is example user format:
 }
 ```
 
-### Friends schema
+### Friends
 
-Here is example friends format:
+Here is example friends payload:
 
 ```json
 [
@@ -32,9 +32,9 @@ Here is example friends format:
 ]
 ```
 
-### Game schema
+### Game
 
-Here is example game format:
+Here is example game payload:
 
 ```json
 {
@@ -97,9 +97,9 @@ for the user interface at the backend:
 }
 ```
 
-### Move schema
+### Move
 
-Here is example move format:
+Here is example move payload:
 
 ```json
 {
