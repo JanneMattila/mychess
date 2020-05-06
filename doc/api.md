@@ -40,6 +40,20 @@ POST `https://{host}/api/games/123-abc-123/moves`
 
 - Creates new move on game
 
+### Friends
+
+GET `https://{host}/api/friends`
+
+- Returns array of all users friends
+
+POST `https://{host}/api/friends/123-abc-123`
+
+- Add user as friend. Optionally overwriting default name.
+
+DELETE `https://{host}/api/friends/123-abc-123`
+
+- Remove user from friends
+
 ### Settings
 
 GET `https://{host}/api/settings`
@@ -49,3 +63,13 @@ GET `https://{host}/api/settings`
 POST `https://{host}/api/settings`
 
 - Update players settings
+
+### Users
+
+GET `https://{host}/api/users`
+
+- Return current users all data
+
+DELETE `https://{host}/api/users`
+
+- Delete current users all data

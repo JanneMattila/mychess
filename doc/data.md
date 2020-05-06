@@ -122,6 +122,16 @@ In case of promotion then additional `promotion` property will be added:
 }
 ```
 
+In case of resign:
+
+```json
+{
+  "comment": "Okay I admit I lost!",
+  "start": "2020-04-05T15:48:57.484Z",
+  "end": "2020-04-05T15:49:05.000Z"
+}
+```
+
 ### New Game
 
 Here is example new game payload:
