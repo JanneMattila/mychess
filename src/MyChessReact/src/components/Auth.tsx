@@ -3,8 +3,9 @@ import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { loginEvent, RootState, ProcessState } from "../actions";
 import { UserAgentApplication, Configuration } from "msal";
-import { Link } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import "./Auth.css";
+import { Database, DatabaseFields } from "../data/Database";
 
 type AuthProps = {
     clientId: string;
@@ -14,6 +15,8 @@ type AuthProps = {
 let userAgentApplication: UserAgentApplication;
 
 export function Auth(props: AuthProps) {
+    let location = useLocation();
+    const history = useHistory();
     const selectorLoginState = (state: RootState) => state.loginState;
     const selectorAccount = (state: RootState) => state.account;
 
@@ -60,6 +63,8 @@ export function Auth(props: AuthProps) {
                     if (loggedInAccount) {
                         dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, response.accessToken));
                     }
+
+                    postLogin();
                 }
             });
 
@@ -69,13 +74,30 @@ export function Auth(props: AuthProps) {
                 if (loggedInAccount) {
                     dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessTokenResponse.accessToken));
                 }
+
+                postLogin();
             }).catch(function (error) {
                 // Acquire token silent failure, wait for user sign in
             });
         }
     });
 
+    const preLogin = () => {
+        if (location.pathname !== "/") {
+            Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
+        }
+    }
+
+    const postLogin = () => {
+        const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
+        Database.delete(DatabaseFields.AUTH_REDIRECT);
+        if (redirectUrl) {
+            history.push(redirectUrl);
+        }
+    }
+
     const onSignIn = () => {
+        preLogin();
         return userAgentApplication.loginRedirect(accessTokenRequest);
     }
 
