@@ -208,12 +208,20 @@ Map from UserID into User record.
 
 ### Game table
 
-TBD
+Game data is split to 3 tables:
 
-| PartitionKey | RowKey      | Updated                  | Data* | State  |
-|--------------|-------------|--------------------------|-------|--------|
-| [1]          | 123-abc-123 | 2020-04-03T15:51:05.000Z | ...   | Normal |
-| [1]          | 123-abc-123 | 2020-04-04T15:51:05.000Z | ...   | Normal |
+- gamesWaitingForYou
+- gamesWaitingForOpponent
+- gamesArchive
+
+This enables to fetch the data only from single table and single partition
+per use case in user interface.
+
+| PartitionKey | RowKey      | Data* |
+|--------------|-------------|-------|
+| [1]          | 123-abc-111 | ...   |
+| [1]          | 123-abc-222 | ...   |
+| [1]          | 123-abc-333 | ...   |
 
 [1] Unique identifier of user
 
