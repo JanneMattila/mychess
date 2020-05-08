@@ -53,10 +53,14 @@ namespace MyChess.Data
             _gamesArchiveTable.CreateIfNotExists();
         }
 
-        private CloudTable GetGamesTable(string tableName)
+        private CloudTable GetTable(string tableName)
         {
             return tableName switch
             {
+                TableNames.Users => _usersTable,
+                TableNames.UserFriends => _userFriendsTable,
+                TableNames.UserNotifications => _userNotificationsTable,
+                TableNames.UserSettings => _userSettingsTable,
                 TableNames.GamesWaitingForYou => _gamesWaitingForYouTable,
                 TableNames.GamesWaitingForOpponent => _gamesWaitingForOpponentTable,
                 TableNames.GamesArchive => _gamesArchiveTable,
@@ -64,24 +68,26 @@ namespace MyChess.Data
             };
         }
 
-        public async Task<GameEntity?> GetGameAsync(string tableName, string userID, string gameID)
+        public async Task<T?> GetAsync<T>(string tableName, string partitionKey, string rowKey)
+            where T : TableEntity
         {
-            var table = GetGamesTable(tableName);
-            var retrieveOperation = TableOperation.Retrieve<GameEntity>(userID, gameID);
+            var table = GetTable(tableName);
+            var retrieveOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
             var result = await table.ExecuteAsync(retrieveOperation);
-            return result.Result as GameEntity;
+            return result.Result as T;
         }
 
-        public async IAsyncEnumerable<GameEntity> GetGamesAsync(string tableName, string userID)
+        public async IAsyncEnumerable<T> GetAllAsync<T>(string tableName, string partitionKey)
+            where T : TableEntity, new()
         {
-            var query = new TableQuery<GameEntity>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userID));
+            var query = new TableQuery<T>()
+                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
             var token = new TableContinuationToken();
-            var table = GetGamesTable(tableName);
+            var table = GetTable(tableName);
 
             do
             {
-                var result = await table.ExecuteQuerySegmentedAsync(query, token);
+                var result = await table.ExecuteQuerySegmentedAsync<T>(query, token);
                 foreach (var item in result)
                 {
                     yield return item;
