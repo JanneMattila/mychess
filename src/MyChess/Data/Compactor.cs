@@ -1,0 +1,38 @@
+﻿using System.IO;
+using System.IO.Compression;
+using System.Text;
+using System.Text.Json;
+using MyChess.Interfaces;
+
+namespace MyChess.Data
+{
+    public class Compactor
+    {
+        public byte[] Compact(MyChessGame game)
+        {
+            var json = JsonSerializer.Serialize(game);
+            var buffer = Encoding.UTF8.GetBytes(json);
+
+            using var input = new MemoryStream(buffer);
+            using var output = new MemoryStream();
+            using var compressor = new BrotliStream(output, CompressionMode.Compress);
+            input.CopyTo(compressor);
+            return output.ToArray();
+        }
+
+        public MyChessGame Decompress(byte[] data)
+        {
+            byte[] buffer;
+            using (var input = new MemoryStream(data))
+            using (var output = new MemoryStream())
+            using (var compressor = new BrotliStream(output, CompressionMode.Decompress))
+            {
+                input.CopyTo(compressor);
+                buffer = output.ToArray();
+            }
+
+            var json = Encoding.UTF8.GetString(buffer);
+            return JsonSerializer.Deserialize<MyChessGame>(json);
+        }
+    }
+}

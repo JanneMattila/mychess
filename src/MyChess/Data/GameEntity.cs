@@ -8,6 +8,6 @@ namespace MyChess.Data
         {
         }
 
-        public string Data { get; set; } = string.Empty;
+        public byte[] Data { get; set; } = new byte[0];
     }
 }
