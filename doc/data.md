@@ -11,7 +11,7 @@ Here is example user payload:
   "id": "123-abc-123",
   "name": "John Doe",
   "created": "2020-04-05T15:48:57.484Z",
-  "updated": "2020-04-06T15:48:57.484Z"
+  "timestamp": "2020-04-06T15:48:57.484Z"
 }
 ```
 
@@ -163,7 +163,7 @@ Here is example new game payload:
 Contains information about authenticated users.
 Only required elements are stored:
 
-| PartitionKey | RowKey | Created                  | Updated                  | Name     | UserID*      | Enabled |
+| PartitionKey | RowKey | Created                  | Timestamp                | Name     | UserID*      | Enabled |
 |--------------|--------|--------------------------|--------------------------|----------|--------------|---------|
 | [1]          | [2]    | 2020-04-03T15:51:05.000Z | 2020-05-03T15:51:05.000Z | John Doe | user-abc-123 | true    |
 
@@ -208,11 +208,11 @@ Map from UserID into User record.
 
 ### Game table
 
-Game data is split to 3 tables:
+Game data is split to 3 tables (real names all lowercase):
 
-- gamesWaitingForYou
-- gamesWaitingForOpponent
-- gamesArchive
+- GamesWaitingForYou
+- GamesWaitingForOpponent
+- GamesArchive
 
 This enables to fetch the data only from single table and single partition
 per use case in user interface.
