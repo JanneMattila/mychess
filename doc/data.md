@@ -178,7 +178,7 @@ Note: `Enabled` field is used only if for some reason we need to disable login o
 
 ### UserNotifications table
 
-| PartitionKey | RowKey   | Enabled | Url                                         |
+| PartitionKey | RowKey   | Enabled | Uri                                         |
 |--------------|----------|---------|---------------------------------------------|
 | user-abc-123 | browser1 | true    | https://fcm.googleapis.com/fcm/send/aZu.../ |
 | user-abc-123 | browser2 | true    | https://fcm.googleapis.com/fcm/send/eZu.../ |
@@ -200,7 +200,7 @@ Map from UserID into User record.
 |--------------|--------------|----------------|------------|
 | user-abc-123 | user-abc-123 | [2]            | [3]        |
 
-### Settings table
+### UserSettings table
 
 | PartitionKey | RowKey       | PlayAlwaysUp |
 |--------------|--------------|--------------|
@@ -208,7 +208,7 @@ Map from UserID into User record.
 
 ### Game table
 
-Game data is split to 3 tables (real names all lowercase):
+Game data is split to 3 tables (note that tables *do* [preserve casing](https://docs.microsoft.com/en-us/rest/api/storageservices/Understanding-the-Table-Service-Data-Model?#table-names) but are case-insensitive in use):
 
 - GamesWaitingForYou
 - GamesWaitingForOpponent

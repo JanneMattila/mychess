@@ -8,5 +8,9 @@ namespace MyChess.Data
         public UserNotificationEntity()
         {
         }
+
+        public string Uri { get; set; } = string.Empty;
+
+        public bool Enabled { get; set; } = false;
     }
 }

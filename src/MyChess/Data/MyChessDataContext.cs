@@ -9,10 +9,16 @@ namespace MyChess.Data
     public class MyChessDataContext
     {
         private readonly CloudStorageAccount _cloudStorageAccount;
-        private readonly CloudTable _playersTable;
-        private readonly CloudTable _gamesTable;
-        private readonly CloudTable _settingsTable;
         private readonly ILogger _log;
+
+        private readonly CloudTable _usersTable;
+        private readonly CloudTable _userFriendsTable;
+        private readonly CloudTable _userNotificationsTable;
+        private readonly CloudTable _userSettingsTable;
+
+        private readonly CloudTable _gamesWaitingForYouTable;
+        private readonly CloudTable _gamesWaitingForOpponentTable;
+        private readonly CloudTable _gamesArchiveTable;
 
         public MyChessDataContext(ILogger log, MyChessDataContextOptions options)
         {
@@ -25,22 +31,32 @@ namespace MyChess.Data
 
             _cloudStorageAccount = CloudStorageAccount.Parse(options.StorageConnectionString);
             var tableClient = _cloudStorageAccount.CreateCloudTableClient();
-            _playersTable = tableClient.GetTableReference(TableNames.Players);
-            _gamesTable = tableClient.GetTableReference(TableNames.Games);
-            _settingsTable = tableClient.GetTableReference(TableNames.Settings);
+            _usersTable = tableClient.GetTableReference(TableNames.Users);
+            _userFriendsTable = tableClient.GetTableReference(TableNames.UserFriends);
+            _userNotificationsTable = tableClient.GetTableReference(TableNames.UserNotifications);
+            _userSettingsTable = tableClient.GetTableReference(TableNames.UserSettings);
+
+            _gamesWaitingForYouTable = tableClient.GetTableReference(TableNames.GamesWaitingForYou);
+            _gamesWaitingForOpponentTable = tableClient.GetTableReference(TableNames.GamesWaitingForOpponent);
+            _gamesArchiveTable = tableClient.GetTableReference(TableNames.GamesArchive);
         }
 
         public void Initialize()
         {
-            _playersTable.CreateIfNotExists();
-            _settingsTable.CreateIfNotExists();
-            _gamesTable.CreateIfNotExists();
+            _usersTable.CreateIfNotExists();
+            _userFriendsTable.CreateIfNotExists();
+            _userNotificationsTable.CreateIfNotExists();
+            _userSettingsTable.CreateIfNotExists();
+
+            _gamesWaitingForYouTable.CreateIfNotExists();
+            _gamesWaitingForOpponentTable.CreateIfNotExists();
+            _gamesArchiveTable.CreateIfNotExists();
         }
 
         public async Task<GameEntity?> GetGameAsync(string userID, string gameID)
         {
             var retrieveOperation = TableOperation.Retrieve<GameEntity>(userID, gameID);
-            var result = await _gamesTable.ExecuteAsync(retrieveOperation);
+            var result = await _gamesWaitingForYouTable.ExecuteAsync(retrieveOperation);
             return result.Result as GameEntity;
         }
 
@@ -52,7 +68,7 @@ namespace MyChess.Data
 
             do
             {
-                var result = await _gamesTable.ExecuteQuerySegmentedAsync(query, token);
+                var result = await _gamesWaitingForYouTable.ExecuteQuerySegmentedAsync(query, token);
                 foreach (var item in result)
                 {
                     yield return item;

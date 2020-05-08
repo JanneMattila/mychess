@@ -15,6 +15,6 @@ namespace MyChess.Data
 
         public bool Enabled { get; set; } = false;
 
-        public DateTimeOffset Created { get; set; }
+        public DateTime Created { get; set; }
     }
 }
