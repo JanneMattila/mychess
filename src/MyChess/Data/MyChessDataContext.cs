@@ -77,6 +77,14 @@ namespace MyChess.Data
             return result.Result as T;
         }
 
+        public async Task<TableResult> UpsertAsync<T>(string tableName, T entity)
+            where T : TableEntity
+        {
+            var table = GetTable(tableName);
+            var upsertOperation = TableOperation.InsertOrReplace(entity);
+            return await table.ExecuteAsync(upsertOperation);
+        }
+
         public async IAsyncEnumerable<T> GetAllAsync<T>(string tableName, string partitionKey)
             where T : TableEntity, new()
         {
