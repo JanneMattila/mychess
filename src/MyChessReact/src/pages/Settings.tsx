@@ -1,4 +1,5 @@
 import React, { useEffect, MouseEvent, useState } from "react";
+import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import "./Settings.css";
 
@@ -41,6 +42,10 @@ export function Settings() {
                     <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Save</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
+
+                <Link to="/friends" className="Settings-link">
+                    <span role="img" aria-label="Invite friend">👥</span> Invite Friends
+                </Link>
             </header>
         </div>
     );

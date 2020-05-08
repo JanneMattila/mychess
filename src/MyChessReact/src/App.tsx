@@ -6,6 +6,7 @@ import { Play } from "./pages/Play";
 import { PlayLocal } from "./pages/PlayLocal";
 import { Privacy } from "./pages/Privacy";
 import { Settings } from "./pages/Settings";
+import { Friends } from "./pages/Friends";
 import "./App.css";
 import logo from "./pages/logo.svg";
 import TelemetryProvider from "./components/TelemetryProvider";
@@ -29,7 +30,7 @@ function App() {
               <div className="App-privacy-container">
                 <Link to="/privacy" className="App-privacy">
                   Privacy
-              </Link>
+                </Link>
               </div>
             </div>
             <Switch>
@@ -38,6 +39,7 @@ function App() {
               <Route exact path="/play/local" component={PlayLocal} />
               <Route exact path="/play/:id" component={Play} />
               <Route path="/settings" component={Settings} />
+              <Route path="/friends" component={Friends} />
             </Switch>
           </div>
         </div>
