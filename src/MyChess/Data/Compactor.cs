@@ -17,6 +17,7 @@ namespace MyChess.Data
             using var output = new MemoryStream();
             using var compressor = new BrotliStream(output, CompressionMode.Compress);
             input.CopyTo(compressor);
+            compressor.Flush();
             return output.ToArray();
         }
 
@@ -25,9 +26,10 @@ namespace MyChess.Data
             byte[] buffer;
             using (var input = new MemoryStream(data))
             using (var output = new MemoryStream())
-            using (var compressor = new BrotliStream(output, CompressionMode.Decompress))
+            using (var decompressor = new BrotliStream(input, CompressionMode.Decompress))
             {
-                input.CopyTo(compressor);
+                decompressor.CopyTo(output);
+                decompressor.Flush();
                 buffer = output.ToArray();
             }
 

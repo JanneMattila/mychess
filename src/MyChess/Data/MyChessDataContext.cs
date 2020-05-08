@@ -28,8 +28,8 @@ namespace MyChess.Data
             }
 
             _log = log;
-
             _cloudStorageAccount = CloudStorageAccount.Parse(options.StorageConnectionString);
+
             var tableClient = _cloudStorageAccount.CreateCloudTableClient();
             _usersTable = tableClient.GetTableReference(TableNames.Users);
             _userFriendsTable = tableClient.GetTableReference(TableNames.UserFriends);
