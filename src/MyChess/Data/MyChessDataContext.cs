@@ -53,22 +53,35 @@ namespace MyChess.Data
             _gamesArchiveTable.CreateIfNotExists();
         }
 
-        public async Task<GameEntity?> GetGameAsync(string userID, string gameID)
+        private CloudTable GetGamesTable(string tableName)
         {
+            return tableName switch
+            {
+                TableNames.GamesWaitingForYou => _gamesWaitingForYouTable,
+                TableNames.GamesWaitingForOpponent => _gamesWaitingForOpponentTable,
+                TableNames.GamesArchive => _gamesArchiveTable,
+                _ => throw new ArgumentOutOfRangeException(nameof(tableName))
+            };
+        }
+
+        public async Task<GameEntity?> GetGameAsync(string tableName, string userID, string gameID)
+        {
+            var table = GetGamesTable(tableName);
             var retrieveOperation = TableOperation.Retrieve<GameEntity>(userID, gameID);
-            var result = await _gamesWaitingForYouTable.ExecuteAsync(retrieveOperation);
+            var result = await table.ExecuteAsync(retrieveOperation);
             return result.Result as GameEntity;
         }
 
-        public async IAsyncEnumerable<GameEntity> GetGamesAsync(string userID)
+        public async IAsyncEnumerable<GameEntity> GetGamesAsync(string tableName, string userID)
         {
             var query = new TableQuery<GameEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userID));
             var token = new TableContinuationToken();
+            var table = GetGamesTable(tableName);
 
             do
             {
-                var result = await _gamesWaitingForYouTable.ExecuteQuerySegmentedAsync(query, token);
+                var result = await table.ExecuteQuerySegmentedAsync(query, token);
                 foreach (var item in result)
                 {
                     yield return item;
