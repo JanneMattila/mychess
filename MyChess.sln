@@ -55,6 +55,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Tests", "test\unit\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Functions", "src\MyChess.Functions\MyChess.Functions.csproj", "{77AEC0AA-ACFF-4464-9400-44C50CB06DD5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChess.Functions.Tests", "test\unit\MyChess.Functions.Tests\MyChess.Functions.Tests.csproj", "{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{77AEC0AA-ACFF-4464-9400-44C50CB06DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77AEC0AA-ACFF-4464-9400-44C50CB06DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77AEC0AA-ACFF-4464-9400-44C50CB06DD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,6 +94,7 @@ Global
 		{D3490502-6FD5-457B-B895-B1F6E8749B4E} = {E74445DD-28F2-4920-961A-C3778DA73664}
 		{3928C475-8F6C-4E34-BE3A-E69CF5B43538} = {7F48B88A-6EC7-4AA2-84C5-CAC112F80102}
 		{77AEC0AA-ACFF-4464-9400-44C50CB06DD5} = {E74445DD-28F2-4920-961A-C3778DA73664}
+		{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E} = {7F48B88A-6EC7-4AA2-84C5-CAC112F80102}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F99521D6-99C8-41D7-83DC-3D5523498EE7}
