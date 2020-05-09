@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MyChess.Data
 {
-    public class MyChessDataContext
+    public class MyChessDataContext : IMyChessDataContext
     {
         private readonly CloudStorageAccount _cloudStorageAccount;
         private readonly ILogger _log;
