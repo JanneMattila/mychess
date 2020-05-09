@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MyChess.Data;
+using MyChess.Interfaces;
 
 namespace MyChess.Handlers
 {
@@ -12,6 +14,11 @@ namespace MyChess.Handlers
         {
             _log = log;
             _context = context;
+        }
+
+        public async Task<string> GetUserAsync(AuthenticatedUser authenticatedUser)
+        {
+            return await Task.FromResult(string.Empty);
         }
     }
 }

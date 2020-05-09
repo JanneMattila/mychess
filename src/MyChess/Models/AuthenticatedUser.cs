@@ -1,6 +1,6 @@
 ﻿namespace MyChess.Interfaces
 {
-    public class AuthenticatedUserModel
+    public class AuthenticatedUser
     {
         public string UserIdentifier { get; set; } = string.Empty;
 
