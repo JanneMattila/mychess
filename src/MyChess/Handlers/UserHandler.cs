@@ -3,15 +3,11 @@ using MyChess.Data;
 
 namespace MyChess.Handlers
 {
-    public class UserHandler
+    public class UserHandler : BaseHandler
     {
-        private readonly ILogger _log;
-        private readonly IMyChessDataContext _context;
-
         public UserHandler(ILogger log, IMyChessDataContext context)
+            : base(log, context)
         {
-            _log = log;
-            _context = context;
         }
     }
 }
