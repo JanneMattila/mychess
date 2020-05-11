@@ -7,9 +7,11 @@ namespace MyChess.Functions.Tests.Stubs
 {
     public class SecurityValidatorStub : ISecurityValidator
     {
+        public ClaimsPrincipal ClaimsPrincipal { get; set; }
+
         public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(HttpRequest req, ILogger log)
         {
-            return await Task.FromResult<ClaimsPrincipal>(null);
+            return await Task.FromResult<ClaimsPrincipal>(ClaimsPrincipal);
         }
     }
 }

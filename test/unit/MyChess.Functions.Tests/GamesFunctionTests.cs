@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using MyChess.Functions.Tests.Stubs;
@@ -24,6 +25,20 @@ namespace MyChess.Functions.Tests
         {
             // Arrange
             var expected = typeof(UnauthorizedResult);
+
+            // Act
+            var actual = await _gamesFunction.Run(null, null, NullLogger.Instance);
+
+            // Assert
+            Assert.IsType(expected, actual);
+        }
+
+        [Fact]
+        public async Task No_Required_Permission_Test()
+        {
+            // Arrange
+            var expected = typeof(UnauthorizedResult);
+            _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
 
             // Act
             var actual = await _gamesFunction.Run(null, null, NullLogger.Instance);
