@@ -6,9 +6,6 @@ export function Friends() {
     useEffect(() => {
     });
 
-    const closeModal = () => {
-    }
-
     return (
         <div>
             <header className="Friends-header">
