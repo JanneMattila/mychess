@@ -10,15 +10,17 @@ namespace MyChess.Functions.Tests
     {
         private readonly GamesFunction _gamesFunction;
         private readonly SecurityValidatorStub _securityValidatorStub;
+        private readonly GamesHandlerStub _gamesHandlerStub;
 
         public GamesFunctionTests()
         {
+            _gamesHandlerStub = new GamesHandlerStub();
             _securityValidatorStub = new SecurityValidatorStub();
-            _gamesFunction = new GamesFunction(null, _securityValidatorStub);
+            _gamesFunction = new GamesFunction(_gamesHandlerStub, _securityValidatorStub);
         }
 
         [Fact]
-        public async Task No_Claims_Test()
+        public async Task No_ClaimsPrincipal_Test()
         {
             // Arrange
             var expected = typeof(UnauthorizedResult);
