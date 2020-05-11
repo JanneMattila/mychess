@@ -14,6 +14,7 @@ namespace MyChess.Data
         private readonly CloudTable _userFriendsTable;
         private readonly CloudTable _userNotificationsTable;
         private readonly CloudTable _userSettingsTable;
+        private readonly CloudTable _userID2UserTable;
 
         private readonly CloudTable _gamesWaitingForYouTable;
         private readonly CloudTable _gamesWaitingForOpponentTable;
@@ -33,6 +34,7 @@ namespace MyChess.Data
             _userFriendsTable = tableClient.GetTableReference(TableNames.UserFriends);
             _userNotificationsTable = tableClient.GetTableReference(TableNames.UserNotifications);
             _userSettingsTable = tableClient.GetTableReference(TableNames.UserSettings);
+            _userID2UserTable = tableClient.GetTableReference(TableNames.UserID2User);
 
             _gamesWaitingForYouTable = tableClient.GetTableReference(TableNames.GamesWaitingForYou);
             _gamesWaitingForOpponentTable = tableClient.GetTableReference(TableNames.GamesWaitingForOpponent);
@@ -45,6 +47,7 @@ namespace MyChess.Data
             _userFriendsTable.CreateIfNotExists();
             _userNotificationsTable.CreateIfNotExists();
             _userSettingsTable.CreateIfNotExists();
+            _userID2UserTable.CreateIfNotExists();
 
             _gamesWaitingForYouTable.CreateIfNotExists();
             _gamesWaitingForOpponentTable.CreateIfNotExists();
@@ -59,6 +62,7 @@ namespace MyChess.Data
                 TableNames.UserFriends => _userFriendsTable,
                 TableNames.UserNotifications => _userNotificationsTable,
                 TableNames.UserSettings => _userSettingsTable,
+                TableNames.UserID2User => _userID2UserTable,
                 TableNames.GamesWaitingForYou => _gamesWaitingForYouTable,
                 TableNames.GamesWaitingForOpponent => _gamesWaitingForOpponentTable,
                 TableNames.GamesArchive => _gamesArchiveTable,
