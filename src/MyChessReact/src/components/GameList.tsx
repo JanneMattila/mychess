@@ -93,7 +93,12 @@ export function GameList(props: GameListProps) {
         let contents: JSX.Element;
         switch (gamesState) {
             case ProcessState.Success:
-                contents = renderGames(games);
+                if (games && games?.length === 0) {
+                    contents = <h6>No games found. Click to <button onClick={refresh}>refresh</button></h6>;
+                }
+                else {
+                    contents = renderGames(games);
+                }
                 break;
             case ProcessState.Error:
                 contents = <h6>Oh no! Couldn't retrieve games. Click to <button onClick={refresh}>refresh</button></h6>;
