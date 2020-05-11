@@ -24,7 +24,7 @@ namespace MyChess.Functions.Tests
             var expected = typeof(UnauthorizedResult);
 
             // Act
-            var actual = await _gamesFunction.Run(null, NullLogger.Instance);
+            var actual = await _gamesFunction.Run(null, null, NullLogger.Instance);
 
             // Assert
             Assert.IsType(expected, actual);
