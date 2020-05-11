@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Extensions.Logging;
 
 namespace MyChess.Data
 {
     public class MyChessDataContext : IMyChessDataContext
     {
         private readonly CloudStorageAccount _cloudStorageAccount;
-        private readonly ILogger _log;
 
         private readonly CloudTable _usersTable;
         private readonly CloudTable _userFriendsTable;
@@ -20,14 +18,13 @@ namespace MyChess.Data
         private readonly CloudTable _gamesWaitingForOpponentTable;
         private readonly CloudTable _gamesArchiveTable;
 
-        public MyChessDataContext(ILogger log, MyChessDataContextOptions options)
+        public MyChessDataContext(MyChessDataContextOptions options)
         {
             if (options == null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _log = log;
             _cloudStorageAccount = CloudStorageAccount.Parse(options.StorageConnectionString);
 
             var tableClient = _cloudStorageAccount.CreateCloudTableClient();

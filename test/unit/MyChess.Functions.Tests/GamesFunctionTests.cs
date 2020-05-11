@@ -14,7 +14,7 @@ namespace MyChess.Functions.Tests
         public GamesFunctionTests()
         {
             _securityValidatorStub = new SecurityValidatorStub();
-            _gamesFunction = new GamesFunction(_securityValidatorStub);
+            _gamesFunction = new GamesFunction(null, _securityValidatorStub);
         }
 
         [Fact]
