@@ -5,3 +5,21 @@
 GET {{endpoint}}/api/games HTTP/1.1
 Content-type: application/json
 Authorization: Bearer {{auth}}
+
+### Get single game
+GET {{endpoint}}/api/games/123-abc-123 HTTP/1.1
+Content-type: application/json
+Authorization: Bearer {{auth}}
+
+### Post move to game
+POST {{endpoint}}/api/games/123-abc-123/moves HTTP/1.1
+Content-type: application/json
+Authorization: Bearer {{auth}}
+
+{
+  "move": "A1A2",
+  "comment": "Here we go!",
+  "promotion": "Queen",
+  "start": "2020-04-05T15:48:57.484Z",
+  "end": "2020-04-05T15:49:05.000Z"
+}

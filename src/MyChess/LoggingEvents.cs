@@ -16,5 +16,9 @@
         public const int FuncSecTokenValidationFailed = 1105;
         public const int FuncSecInvalidIssuer = 1106;
         public const int FuncSecIssuer = 1107;
+
+        public const int FuncGamesMoveStarted = 1200;
+        public const int FuncGamesMoveUserDoesNotHavePermission = 1201;
+        public const int FuncGamesMoveProcessingMethod = 1202;
     }
 }
