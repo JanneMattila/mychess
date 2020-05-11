@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyChess.Data;
 using MyChess.Functions;
+using MyChess.Handlers;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -29,6 +30,7 @@ namespace MyChess.Functions
 
             builder.Services.AddSingleton<ISecurityValidator, SecurityValidator>();
             builder.Services.AddSingleton<IMyChessDataContext, MyChessDataContext>();
+            builder.Services.AddSingleton<GamesHandler>();
         }
     }
 }

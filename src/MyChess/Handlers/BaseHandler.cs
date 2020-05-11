@@ -16,8 +16,11 @@ namespace MyChess.Handlers
             _context = context;
         }
 
-        public async Task<string> GetUserAsync(AuthenticatedUser authenticatedUser)
+        public async Task<string> GetOrCreateUserAsync(AuthenticatedUser authenticatedUser)
         {
+            var userMap = await _context.GetAsync<UserID2UserEntity>(TableNames.UserID2User,
+                authenticatedUser.UserIdentifier, authenticatedUser.ProviderIdentifier);
+
             return await Task.FromResult(string.Empty);
         }
     }

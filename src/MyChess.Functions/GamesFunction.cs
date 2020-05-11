@@ -6,17 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
+using MyChess.Handlers;
 using MyChess.Interfaces;
 
 namespace MyChess.Functions
 {
     public class GamesFunction
     {
+        private readonly GamesHandler _gamesHandler;
         private readonly ISecurityValidator _securityValidator;
 
         public GamesFunction(
+            GamesHandler gamesHandler,
             ISecurityValidator securityValidator)
         {
+            _gamesHandler = gamesHandler;
             _securityValidator = securityValidator;
         }
 
@@ -40,6 +44,8 @@ namespace MyChess.Functions
                     "User {user} does not have permission {permission}", principal.Identity.Name, PermissionConstants.GamesReadWrite);
                 return new UnauthorizedResult();
             }
+
+            var user = await _gamesHandler.GetOrCreateUserAsync(principal.ToAuthenticatedUser());
 
             var games = new List<MyChessGame>();
             for (int i = 0; i < 5; i++)
