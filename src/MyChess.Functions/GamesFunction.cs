@@ -45,7 +45,7 @@ namespace MyChess.Functions
                 return new UnauthorizedResult();
             }
 
-            var user = await _gamesHandler.GetOrCreateUserAsync(principal.ToAuthenticatedUser());
+            var userGames = await _gamesHandler.GetGamesAsync(principal.ToAuthenticatedUser());
 
             var games = new List<MyChessGame>();
             for (int i = 0; i < 5; i++)
