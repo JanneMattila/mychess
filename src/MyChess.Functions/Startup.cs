@@ -30,7 +30,7 @@ namespace MyChess.Functions
 
             builder.Services.AddSingleton<ISecurityValidator, SecurityValidator>();
             builder.Services.AddSingleton<IMyChessDataContext, MyChessDataContext>();
-            builder.Services.AddSingleton<GamesHandler>();
+            builder.Services.AddSingleton<IGamesHandler, GamesHandler>();
         }
     }
 }

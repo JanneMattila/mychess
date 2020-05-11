@@ -6,7 +6,7 @@ using MyChess.Interfaces;
 
 namespace MyChess.Handlers
 {
-    public class GamesHandler : BaseHandler
+    public class GamesHandler : BaseHandler, IGamesHandler
     {
         private readonly Compactor _compactor = new Compactor();
 
@@ -30,8 +30,8 @@ namespace MyChess.Handlers
         {
             var userID = await GetOrCreateUserAsync(authenticatedUser);
             var games = new List<MyChessGame>();
-            
-            await foreach(var gameEntity in _context.GetAllAsync<GameEntity>(TableNames.Users, userID))
+
+            await foreach (var gameEntity in _context.GetAllAsync<GameEntity>(TableNames.Users, userID))
             {
                 var game = _compactor.Decompress(gameEntity.Data);
                 games.Add(game);

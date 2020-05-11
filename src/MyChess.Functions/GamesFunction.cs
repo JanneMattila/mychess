@@ -12,11 +12,11 @@ namespace MyChess.Functions
 {
     public class GamesFunction
     {
-        private readonly GamesHandler _gamesHandler;
+        private readonly IGamesHandler _gamesHandler;
         private readonly ISecurityValidator _securityValidator;
 
         public GamesFunction(
-            GamesHandler gamesHandler,
+            IGamesHandler gamesHandler,
             ISecurityValidator securityValidator)
         {
             _gamesHandler = gamesHandler;
