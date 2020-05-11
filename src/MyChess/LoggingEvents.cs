@@ -4,6 +4,9 @@
     {
         public const int FuncGamesStarted = 1000;
         public const int FuncGamesUserDoesNotHavePermission = 1001;
+        public const int FuncGamesProcessingMethod = 1002;
+        public const int FuncGamesFetchAllGames = 1003;
+        public const int FuncGamesFetchSingleGame = 1004;
 
         public const int FuncSecNoAuthHeader = 1100;
         public const int FuncSecNoBearerToken = 1101;
