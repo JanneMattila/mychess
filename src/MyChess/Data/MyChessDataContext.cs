@@ -87,6 +87,14 @@ namespace MyChess.Data
             return await table.ExecuteAsync(upsertOperation);
         }
 
+        public async Task<TableResult> DeleteAsync<T>(string tableName, T entity)
+            where T : TableEntity
+        {
+            var table = GetTable(tableName);
+            var deleteOperation = TableOperation.Delete(entity);
+            return await table.ExecuteAsync(deleteOperation);
+        }
+
         public async IAsyncEnumerable<T> GetAllAsync<T>(string tableName, string partitionKey)
             where T : TableEntity, new()
         {

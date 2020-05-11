@@ -10,5 +10,6 @@ namespace MyChess.Data
         Task<T?> GetAsync<T>(string tableName, string partitionKey, string rowKey) where T : TableEntity;
         void Initialize();
         Task<TableResult> UpsertAsync<T>(string tableName, T entity) where T : TableEntity;
+        Task<TableResult> DeleteAsync<T>(string tableName, T entity) where T : TableEntity;
     }
 }
