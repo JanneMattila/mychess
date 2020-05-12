@@ -42,36 +42,33 @@ namespace MyChess.Functions
 
             if (!principal.HasPermission(PermissionConstants.GamesReadWrite))
             {
-                _log.LogWarning(LoggingEvents.FuncGamesUserDoesNotHavePermission,
-                    "User {user} does not have permission {permission}", principal.Identity.Name, PermissionConstants.GamesReadWrite);
+                _log.FuncGamesUserDoesNotHavePermission(principal.Identity.Name, PermissionConstants.GamesReadWrite);
                 return new UnauthorizedResult();
             }
 
             var authenticatedUser = principal.ToAuthenticatedUser();
 
-            _log.LogInformation(LoggingEvents.FuncGamesProcessingMethod, 
-                "Processing {method} request", req.Method);
+            _log.FuncGamesProcessingMethod(req.Method);
             return req.Method switch
             {
-                "GET" => await Get(_log, authenticatedUser, id),
-                "POST" => Post(_log, authenticatedUser, req, id),
-                "DELETE" => Delete(_log, authenticatedUser, id),
+                "GET" => await Get(authenticatedUser, id),
+                "POST" => Post(authenticatedUser, req, id),
+                "DELETE" => Delete(authenticatedUser, id),
                 _ => new StatusCodeResult((int)HttpStatusCode.NotImplemented)
             };
         }
 
-        private async Task<IActionResult> Get(ILogger log, AuthenticatedUser authenticatedUser, string id)
+        private async Task<IActionResult> Get(AuthenticatedUser authenticatedUser, string id)
         {
             if (string.IsNullOrEmpty(id))
             {
-                log.LogTrace(LoggingEvents.FuncGamesFetchAllGames, "Fetch all games");
+                _log.FuncGamesFetchAllGames();
                 var games = await _gamesHandler.GetGamesAsync(authenticatedUser);
                 return new OkObjectResult(games);
             }
             else
             {
-                log.LogTrace(LoggingEvents.FuncGamesFetchSingleGame,
-                    "Fetch single game {gameID}", id);
+                _log.FuncGamesFetchSingleGame(id);
                 var game = await _gamesHandler.GetGameAsync(authenticatedUser, id);
                 if (game == null)
                 {
@@ -81,12 +78,12 @@ namespace MyChess.Functions
             }
         }
 
-        private IActionResult Post(ILogger log, AuthenticatedUser authenticatedUser, HttpRequest req, string id)
+        private IActionResult Post(AuthenticatedUser authenticatedUser, HttpRequest req, string id)
         {
             return new OkObjectResult($"create game {id}");
         }
 
-        private IActionResult Delete(ILogger log, AuthenticatedUser authenticatedUser, string id)
+        private IActionResult Delete(AuthenticatedUser authenticatedUser, string id)
         {
             return new OkResult();
         }
