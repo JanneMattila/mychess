@@ -9,7 +9,7 @@ namespace MyChess.Functions.Tests.Stubs
     {
         public ClaimsPrincipal ClaimsPrincipal { get; set; }
 
-        public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(HttpRequest req, ILogger log)
+        public async Task<ClaimsPrincipal> GetClaimsPrincipalAsync(HttpRequest req)
         {
             return await Task.FromResult<ClaimsPrincipal>(ClaimsPrincipal);
         }

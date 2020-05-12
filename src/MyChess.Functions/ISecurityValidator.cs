@@ -7,6 +7,6 @@ namespace MyChess.Functions
 {
     public interface ISecurityValidator
     {
-        Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(HttpRequest req, ILogger log);
+        Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(HttpRequest req);
     }
 }

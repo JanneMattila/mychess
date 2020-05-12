@@ -6,7 +6,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using MyChess.Handlers;
-using MyChess.Interfaces;
 
 namespace MyChess.Functions
 {
@@ -32,7 +31,7 @@ namespace MyChess.Functions
             using var scope = log.BeginScope("GamesMove");
             log.LogInformation(LoggingEvents.FuncGamesMoveStarted, "GamesMove function processing request.");
 
-            var principal = await _securityValidator.GetClaimsPrincipalAsync(req, log);
+            var principal = await _securityValidator.GetClaimsPrincipalAsync(req);
             if (principal == null)
             {
                 return new UnauthorizedResult();

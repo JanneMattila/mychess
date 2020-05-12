@@ -27,12 +27,12 @@ namespace MyChess.Functions
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "delete", Route = "games/{id?}")] HttpRequest req,
             string id,
-            ILogger log)
+            ILogger<GamesFunction> log)
         {
             using var scope = log.BeginScope("Games");
-            log.LogInformation(LoggingEvents.FuncGamesStarted, "Games function processing request.");
+            log.FuncGamesStarted();
 
-            var principal = await _securityValidator.GetClaimsPrincipalAsync(req, log);
+            var principal = await _securityValidator.GetClaimsPrincipalAsync(req);
             if (principal == null)
             {
                 return new UnauthorizedResult();
