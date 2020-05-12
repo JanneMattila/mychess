@@ -5,7 +5,7 @@ namespace MyChess.Handlers
 {
     public class UserHandler : BaseHandler
     {
-        public UserHandler(ILogger log, IMyChessDataContext context)
+        public UserHandler(ILogger<UserHandler> log, IMyChessDataContext context)
             : base(log, context)
         {
         }

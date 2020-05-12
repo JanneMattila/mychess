@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using Xunit;
 
 namespace MyChess.Tests
 {
@@ -8,7 +9,7 @@ namespace MyChess.Tests
 
         public ChessBoardTests()
         {
-            _board = new ChessBoard();
+            _board = new ChessBoard(NullLogger<ChessBoard>.Instance);
             _board.Initialize();
         }
 

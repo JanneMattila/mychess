@@ -10,7 +10,7 @@ namespace MyChess.Handlers
     {
         private readonly Compactor _compactor = new Compactor();
 
-        public GamesHandler(ILogger log, IMyChessDataContext context)
+        public GamesHandler(ILogger<GamesHandler> log, IMyChessDataContext context)
             : base(log, context)
         {
         }

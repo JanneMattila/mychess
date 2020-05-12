@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace MyChess
 {
@@ -14,6 +15,7 @@ namespace MyChess
 
         public PiecePlayer CurrentPlayer { get; internal set; }
 
+        private readonly ILogger<ChessBoard> _log;
         private readonly Stack<List<ChessMove>> _moves = new Stack<List<ChessMove>>();
         private readonly Stack<List<ChessBoardChange>> _boardChanges = new Stack<List<ChessBoardChange>>();
 
@@ -80,6 +82,11 @@ namespace MyChess
 
                 return new ChessBoardChange[0];
             }
+        }
+
+        public ChessBoard(ILogger<ChessBoard> log)
+        {
+            _log = log;
         }
 
         public ChessBoardState GetBoardState()
