@@ -39,8 +39,7 @@ namespace MyChess
                 return 1;
             }
 
-            var otherMove = obj as ChessMove;
-            if (otherMove != null)
+            if (obj is ChessMove otherMove)
             {
                 int compare = this.From.CompareTo(this.From);
                 if (compare == 0)

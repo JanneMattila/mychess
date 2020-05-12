@@ -31,8 +31,7 @@ namespace MyChess
                 return 1;
             }
 
-            var otherLocation = obj as ChessBoardLocation;
-            if (otherLocation != null)
+            if (obj is ChessBoardLocation otherLocation)
             {
                 int compare = HorizontalLocation.CompareTo(otherLocation.HorizontalLocation);
                 if (compare == 0)

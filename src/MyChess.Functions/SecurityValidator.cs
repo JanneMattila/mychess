@@ -18,8 +18,8 @@ namespace MyChess.Functions
     {
         private readonly ILogger<SecurityValidator> _log;
         private readonly AzureADOptions _securityValidatorOptions;
+        private readonly SemaphoreSlim _initializationSemaphore = new SemaphoreSlim(1, 1);
         private TokenValidationParameters? _tokenValidationParameters;
-        private SemaphoreSlim _initializationSemaphore = new SemaphoreSlim(1, 1);
 
         public SecurityValidator(ILogger<SecurityValidator> log, IOptions<AzureADOptions> securityValidatorOptions)
         {

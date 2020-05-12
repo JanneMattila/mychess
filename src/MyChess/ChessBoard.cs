@@ -904,7 +904,7 @@ namespace MyChess
             return new List<ChessMove>();
         }
 
-        override public string ToString()
+        public override string ToString()
         {
             string content = Environment.NewLine;
             for (int i = 0; i < BOARD_SIZE; i++)
