@@ -56,13 +56,12 @@ namespace MyChess.Functions
             const string end = "/v2.0";
             if (!issuer.StartsWith(start) || !issuer.EndsWith(end))
             {
-                _log.LogWarning(LoggingEvents.FuncSecInvalidIssuer,
-                    "Invalid issuer {issuer}", issuer);
+                _log.FuncSecInvalidIssuer(issuer);
                 return false;
             }
 
             var tenant = issuer.Replace(start, string.Empty).Replace(end, string.Empty);
-            _log.LogInformation(LoggingEvents.FuncSecIssuer, "Issuer tenant {issuer}", tenant);
+            _log.FuncSecIssuer(tenant);
             return true;
         }
 
@@ -70,8 +69,7 @@ namespace MyChess.Functions
         {
             if (!req.Headers.ContainsKey(HeaderNames.Authorization))
             {
-                _log.LogTrace(LoggingEvents.FuncSecNoAuthHeader,
-                    "Request does not contain authorization header");
+                _log.FuncSecNoAuthHeader();
                 return null;
             }
 
@@ -79,8 +77,7 @@ namespace MyChess.Functions
             if (authorizationValue.Length != 2 &&
                 authorizationValue[0] != JwtBearerDefaults.AuthenticationScheme)
             {
-                _log.LogTrace(LoggingEvents.FuncSecNoBearerToken,
-                    "Request does not contain Bearer token");
+                _log.FuncSecNoBearerToken();
                 return null;
             }
 
@@ -94,16 +91,13 @@ namespace MyChess.Functions
                 {
                     try
                     {
-                        _log.LogTrace(LoggingEvents.FuncSecInitializing,
-                            "Initializing OpenID configuration");
+                        _log.FuncSecInitializing();
                         await InitializeAsync();
-                        _log.LogTrace(LoggingEvents.FuncSecInitialized,
-                            "Initialized OpenID configuration successfully");
+                        _log.FuncSecInitialized();
                     }
                     catch (Exception ex)
                     {
-                        _log.LogError(LoggingEvents.FuncSecInitializingFailed,
-                            ex, "Could not initialize OpenID configuration");
+                        _log.FuncSecInitializingFailed(ex);
                         return null;
                     }
                     finally
@@ -123,8 +117,7 @@ namespace MyChess.Functions
             }
             catch (Exception ex)
             {
-                _log.LogError(LoggingEvents.FuncSecTokenValidationFailed,
-                    ex, "Token validation failed");
+                _log.FuncSecTokenValidationFailed(ex);
                 return null;
             }
         }
