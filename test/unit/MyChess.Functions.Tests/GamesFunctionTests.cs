@@ -17,7 +17,7 @@ namespace MyChess.Functions.Tests
         {
             _gamesHandlerStub = new GamesHandlerStub();
             _securityValidatorStub = new SecurityValidatorStub();
-            _gamesFunction = new GamesFunction(_gamesHandlerStub, _securityValidatorStub);
+            _gamesFunction = new GamesFunction(NullLogger<GamesFunction>.Instance, _gamesHandlerStub, _securityValidatorStub);
         }
 
         [Fact]
@@ -27,7 +27,7 @@ namespace MyChess.Functions.Tests
             var expected = typeof(UnauthorizedResult);
 
             // Act
-            var actual = await _gamesFunction.Run(null, null, NullLogger<GamesFunction>.Instance);
+            var actual = await _gamesFunction.Run(null, null);
 
             // Assert
             Assert.IsType(expected, actual);
@@ -41,7 +41,7 @@ namespace MyChess.Functions.Tests
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
 
             // Act
-            var actual = await _gamesFunction.Run(null, null, NullLogger<GamesFunction>.Instance);
+            var actual = await _gamesFunction.Run(null, null);
 
             // Assert
             Assert.IsType(expected, actual);

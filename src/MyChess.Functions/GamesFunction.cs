@@ -12,13 +12,16 @@ namespace MyChess.Functions
 {
     public class GamesFunction
     {
+        private readonly ILogger<GamesFunction> _log;
         private readonly IGamesHandler _gamesHandler;
         private readonly ISecurityValidator _securityValidator;
 
         public GamesFunction(
+            ILogger<GamesFunction> log,
             IGamesHandler gamesHandler,
             ISecurityValidator securityValidator)
         {
+            _log = log;
             _gamesHandler = gamesHandler;
             _securityValidator = securityValidator;
         }
@@ -26,11 +29,10 @@ namespace MyChess.Functions
         [FunctionName("Games")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "delete", Route = "games/{id?}")] HttpRequest req,
-            string id,
-            ILogger<GamesFunction> log)
+            string id)
         {
-            using var scope = log.BeginScope("Games");
-            log.FuncGamesStarted();
+            using var _ = _log.FuncGamesScope();
+            _log.FuncGamesStarted();
 
             var principal = await _securityValidator.GetClaimsPrincipalAsync(req);
             if (principal == null)
@@ -40,20 +42,20 @@ namespace MyChess.Functions
 
             if (!principal.HasPermission(PermissionConstants.GamesReadWrite))
             {
-                log.LogWarning(LoggingEvents.FuncGamesUserDoesNotHavePermission,
+                _log.LogWarning(LoggingEvents.FuncGamesUserDoesNotHavePermission,
                     "User {user} does not have permission {permission}", principal.Identity.Name, PermissionConstants.GamesReadWrite);
                 return new UnauthorizedResult();
             }
 
             var authenticatedUser = principal.ToAuthenticatedUser();
 
-            log.LogInformation(LoggingEvents.FuncGamesProcessingMethod, 
+            _log.LogInformation(LoggingEvents.FuncGamesProcessingMethod, 
                 "Processing {method} request", req.Method);
             return req.Method switch
             {
-                "GET" => await Get(log, authenticatedUser, id),
-                "POST" => Post(log, authenticatedUser, req, id),
-                "DELETE" => Delete(log, authenticatedUser, id),
+                "GET" => await Get(_log, authenticatedUser, id),
+                "POST" => Post(_log, authenticatedUser, req, id),
+                "DELETE" => Delete(_log, authenticatedUser, id),
                 _ => new StatusCodeResult((int)HttpStatusCode.NotImplemented)
             };
         }
