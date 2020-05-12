@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{7B2AAD5E-368
 		.gitignore = .gitignore
 		azure-pipelines-deploy.yml = azure-pipelines-deploy.yml
 		azure-pipelines.yml = azure-pipelines.yml
+		doc\data.drawio.svg = doc\data.drawio.svg
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
@@ -55,7 +56,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Tests", "test\unit\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Functions", "src\MyChess.Functions\MyChess.Functions.csproj", "{77AEC0AA-ACFF-4464-9400-44C50CB06DD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChess.Functions.Tests", "test\unit\MyChess.Functions.Tests\MyChess.Functions.Tests.csproj", "{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Functions.Tests", "test\unit\MyChess.Functions.Tests\MyChess.Functions.Tests.csproj", "{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
