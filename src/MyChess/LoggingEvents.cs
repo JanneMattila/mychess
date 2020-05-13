@@ -21,5 +21,9 @@
         public const int FuncGamesMoveStarted = 1200;
         public const int FuncGamesMoveUserDoesNotHavePermission = 1201;
         public const int FuncGamesMoveProcessingMethod = 1202;
+
+        public const int BaseHandlerCreateNewUser = 2000;
+        public const int BaseHandlerNewUserCreated = 2001;
+        public const int BaseHandlerExistingUserFound = 2002;
     }
 }

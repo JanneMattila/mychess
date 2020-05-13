@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MyChess.Data;
+using MyChess.Handlers.Internal;
 using MyChess.Interfaces;
 
 namespace MyChess.Handlers
@@ -23,6 +24,8 @@ namespace MyChess.Handlers
                 authenticatedUser.UserIdentifier, authenticatedUser.ProviderIdentifier);
             if (user == null)
             {
+                _log.BaseHandlerCreateNewUser();
+
                 var userID = Guid.NewGuid().ToString("D");
                 var userEntity = new UserEntity
                 {
@@ -45,10 +48,13 @@ namespace MyChess.Handlers
                 };
 
                 await _context.UpsertAsync(TableNames.UserID2User, userID2UserEntity);
+                _log.BaseHandlerNewUserCreated(userID);
+
                 return userID;
             }
             else
             {
+                _log.BaseHandlerExistingUserFound(user.UserID);
                 return user.UserID;
             }
         }
