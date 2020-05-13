@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MyChess.Data;
+using MyChess.Handlers.Internal;
 using MyChess.Interfaces;
 
 namespace MyChess.Handlers
@@ -32,9 +33,14 @@ namespace MyChess.Handlers
             var gameEntity = await _context.GetAsync<GameEntity>(TableNames.GamesWaitingForYou, userID, gameID);
             if (gameEntity != null)
             {
+                _log.GameHandlerGameFound(gameID);
                 return _compactor.Decompress(gameEntity.Data);
             }
-            return null;
+            else
+            {
+                _log.GameHandlerGameNotFound(gameID);
+                return null;
+            }
         }
 
         public async Task<List<MyChessGame>> GetGamesAsync(AuthenticatedUser authenticatedUser)
@@ -47,6 +53,8 @@ namespace MyChess.Handlers
                 var game = _compactor.Decompress(gameEntity.Data);
                 games.Add(game);
             }
+
+            _log.GameHandlerGamesFound(games.Count);
             return games;
         }
     }

@@ -20,11 +20,11 @@ namespace MyChess.Handlers.Internal
             _baseHandlerNewUserCreated = LoggerMessage.Define<string>(
                 LogLevel.Information,
                 new EventId(LoggingEvents.BaseHandlerNewUserCreated, nameof(BaseHandlerNewUserCreated)),
-                "New user created {User}");
+                "New user created {UserID}");
             _baseHandlerExistingUserFound = LoggerMessage.Define<string>(
                 LogLevel.Information,
                 new EventId(LoggingEvents.BaseHandlerExistingUserFound, nameof(BaseHandlerExistingUserFound)),
-                "Existing user found {User}");
+                "Existing user found {UserID}");
         }
 
         public static void BaseHandlerCreateNewUser(this ILogger logger) => _baseHandlerCreateNewUser(logger, null);
