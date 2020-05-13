@@ -29,7 +29,7 @@ namespace MyChess.Handlers
         public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID)
         {
             var userID = await GetOrCreateUserAsync(authenticatedUser);
-            var gameEntity = await _context.GetAsync<GameEntity>(TableNames.Users, userID, gameID);
+            var gameEntity = await _context.GetAsync<GameEntity>(TableNames.GamesWaitingForYou, userID, gameID);
             if (gameEntity != null)
             {
                 return _compactor.Decompress(gameEntity.Data);
