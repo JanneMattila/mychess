@@ -58,5 +58,33 @@ namespace MyChess.Handlers
                 return user.UserID;
             }
         }
+
+        protected async Task<UserEntity?> GetUserByUserIDAsync(string userID)
+        {
+            var userLookup = await _context.GetAsync<UserID2UserEntity>(TableNames.UserID2User, 
+                userID, userID);
+            if (userLookup != null)
+            {
+                _log.BaseHandlerUserLookupFoundByUserID(userID);
+
+                var user = await _context.GetAsync<UserEntity>(TableNames.Users, 
+                    userLookup.UserPrimaryKey, userLookup.UserRowKey);
+                if (user != null)
+                {
+                    _log.BaseHandlerUserFoundByUserID(userID);
+                }
+                else
+                {
+                    _log.BaseHandlerUserNotFoundByUserID(userID);
+                }
+
+                return user;
+            }
+            else
+            {
+                _log.BaseHandlerUserLookupNotFoundByUserID(userID);
+                return null;
+            }
+        }
     }
 }

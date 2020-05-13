@@ -25,6 +25,10 @@
         public const int BaseHandlerCreateNewUser = 2000;
         public const int BaseHandlerNewUserCreated = 2001;
         public const int BaseHandlerExistingUserFound = 2002;
+        public const int BaseHandlerUserLookupFoundByUserID = 2003;
+        public const int BaseHandlerUserFoundByUserID = 2004;
+        public const int BaseHandlerUserNotFoundByUserID = 2005;
+        public const int BaseHandlerUserLookupNotFoundByUserID = 2006;
 
         public const int GameHandlerGameFound = 2100;
         public const int GameHandlerGameNotFound = 2101;
