@@ -18,6 +18,8 @@ namespace MyChess.Handlers
 
         public async Task<MyChessGame> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
         {
+            var userID = await GetOrCreateUserAsync(authenticatedUser);
+
             return await Task.FromResult(new MyChessGame()
             {
                 ID = Guid.NewGuid().ToString("D")
@@ -40,7 +42,7 @@ namespace MyChess.Handlers
             var userID = await GetOrCreateUserAsync(authenticatedUser);
             var games = new List<MyChessGame>();
 
-            await foreach (var gameEntity in _context.GetAllAsync<GameEntity>(TableNames.Users, userID))
+            await foreach (var gameEntity in _context.GetAllAsync<GameEntity>(TableNames.GamesWaitingForYou, userID))
             {
                 var game = _compactor.Decompress(gameEntity.Data);
                 games.Add(game);
