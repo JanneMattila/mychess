@@ -11,6 +11,11 @@ namespace MyChess.Functions.Tests.Stubs
 
         public List<MyChessGame> Games { get; set; } = new List<MyChessGame>();
 
+        public async Task<MyChessGame> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
+        {
+            return await Task.FromResult(SingleGame);
+        }
+
         public async Task<MyChessGame> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID)
         {
             return await Task.FromResult(SingleGame);

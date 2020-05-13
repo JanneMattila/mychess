@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MyChess.Data;
@@ -13,6 +14,14 @@ namespace MyChess.Handlers
         public GamesHandler(ILogger<GamesHandler> log, IMyChessDataContext context)
             : base(log, context)
         {
+        }
+
+        public async Task<MyChessGame> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
+        {
+            return await Task.FromResult(new MyChessGame()
+            {
+                ID = Guid.NewGuid().ToString("D")
+            });
         }
 
         public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID)

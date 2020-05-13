@@ -13,6 +13,7 @@ namespace MyChess.Internal
         private static readonly Action<ILogger, string, Exception> _funcGamesProcessingMethod;
         private static readonly Action<ILogger, Exception> _funcGamesFetchAllGames;
         private static readonly Action<ILogger, string, Exception> _funcGamesFetchSingleGame;
+        private static readonly Action<ILogger, Exception> _funcGamesCreateNewGame;
 
         static GamesFunctionLoggerExtensions()
         {
@@ -38,6 +39,10 @@ namespace MyChess.Internal
                 LogLevel.Trace,
                 new EventId(LoggingEvents.FuncGamesFetchSingleGame, nameof(FuncGamesFetchSingleGame)),
                 "Fetch single game {GameID}");
+            _funcGamesCreateNewGame = LoggerMessage.Define(
+                LogLevel.Information,
+                new EventId(LoggingEvents.FuncGamesCreateNewGame, nameof(FuncGamesCreateNewGame)),
+                "Create new game");
         }
 
         // GamesFunction
@@ -47,5 +52,6 @@ namespace MyChess.Internal
         public static void FuncGamesProcessingMethod(this ILogger logger, string method) => _funcGamesProcessingMethod(logger, method, null);
         public static void FuncGamesFetchAllGames(this ILogger logger) => _funcGamesFetchAllGames(logger, null);
         public static void FuncGamesFetchSingleGame(this ILogger logger, string gameID) => _funcGamesFetchSingleGame(logger, gameID, null);
+        public static void FuncGamesCreateNewGame(this ILogger logger) => _funcGamesCreateNewGame(logger, null);
     }
 }

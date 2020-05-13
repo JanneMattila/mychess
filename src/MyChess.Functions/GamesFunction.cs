@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -53,7 +54,7 @@ namespace MyChess.Functions
             return req.Method switch
             {
                 "GET" => await Get(authenticatedUser, id),
-                "POST" => Post(authenticatedUser, req, id),
+                "POST" => await PostAsync(authenticatedUser, req, id),
                 "DELETE" => Delete(authenticatedUser, id),
                 _ => new StatusCodeResult((int)HttpStatusCode.NotImplemented)
             };
@@ -79,9 +80,12 @@ namespace MyChess.Functions
             }
         }
 
-        private IActionResult Post(AuthenticatedUser authenticatedUser, HttpRequest req, string id)
+        private async Task<IActionResult> PostAsync(AuthenticatedUser authenticatedUser, HttpRequest req, string id)
         {
-            return new OkObjectResult($"create game {id}");
+            _log.FuncGamesCreateNewGame();
+            var gameToCreate = await JsonSerializer.DeserializeAsync<MyChessGame>(req.Body);
+            var gameCreated = await _gamesHandler.CreateGameAsync(authenticatedUser, gameToCreate);
+            return new CreatedResult($"/api/games/{gameCreated.ID}", gameCreated);
         }
 
         private IActionResult Delete(AuthenticatedUser authenticatedUser, string id)

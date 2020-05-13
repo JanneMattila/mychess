@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -100,6 +101,48 @@ namespace MyChess.Functions.Tests
             // Assert
             Assert.IsType(expected, actual);
             var body = actual as OkObjectResult;
+            var actualGame = body.Value as MyChessGame;
+            Assert.Equal(expectedGameID, actualGame.ID);
+        }
+
+        [Fact]
+        public async Task Create_Game_Test()
+        {
+            // Arrange
+            var expected = typeof(CreatedResult);
+            var expectedGameID = "abc";
+            var game = new MyChessGame()
+            {
+                Name = "great game",
+                State = "Normal",
+                Updated = DateTimeOffset.UtcNow
+            };
+            game.Players.White.ID = "p1";
+            game.Players.Black.ID = "p2";
+            game.Moves.Add(new MyChessGameMove()
+            {
+                Move = "A2A3", Comment = "Cool move", 
+                Start = DateTimeOffset.UtcNow.AddMinutes(-1),
+                End = DateTimeOffset.UtcNow
+            });
+
+            _gamesHandlerStub.SingleGame = new MyChessGame()
+            {
+                ID = "abc"
+            };
+
+            var identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
+            _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
+
+            var req = HttpRequestHelper.Create("POST", body: game);
+
+            // Act
+            var actual = await _gamesFunction.Run(req, "abc");
+
+            // Assert
+            Assert.IsType(expected, actual);
+            var body = actual as CreatedResult;
             var actualGame = body.Value as MyChessGame;
             Assert.Equal(expectedGameID, actualGame.ID);
         }

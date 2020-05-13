@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -8,7 +9,7 @@ namespace MyChess.Functions.Tests.Helpers
 {
     public static class HttpRequestHelper
     {
-        public static HttpRequest Create(string method, Dictionary<string, StringValues> query = null, string body = null)
+        public static HttpRequest Create(string method, Dictionary<string, StringValues> query = null, object body = null)
         {
             var reqMock = new Mock<HttpRequest>();
             reqMock.Setup(req => req.Method).Returns(method);
@@ -20,9 +21,13 @@ namespace MyChess.Functions.Tests.Helpers
 
             if (body != null)
             {
-                using var stream = new MemoryStream();
-                using var writer = new StreamWriter(stream);
-                writer.Write(body);
+                var json = JsonSerializer.Serialize(body);
+
+                // Note: Do not dispose these two since
+                // they are read during the test execution.
+                var stream = new MemoryStream();
+                var writer = new StreamWriter(stream);
+                writer.Write(json);
                 writer.Flush();
                 stream.Position = 0;
                 reqMock.Setup(req => req.Body).Returns(stream);
