@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using MyChess.Handlers;
 using MyChess.Interfaces;
+using MyChess.Internal;
 
 namespace MyChess.Functions
 {

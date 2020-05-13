@@ -3,19 +3,10 @@
 using System;
 using Microsoft.Extensions.Logging;
 
-namespace MyChess
+namespace MyChess.Internal
 {
-    public static class LoggerExtensions
+    public static class SecurityValidatorLoggerExtensions
     {
-        // GamesFunction
-        private static readonly Func<ILogger, IDisposable> _funcGamesScope;
-        private static readonly Action<ILogger, Exception> _funcGamesStarted;
-        private static readonly Action<ILogger, string, string, Exception> _funcGamesUserDoesNotHavePermission;
-        private static readonly Action<ILogger, string, Exception> _funcGamesProcessingMethod;
-        private static readonly Action<ILogger, Exception> _funcGamesFetchAllGames;
-        private static readonly Action<ILogger, string, Exception> _funcGamesFetchSingleGame;
-
-        // SecurityValidator
         private static readonly Action<ILogger, string, Exception> _funcSecInvalidIssuer;
         private static readonly Action<ILogger, string, Exception> _funcSecIssuer;
         private static readonly Action<ILogger, Exception> _funcSecNoAuthHeader;
@@ -25,32 +16,8 @@ namespace MyChess
         private static readonly Action<ILogger, Exception> _funcSecInitializingFailed;
         private static readonly Action<ILogger, Exception> _funcSecTokenValidationFailed;
 
-        static LoggerExtensions()
+        static SecurityValidatorLoggerExtensions()
         {
-            // GamesFunction
-            _funcGamesScope = LoggerMessage.DefineScope("Games");
-            _funcGamesStarted = LoggerMessage.Define(
-                LogLevel.Information,
-                new EventId(LoggingEvents.FuncGamesStarted, nameof(FuncGamesStarted)),
-                "Games function processing request.");
-            _funcGamesUserDoesNotHavePermission = LoggerMessage.Define<string, string>(
-                LogLevel.Warning,
-                new EventId(LoggingEvents.FuncGamesUserDoesNotHavePermission, nameof(FuncGamesUserDoesNotHavePermission)),
-                "User {User} does not have permission {Permission}");
-            _funcGamesProcessingMethod = LoggerMessage.Define<string>(
-                LogLevel.Trace,
-                new EventId(LoggingEvents.FuncGamesUserDoesNotHavePermission, nameof(FuncGamesProcessingMethod)),
-                "Processing {Method} request");
-            _funcGamesFetchAllGames = LoggerMessage.Define(
-                LogLevel.Trace,
-                new EventId(LoggingEvents.FuncGamesFetchAllGames, nameof(FuncGamesFetchAllGames)),
-                "Fetch all games");
-            _funcGamesFetchSingleGame = LoggerMessage.Define<string>(
-                LogLevel.Trace,
-                new EventId(LoggingEvents.FuncGamesFetchSingleGame, nameof(FuncGamesFetchSingleGame)),
-                "Fetch single game {GameID}");
-
-            // SecurityValidator
             _funcSecInvalidIssuer = LoggerMessage.Define<string>(
                 LogLevel.Warning,
                 new EventId(LoggingEvents.FuncSecInvalidIssuer, nameof(FuncSecInvalidIssuer)),
@@ -85,15 +52,6 @@ namespace MyChess
                 "Token validation failed");
         }
 
-        // GamesFunction
-        public static IDisposable FuncGamesScope(this ILogger logger) => _funcGamesScope(logger);
-        public static void FuncGamesStarted(this ILogger logger) => _funcGamesStarted(logger, null);
-        public static void FuncGamesUserDoesNotHavePermission(this ILogger logger, string user, string permission) => _funcGamesUserDoesNotHavePermission(logger, user, permission, null);
-        public static void FuncGamesProcessingMethod(this ILogger logger, string method) => _funcGamesProcessingMethod(logger, method, null);
-        public static void FuncGamesFetchAllGames(this ILogger logger) => _funcGamesFetchAllGames(logger, null);
-        public static void FuncGamesFetchSingleGame(this ILogger logger, string gameID) => _funcGamesFetchSingleGame(logger, gameID, null);
-
-        // SecurityValidator
         public static void FuncSecInvalidIssuer(this ILogger logger, string issuer) => _funcSecInvalidIssuer(logger, issuer, null);
         public static void FuncSecIssuer(this ILogger logger, string issuer) => _funcSecIssuer(logger, issuer, null);
         public static void FuncSecNoAuthHeader(this ILogger logger) => _funcSecNoAuthHeader(logger, null);
