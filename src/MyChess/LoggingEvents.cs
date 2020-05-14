@@ -33,5 +33,10 @@
         public const int GameHandlerGameFound = 2100;
         public const int GameHandlerGameNotFound = 2101;
         public const int GameHandlerGamesFound = 2102;
+
+        public static string CreateLinkToProblemDescription(int eventID)
+        {
+            return $"https://bit.ly/MyChessProblems#{eventID}";
+        }
     }
 }
