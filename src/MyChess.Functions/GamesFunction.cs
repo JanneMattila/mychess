@@ -84,8 +84,30 @@ namespace MyChess.Functions
         {
             _log.FuncGamesCreateNewGame();
             var gameToCreate = await JsonSerializer.DeserializeAsync<MyChessGame>(req.Body);
-            var gameCreated = await _gamesHandler.CreateGameAsync(authenticatedUser, gameToCreate);
-            return new CreatedResult($"/api/games/{gameCreated.ID}", gameCreated);
+            var result = await _gamesHandler.CreateGameAsync(authenticatedUser, gameToCreate);
+            if (result.Game != null)
+            {
+                return new CreatedResult($"/api/games/{result.Game.ID}", result.Game);
+            }
+            else if (result.Error != null)
+            {
+                var problemDetail = new ProblemDetails
+                {
+                    Detail = result.Error.Detail,
+                    Instance = result.Error.Instance,
+                    Status = result.Error.Status,
+                    Title = result.Error.Title
+                };
+
+                return new ObjectResult(problemDetail)
+                {
+                    StatusCode = problemDetail.Status
+                };
+            }
+            else
+            {
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         private IActionResult Delete(AuthenticatedUser authenticatedUser, string id)

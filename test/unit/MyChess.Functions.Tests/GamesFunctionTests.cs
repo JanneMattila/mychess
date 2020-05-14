@@ -73,8 +73,8 @@ namespace MyChess.Functions.Tests
             // Assert
             Assert.IsType(expected, actual);
             var body = actual as OkObjectResult;
-            var list = body.Value as List<MyChessGame>;
-            Assert.Equal(expectedGames, list.Count);
+            var list = body?.Value as List<MyChessGame>;
+            Assert.Equal(expectedGames, list?.Count);
         }
 
         [Fact]
@@ -101,8 +101,8 @@ namespace MyChess.Functions.Tests
             // Assert
             Assert.IsType(expected, actual);
             var body = actual as OkObjectResult;
-            var actualGame = body.Value as MyChessGame;
-            Assert.Equal(expectedGameID, actualGame.ID);
+            var actualGame = body?.Value as MyChessGame;
+            Assert.Equal(expectedGameID, actualGame?.ID);
         }
 
         [Fact]
@@ -143,8 +143,8 @@ namespace MyChess.Functions.Tests
             // Assert
             Assert.IsType(expected, actual);
             var body = actual as CreatedResult;
-            var actualGame = body.Value as MyChessGame;
-            Assert.Equal(expectedGameID, actualGame.ID);
+            var actualGame = body?.Value as MyChessGame;
+            Assert.Equal(expectedGameID, actualGame?.ID);
         }
     }
 }

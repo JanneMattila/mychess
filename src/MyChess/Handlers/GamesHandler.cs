@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using MyChess.Data;
 using MyChess.Handlers.Internal;
 using MyChess.Interfaces;
+using MyChess.Models;
 
 namespace MyChess.Handlers
 {
@@ -17,14 +18,29 @@ namespace MyChess.Handlers
         {
         }
 
-        public async Task<MyChessGame> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
+        public async Task<(MyChessGame Game, HandlerError? Error)> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
         {
+            var opponentID = game.Players.Black.ID;
+            var opponent = await GetUserByUserIDAsync(opponentID);
             var userID = await GetOrCreateUserAsync(authenticatedUser);
 
-            return await Task.FromResult(new MyChessGame()
+            game.ID = Guid.NewGuid().ToString("D");
+            var data = _compactor.Compact(game);
+
+            await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity
             {
-                ID = Guid.NewGuid().ToString("D")
+                PartitionKey = opponentID,
+                RowKey = game.ID,
+                Data = data
             });
+            await _context.UpsertAsync(TableNames.GamesWaitingForOpponent, new GameEntity
+            {
+                PartitionKey = userID,
+                RowKey = game.ID,
+                Data = data
+            });
+
+            return (game, null);
         }
 
         public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID)
