@@ -18,7 +18,7 @@ namespace MyChess.Functions.Tests.Stubs
             return (SingleGame, null);
         }
 
-        public async Task<MyChessGame> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID)
+        public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID)
         {
             return await Task.FromResult(SingleGame);
         }
