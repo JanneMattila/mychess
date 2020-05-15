@@ -37,6 +37,7 @@ namespace MyChess.Handlers
             var userID = await GetOrCreateUserAsync(authenticatedUser);
 
             game.ID = Guid.NewGuid().ToString("D");
+            game.Players.White.ID = userID;
             var data = _compactor.Compact(game);
 
             await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity

@@ -97,5 +97,55 @@ namespace MyChess.Tests.Handlers
             Assert.NotNull(actual.Error);
             Assert.EndsWith(expected, actual.Error?.Instance);
         }
+
+        [Fact]
+        public async Task Create_New_Game()
+        {
+            // Arrange
+            var expectedWhitePlayer = "user123";
+            var expectedBlackPlayer = "user456";
+
+            var user = new AuthenticatedUser()
+            {
+                Name = "abc",
+                PreferredUsername = "a b",
+                UserIdentifier = "u1",
+                ProviderIdentifier = "p1"
+            };
+
+            // Player creating the game
+            await _context.UpsertAsync(TableNames.Users, new UserEntity()
+            {
+                PartitionKey = "u1",
+                RowKey = "p1",
+                UserID = "user123"
+            });
+
+            // Opponent
+            await _context.UpsertAsync(TableNames.Users, new UserEntity()
+            {
+                PartitionKey = "u2",
+                RowKey = "p2",
+                UserID = "user456"
+            });
+            await _context.UpsertAsync(TableNames.UserID2User, new UserID2UserEntity()
+            {
+                PartitionKey = "user456",
+                RowKey = "user456",
+                UserPrimaryKey = "u2",
+                UserRowKey = "p2"
+            });
+            var gameToCreate = new MyChessGame();
+            gameToCreate.Players.Black.ID = "user456";
+
+            // Act
+            var actual = await _gamesHandler.CreateGameAsync(user, gameToCreate);
+
+            // Assert
+            Assert.Null(actual.Error);
+            Assert.NotNull(actual.Game);
+            Assert.Equal(expectedWhitePlayer, actual.Game?.Players.White.ID);
+            Assert.Equal(expectedBlackPlayer, actual.Game?.Players.Black.ID);
+        }
     }
 }
