@@ -33,6 +33,7 @@
         public const int GameHandlerGameFound = 2100;
         public const int GameHandlerGameNotFound = 2101;
         public const int GameHandlerGamesFound = 2102;
+        public const int GameHandlerOpponentNotFound = 2103;
 
         public static string CreateLinkToProblemDescription(int eventID)
         {

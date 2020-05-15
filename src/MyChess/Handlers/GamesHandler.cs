@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using MyChess.Data;
@@ -18,10 +19,21 @@ namespace MyChess.Handlers
         {
         }
 
-        public async Task<(MyChessGame Game, HandlerError? Error)> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
+        public async Task<(MyChessGame? Game, HandlerError? Error)> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
         {
             var opponentID = game.Players.Black.ID;
             var opponent = await GetUserByUserIDAsync(opponentID);
+            if (opponent == null)
+            {
+                return (null, new HandlerError()
+                {
+                    Instance = LoggingEvents.CreateLinkToProblemDescription(LoggingEvents.GameHandlerOpponentNotFound),
+                    Status = (int)HttpStatusCode.NotFound,
+                    Title = "User not found",
+                    Detail = "For some reason your opponent could not be found"
+                });
+            }
+
             var userID = await GetOrCreateUserAsync(authenticatedUser);
 
             game.ID = Guid.NewGuid().ToString("D");

@@ -20,7 +20,7 @@ namespace MyChess.Tests.Handlers
         }
 
         [Fact]
-        public async Task New_User_No_Games()
+        public async Task Get_Games_As_New_User_No_Games()
         {
             // Arrange
             var expected = 0;
@@ -40,7 +40,7 @@ namespace MyChess.Tests.Handlers
         }
 
         [Fact]
-        public async Task Existing_User_With_Game()
+        public async Task Get_Games_As_Existing_User_With_Game()
         {
             // Arrange
             var expected = "123";
@@ -72,6 +72,30 @@ namespace MyChess.Tests.Handlers
             // Assert
             Assert.NotNull(actual);
             Assert.Equal(expected, actual?.ID);
+        }
+
+        [Fact]
+        public async Task Create_New_Game_But_No_Opponent_Found()
+        {
+            // Arrange
+            var expected = "2103"; // GameHandlerOpponentNotFound
+            var user = new AuthenticatedUser()
+            {
+                Name = "abc",
+                PreferredUsername = "a b",
+                UserIdentifier = "u",
+                ProviderIdentifier = "p"
+            };
+
+            var gameToCreate = new MyChessGame();
+
+            // Act
+            var actual = await _gamesHandler.CreateGameAsync(user, gameToCreate);
+
+            // Assert
+            Assert.Null(actual.Game);
+            Assert.NotNull(actual.Error);
+            Assert.EndsWith(expected, actual.Error?.Instance);
         }
     }
 }

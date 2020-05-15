@@ -12,7 +12,7 @@ namespace MyChess.Functions.Tests.Stubs
 
         public List<MyChessGame> Games { get; set; } = new List<MyChessGame>();
 
-        public async Task<(MyChessGame Game, HandlerError? Error)> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
+        public async Task<(MyChessGame? Game, HandlerError? Error)> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
         {
             await Task.CompletedTask;
             return (SingleGame, null);
