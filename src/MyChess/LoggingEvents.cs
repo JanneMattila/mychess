@@ -22,6 +22,13 @@
         public const int FuncGamesMoveUserDoesNotHavePermission = 1201;
         public const int FuncGamesMoveProcessingMethod = 1202;
 
+        public const int FuncFriendsStarted = 1300;
+        public const int FuncFriendsUserDoesNotHavePermission = 1301;
+        public const int FuncFriendsProcessingMethod = 1302;
+        public const int FuncFriendsFetchAllFriends = 1303;
+        public const int FuncFriendsFetchSingleFriend = 1304;
+        public const int FuncFriendsAddNewFriend = 1305;
+
         public const int BaseHandlerCreateNewUser = 2000;
         public const int BaseHandlerNewUserCreated = 2001;
         public const int BaseHandlerExistingUserFound = 2002;
@@ -34,6 +41,11 @@
         public const int GameHandlerGameNotFound = 2101;
         public const int GameHandlerGamesFound = 2102;
         public const int GameHandlerOpponentNotFound = 2103;
+
+        public const int FriendHandlerFriendFound = 2200;
+        public const int FriendHandlerFriendNotFound = 2201;
+        public const int FriendHandlerFriendsFound = 2202;
+        public const int FriendHandlerOpponentNotFound = 2203;
 
         public static string CreateLinkToProblemDescription(int eventID)
         {
