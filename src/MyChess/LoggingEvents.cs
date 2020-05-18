@@ -2,6 +2,10 @@
 {
     public static class LoggingEvents
     {
+        public const int DataContextInitializing = 100;
+        public const int DataContextInitialized = 101;
+        public const int DataContextInitializeTable = 102;
+
         public const int FuncGamesStarted = 1000;
         public const int FuncGamesUserDoesNotHavePermission = 1001;
         public const int FuncGamesProcessingMethod = 1002;
