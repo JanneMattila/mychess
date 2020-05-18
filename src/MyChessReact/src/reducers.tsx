@@ -4,7 +4,8 @@ import { EventTypes, RootState, RootAction, ProcessState, DialogType } from "./a
 export const getInitialState = () => {
     return {
         loginState: ProcessState.NotStarted,
-        gamesState: ProcessState.NotStarted
+        gamesState: ProcessState.NotStarted,
+        friendsState: ProcessState.NotStarted
     }
 }
 
@@ -35,6 +36,14 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 gamesState: action.gamesState,
                 error: action.error,
                 games: action.games
+            })
+        }
+
+        case EventTypes.FRIENDS_LOADING: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                friendsState: action.friendsState,
+                error: action.error,
+                friends: action.friends
             })
         }
 

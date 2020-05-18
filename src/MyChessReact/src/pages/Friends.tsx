@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
+import { GetConfiguration } from "../ConfigurationManager";
+import { FriendList } from "../components/FriendList";
 import "./Friends.css";
 
+let configuration = GetConfiguration();
+
 export function Friends() {
-
-    useEffect(() => {
-    });
-
     return (
         <div>
             <header className="Friends-header">
-                <h4>Friends</h4>
+                <FriendList title="Friends" endpoint={configuration.endpoint} />
             </header>
         </div>
     );

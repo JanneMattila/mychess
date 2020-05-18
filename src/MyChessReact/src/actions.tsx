@@ -1,5 +1,6 @@
 import { Account } from "msal";
 import { MyChessGame } from "./models/MyChessGame";
+import { Player } from "./models/Player";
 
 export enum ProcessState {
     NotStarted,
@@ -27,6 +28,9 @@ export enum EventTypes {
     // Game loading related events
     GAMES_LOADING = "Games/Load",
 
+    // Game loading related events
+    FRIENDS_LOADING = "Friends/Load",
+
     // Game playing related events
     PLAY_LOADING = "Play/Load",
     PLAY_SHOW_DIALOG = "Play/Dialog",
@@ -36,6 +40,7 @@ type LoginAction = { type: EventTypes.AUTH_LOGIN, loginState: ProcessState, erro
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
+type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: Player[] }
 type PlayShowDialogAction = { type: EventTypes.PLAY_SHOW_DIALOG, dialog: DialogType, show: boolean }
 
 // Root action
@@ -44,6 +49,7 @@ export type RootAction =
     | LogoutAction
     | LoginExpiredAction
     | GamesLoadingAction
+    | FriendsLoadingAction
     | PlayShowDialogAction
 
 export interface RootState {
@@ -54,6 +60,9 @@ export interface RootState {
 
     readonly gamesState?: ProcessState
     readonly games?: MyChessGame[]
+
+    readonly friendsState?: ProcessState
+    readonly friends?: Player[]
 
     readonly activeDialog?: DialogType
 }
@@ -67,6 +76,10 @@ export function loginEvent(loginState: ProcessState, error?: string, account?: A
 
 export function gamesLoadingEvent(gamesState: ProcessState, error?: string, games?: MyChessGame[]): GamesLoadingAction {
     return { type: EventTypes.GAMES_LOADING, gamesState, error, games };
+}
+
+export function friendsLoadingEvent(friendsState: ProcessState, error?: string, friends?: Player[]): FriendsLoadingAction {
+    return { type: EventTypes.FRIENDS_LOADING, friendsState, error, friends };
 }
 
 export function showDialogEvent(dialog: DialogType, show: boolean): PlayShowDialogAction {
