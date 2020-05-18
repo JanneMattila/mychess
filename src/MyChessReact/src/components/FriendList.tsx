@@ -75,13 +75,20 @@ export function FriendList(props: FriendListProps) {
         dispatch(friendsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
     }
 
+    const addNewFriend = () => {
+    }
+
     if (loginState === ProcessState.Success) {
 
         let contents: JSX.Element;
         switch (friendsState) {
             case ProcessState.Success:
                 if (friends && friends?.length === 0) {
-                    contents = <h6>No friends found. Click to <button onClick={refresh}>refresh</button></h6>;
+                    contents =
+                        <h6>
+                            No friends found. Click to <button onClick={refresh}>refresh</button> or
+                            <button onClick={addNewFriend}>add new</button> friend.
+                        </h6>;
                 }
                 else {
                     contents = renderFriends(friends);
