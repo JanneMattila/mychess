@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { RootState, ProcessState, friendsLoadingEvent } from "../actions";
@@ -22,6 +22,10 @@ export function FriendList(props: FriendListProps) {
     const accessToken = useTypedSelector(selectorAccessToken);
     const friendsState = useTypedSelector(selectorFriendsState);
     const friends = useTypedSelector(selectorFriends);
+
+    const [isFriendDialogOpen, showFriendDialog] = useState(false);
+    const [friendName, setFriendName] = useState("");
+    const [friendID, setFriendID] = useState("");
 
     const dispatch = useDispatch();
     const ai = getAppInsights();
@@ -75,7 +79,25 @@ export function FriendList(props: FriendListProps) {
         dispatch(friendsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
     }
 
-    const addNewFriend = () => {
+    const showAddNewFriend = () => {
+        showFriendDialog(true)
+    }
+
+    const addFriend = () => {
+    }
+
+    const cancel = () => {
+        setFriendID("");
+        setFriendName("");
+        showFriendDialog(false);
+    }
+
+    const visible = {
+    }
+
+
+    const hidden = {
+        display: "none",
     }
 
     if (loginState === ProcessState.Success) {
@@ -85,10 +107,26 @@ export function FriendList(props: FriendListProps) {
             case ProcessState.Success:
                 if (friends && friends?.length === 0) {
                     contents =
-                        <h6>
-                            No friends found. Click to <button onClick={refresh}>refresh</button> or
-                            <button onClick={addNewFriend}>add new</button> friend.
-                        </h6>;
+                        <div>
+                            <h6>
+                                No friends found. Click to <button onClick={refresh}>refresh</button> or
+                                <button onClick={showAddNewFriend}>add new</button> friend.
+                            </h6>
+                            <div id="addFriend" style={(isFriendDialogOpen ? visible : hidden)}>
+                                <label>
+                                    Friend identifier<br />
+                                    <input type="text" value={friendID} onChange={e => setFriendID(e.target.value)} />
+                                </label>
+                                <br />
+                                <label>
+                                    Friend name<br />
+                                    <input type="text" value={friendName} onChange={e => setFriendName(e.target.value)} />
+                                </label>
+                                <br />
+                                <button onClick={addFriend}><span role="img" aria-label="Add friend">✅</span> Add friend</button>
+                                <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+                            </div>
+                        </div>;
                 }
                 else {
                     contents = renderFriends(friends);
