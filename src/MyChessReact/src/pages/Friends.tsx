@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { GetConfiguration } from "../ConfigurationManager";
 import { FriendList } from "../components/FriendList";
 import "./Friends.css";
