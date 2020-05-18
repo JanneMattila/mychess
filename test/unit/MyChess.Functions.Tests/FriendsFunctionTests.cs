@@ -114,7 +114,7 @@ namespace MyChess.Functions.Tests
             var friend = new Player()
             {
                 ID = "abc",
-                Name = "great game"
+                Name = "John Doe"
             };
 
             _friendsHandlerStub.SingleFriend = new Player()
@@ -136,6 +136,39 @@ namespace MyChess.Functions.Tests
             var body = actual as CreatedResult;
             var actualPlayer = body?.Value as Player;
             Assert.Equal(expectedPlayerID, actualPlayer?.ID);
+        }
+
+        [Fact]
+        public async Task Add_Friend_Fails_Due_Invalid_Player_Test()
+        {
+            // Arrange
+            var expected = typeof(ObjectResult);
+            var expectedError = "1234";
+            var friend = new Player()
+            {
+                ID = "abc",
+                Name = "John Doe"
+            };
+
+            _friendsHandlerStub.Error = new Models.HandlerError()
+            {
+                Instance = "some text/1234"
+            };
+
+            var identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
+            _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
+
+            var req = HttpRequestHelper.Create("POST", body: friend);
+
+            // Act
+            var actual = await _friendsFunction.Run(req, "abc");
+
+            // Assert
+            Assert.IsType(expected, actual);
+            var body = actual as ObjectResult;
+            var actualError = body?.Value as ProblemDetails;
+            Assert.EndsWith(expectedError, actualError?.Instance);
         }
     }
 }
