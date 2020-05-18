@@ -14,7 +14,7 @@ namespace MyChess.Functions.Tests.Stubs
 
         public HandlerError? Error { get; set; }
 
-        public async Task<(Player? Friend, HandlerError? Error)> AddNewFriend(AuthenticatedUser authenticatedUser, MyChessGame game)
+        public async Task<(Player? Friend, HandlerError? Error)> AddNewFriend(AuthenticatedUser authenticatedUser, Player player)
         {
             await Task.CompletedTask;
             return (SingleFriend, Error);

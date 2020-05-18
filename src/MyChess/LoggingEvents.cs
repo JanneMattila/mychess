@@ -45,7 +45,7 @@
         public const int FriendHandlerFriendFound = 2200;
         public const int FriendHandlerFriendNotFound = 2201;
         public const int FriendHandlerFriendsFound = 2202;
-        public const int FriendHandlerOpponentNotFound = 2203;
+        public const int FriendHandlerPlayerNotFound = 2203;
 
         public static string CreateLinkToProblemDescription(int eventID)
         {
