@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MyChess.Data.Internal;
 
 namespace MyChess.Data
 {
@@ -22,6 +23,7 @@ namespace MyChess.Data
         private readonly CloudTable _gamesWaitingForYouTable;
         private readonly CloudTable _gamesWaitingForOpponentTable;
         private readonly CloudTable _gamesArchiveTable;
+        private bool _initialized = false;
 
         public MyChessDataContext(ILogger<MyChessDataContext> log, IOptions<MyChessDataContextOptions> options)
         {
@@ -47,15 +49,37 @@ namespace MyChess.Data
 
         public void Initialize()
         {
-            _usersTable.CreateIfNotExists();
-            _userFriendsTable.CreateIfNotExists();
-            _userNotificationsTable.CreateIfNotExists();
-            _userSettingsTable.CreateIfNotExists();
-            _userID2UserTable.CreateIfNotExists();
+            if (!_initialized)
+            {
+                _log.DataContextInitializing();
 
-            _gamesWaitingForYouTable.CreateIfNotExists();
-            _gamesWaitingForOpponentTable.CreateIfNotExists();
-            _gamesArchiveTable.CreateIfNotExists();
+                var usersTableCreated = _usersTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.Users, usersTableCreated);
+
+                var userFriendsTableCreated = _userFriendsTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserFriends, userFriendsTableCreated);
+
+                var userNotificationsTableCreated = _userNotificationsTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserNotifications, userNotificationsTableCreated);
+
+                var userSettingsTableCreated = _userSettingsTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserSettings, userSettingsTableCreated);
+
+                var userID2UserTableCreated = _userID2UserTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserID2User, userID2UserTableCreated);
+
+                var gamesWaitingForYouTableCreated = _gamesWaitingForYouTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.GamesWaitingForYou, gamesWaitingForYouTableCreated);
+
+                var gamesWaitingForOpponentTableCreated = _gamesWaitingForOpponentTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.GamesWaitingForOpponent, gamesWaitingForOpponentTableCreated);
+
+                var gamesArchiveTableCreated = _gamesArchiveTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.GamesArchive, gamesArchiveTableCreated);
+
+                _log.DataContextInitialized();
+                _initialized = true;
+            }
         }
 
         private CloudTable GetTable(string tableName)
@@ -77,6 +101,7 @@ namespace MyChess.Data
         public async Task<T?> GetAsync<T>(string tableName, string partitionKey, string rowKey)
             where T : TableEntity
         {
+            Initialize();
             var table = GetTable(tableName);
             var retrieveOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
             var result = await table.ExecuteAsync(retrieveOperation);
@@ -86,6 +111,7 @@ namespace MyChess.Data
         public async Task<TableResult> UpsertAsync<T>(string tableName, T entity)
             where T : TableEntity
         {
+            Initialize();
             var table = GetTable(tableName);
             var upsertOperation = TableOperation.InsertOrReplace(entity);
             return await table.ExecuteAsync(upsertOperation);
@@ -94,6 +120,7 @@ namespace MyChess.Data
         public async Task<TableResult> DeleteAsync<T>(string tableName, T entity)
             where T : TableEntity
         {
+            Initialize();
             var table = GetTable(tableName);
             var deleteOperation = TableOperation.Delete(entity);
             return await table.ExecuteAsync(deleteOperation);
@@ -102,10 +129,11 @@ namespace MyChess.Data
         public async IAsyncEnumerable<T> GetAllAsync<T>(string tableName, string partitionKey)
             where T : TableEntity, new()
         {
+            Initialize();
+            var table = GetTable(tableName);
             var query = new TableQuery<T>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
             var token = new TableContinuationToken();
-            var table = GetTable(tableName);
 
             do
             {
