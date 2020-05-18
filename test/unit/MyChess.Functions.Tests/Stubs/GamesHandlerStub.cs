@@ -8,14 +8,16 @@ namespace MyChess.Functions.Tests.Stubs
 {
     public class GamesHandlerStub : IGamesHandler
     {
-        public MyChessGame SingleGame { get; set; } = new MyChessGame();
-
+        public MyChessGame? SingleGame { get; set; }
+        
         public List<MyChessGame> Games { get; set; } = new List<MyChessGame>();
+
+        public HandlerError? Error { get; set; }
 
         public async Task<(MyChessGame? Game, HandlerError? Error)> CreateGameAsync(AuthenticatedUser authenticatedUser, MyChessGame game)
         {
             await Task.CompletedTask;
-            return (SingleGame, null);
+            return (SingleGame, Error);
         }
 
         public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID)

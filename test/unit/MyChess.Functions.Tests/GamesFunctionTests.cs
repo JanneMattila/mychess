@@ -146,5 +146,48 @@ namespace MyChess.Functions.Tests
             var actualGame = body?.Value as MyChessGame;
             Assert.Equal(expectedGameID, actualGame?.ID);
         }
+
+        [Fact]
+        public async Task Create_Game_Fails_Due_Invalid_Opponent_Test()
+        {
+            // Arrange
+            var expected = typeof(ObjectResult);
+            var expectedError = "1234";
+            var game = new MyChessGame()
+            {
+                Name = "great game",
+                State = "Normal",
+                Updated = DateTimeOffset.UtcNow
+            };
+            game.Players.White.ID = "p1";
+            game.Players.Black.ID = "p3";
+            game.Moves.Add(new MyChessGameMove()
+            {
+                Move = "A2A3",
+                Comment = "Cool move",
+                Start = DateTimeOffset.UtcNow.AddMinutes(-1),
+                End = DateTimeOffset.UtcNow
+            });
+
+            _gamesHandlerStub.Error = new Models.HandlerError()
+            {
+                Instance = "some text/1234"
+            };
+
+            var identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
+            _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
+
+            var req = HttpRequestHelper.Create("POST", body: game);
+
+            // Act
+            var actual = await _gamesFunction.Run(req, "abc");
+
+            // Assert
+            Assert.IsType(expected, actual);
+            var body = actual as ObjectResult;
+            var actualError = body?.Value as ProblemDetails;
+            Assert.EndsWith(expectedError, actualError?.Instance);
+        }
     }
 }
