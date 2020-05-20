@@ -6,6 +6,7 @@ import { getAppInsights } from "./TelemetryService";
 import { Link } from "react-router-dom";
 import "./FriendList.css";
 import { Player } from "../models/Player";
+import { ProblemDetail } from "../models/ProblemDetail";
 
 type FriendListProps = {
     title: string;
@@ -26,6 +27,7 @@ export function FriendList(props: FriendListProps) {
     const [isFriendDialogOpen, showFriendDialog] = useState(false);
     const [friendName, setFriendName] = useState("");
     const [friendID, setFriendID] = useState("");
+    const [friendError, setFriendError] = useState({ title: "", link: "" });
 
     const dispatch = useDispatch();
     const ai = getAppInsights();
@@ -83,7 +85,42 @@ export function FriendList(props: FriendListProps) {
         showFriendDialog(true)
     }
 
-    const addFriend = () => {
+    const addFriend = async () => {
+        const json: Player = {
+            "id": friendID,
+            "name": friendName,
+        };
+
+        const request: RequestInit = {
+            method: "POST",
+            body: JSON.stringify(json),
+            headers: {
+                "Accept": "application/json",
+                "Authorization": "Bearer " + accessToken
+            }
+        };
+
+        let errorText = "a2";
+        let errorLink = "b";
+
+        try {
+            const response = await fetch(props.endpoint + "/api/users/me/friends", request);
+            const data = await response.json();
+
+            if (response.status !== 200) {
+                const ex = data as ProblemDetail;
+                if (ex.title !== undefined && ex.instance !== undefined) {
+                    console.log(ex);
+                    setFriendError({ title: ex.title, link: ex.instance });
+                }
+            }
+            console.log(data);
+        } catch (error) {
+            ai.trackException(error);
+
+            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to add friend.";
+            console.log(error);
+        }
     }
 
     const cancel = () => {
@@ -124,6 +161,9 @@ export function FriendList(props: FriendListProps) {
                                 <br />
                                 <button onClick={addFriend}><span role="img" aria-label="Add friend">✅</span> Add friend</button>
                                 <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+                                <div>
+                                    <a className="FriendList-AddFriendError" href={friendError.link} target="_blank">{friendError.title}</a>
+                                </div>
                             </div>
                         </div>;
                 }

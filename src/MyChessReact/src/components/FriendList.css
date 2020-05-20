@@ -10,6 +10,12 @@
   font-size: 16pt;
 }
 
+.FriendList-AddFriendError { 
+  font-size: 16pt;
+  color: red;
+  text-decoration: none;
+}
+
 .template-1 { width: 30%; }
 
 [class*="template-"] {
