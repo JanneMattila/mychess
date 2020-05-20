@@ -6,6 +6,10 @@
   color: #ffffff;
 }
 
+.FriendList-AddFriend { 
+  font-size: 16pt;
+}
+
 .template-1 { width: 30%; }
 
 [class*="template-"] {

@@ -36,3 +36,11 @@ button {
   padding: 5px;
   margin: 10px;
 }
+
+input,
+select,
+textarea {
+  font-size: medium;
+  padding: 5px;
+  margin: 10px;
+}

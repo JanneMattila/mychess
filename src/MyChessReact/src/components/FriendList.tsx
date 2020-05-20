@@ -95,7 +95,6 @@ export function FriendList(props: FriendListProps) {
     const visible = {
     }
 
-
     const hidden = {
         display: "none",
     }
@@ -113,12 +112,12 @@ export function FriendList(props: FriendListProps) {
                                 <button onClick={showAddNewFriend}>add new</button> friend.
                             </h6>
                             <div id="addFriend" style={(isFriendDialogOpen ? visible : hidden)}>
-                                <label>
+                                <label className="FriendList-AddFriend">
                                     Friend identifier<br />
                                     <input type="text" value={friendID} onChange={e => setFriendID(e.target.value)} />
                                 </label>
                                 <br />
-                                <label>
+                                <label className="FriendList-AddFriend">
                                     Friend name<br />
                                     <input type="text" value={friendName} onChange={e => setFriendName(e.target.value)} />
                                 </label>
