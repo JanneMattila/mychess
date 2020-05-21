@@ -88,13 +88,17 @@ export function GameList(props: GameListProps) {
         dispatch(gamesLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
     }
 
+    const addNewGame = () => {
+    }
+
     if (loginState === ProcessState.Success) {
 
         let contents: JSX.Element;
         switch (gamesState) {
             case ProcessState.Success:
                 if (games && games?.length === 0) {
-                    contents = <h6>No games found. Click to <button onClick={refresh}>refresh</button></h6>;
+                    contents = <h6>No games found. Click to <button onClick={refresh}>refresh</button> or
+                                <button onClick={addNewGame}>add new</button> game.</h6>;
                 }
                 else {
                     contents = renderGames(games);
