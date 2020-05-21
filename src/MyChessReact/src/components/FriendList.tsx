@@ -50,7 +50,7 @@ export function FriendList(props: FriendListProps) {
             } catch (error) {
                 ai.trackException(error);
 
-                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve friends.";
                 dispatch(friendsLoadingEvent(ProcessState.Error, errorMessage));
             }
         }
@@ -118,6 +118,7 @@ export function FriendList(props: FriendListProps) {
 
             const errorMessage = error.errorMessage ? error.errorMessage : "Unable to add friend.";
             console.log(error);
+            console.log(errorMessage);
         }
     }
 
@@ -161,7 +162,7 @@ export function FriendList(props: FriendListProps) {
                                 <button onClick={addFriend}><span role="img" aria-label="Add friend">✅</span> Add friend</button>
                                 <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                                 <div>
-                                    <a className="FriendList-AddFriendError" href={friendError.link} target="_blank">{friendError.title}</a>
+                                    <a className="FriendList-AddFriendError" href={friendError.link} target="_blank" rel="noopener noreferrer">{friendError.title}</a>
                                 </div>
                             </div>
                         </div>;
