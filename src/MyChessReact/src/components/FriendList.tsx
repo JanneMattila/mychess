@@ -78,6 +78,7 @@ export function FriendList(props: FriendListProps) {
     }
 
     const refresh = () => {
+        cancel();
         dispatch(friendsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
     }
 

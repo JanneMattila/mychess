@@ -13,3 +13,11 @@
   text-decoration: none;
   margin-top: 25px;
 }
+
+.Settings-Text { 
+  font-size: 18pt;
+}
+
+.Settings-SubText { 
+  font-size: 12pt;
+}

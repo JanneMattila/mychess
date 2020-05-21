@@ -26,13 +26,21 @@ export function Settings() {
     return (
         <div>
             <header className="Settings-header">
-                <h4>Settings</h4>
+                <h4>Profile</h4>
 
-                <label>
-                    Username<br />
+                <label className="Settings-Text">
+                    Your player identifier<br />
+                    <div className="Settings-SubText">
+                        Share this to your friend so that they can connect to you
+                    </div>
                     <input type="text" />
                 </label>
-                <br />
+
+                <Link to="/friends" className="Settings-link">
+                    <span role="img" aria-label="Invite friend">👥</span> Invite Friends
+                </Link>
+
+                <h4>Settings</h4>
                 <label>
                     Notifications<br />
                     <Switch onChange={handleNotificationChange} checked={isNotificationsEnabled} />
@@ -42,10 +50,6 @@ export function Settings() {
                     <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Save</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
-
-                <Link to="/friends" className="Settings-link">
-                    <span role="img" aria-label="Invite friend">👥</span> Invite Friends
-                </Link>
             </header>
         </div>
     );
