@@ -86,6 +86,7 @@ export function FriendList(props: FriendListProps) {
     }
 
     const addFriend = async () => {
+        setFriendError({ title: "", link: "" });
         const json: Player = {
             "id": friendID,
             "name": friendName,
@@ -99,9 +100,6 @@ export function FriendList(props: FriendListProps) {
                 "Authorization": "Bearer " + accessToken
             }
         };
-
-        let errorText = "a2";
-        let errorLink = "b";
 
         try {
             const response = await fetch(props.endpoint + "/api/users/me/friends", request);
@@ -127,6 +125,7 @@ export function FriendList(props: FriendListProps) {
         setFriendID("");
         setFriendName("");
         showFriendDialog(false);
+        setFriendError({ title: "", link: "" });
     }
 
     const visible = {
