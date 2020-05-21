@@ -151,11 +151,19 @@ export function FriendList(props: FriendListProps) {
                             <div id="addFriend" style={(isFriendDialogOpen ? visible : hidden)}>
                                 <label className="FriendList-AddFriend">
                                     Friend identifier<br />
+                                    <div className="FriendList-AddFriendSubText">
+                                        This is your friends identifier.<br />
+                                        You need this in order to connect to your friend.
+                                    </div>
                                     <input type="text" value={friendID} onChange={e => setFriendID(e.target.value)} />
                                 </label>
                                 <br />
                                 <label className="FriendList-AddFriend">
                                     Friend name<br />
+                                    <div className="FriendList-AddFriendSubText">
+                                        This is your friends name.<br />
+                                        This is <b>only visible to you</b>.
+                                    </div>
                                     <input type="text" value={friendName} onChange={e => setFriendName(e.target.value)} />
                                 </label>
                                 <br />

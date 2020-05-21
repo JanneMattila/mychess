@@ -7,8 +7,13 @@
 }
 
 .FriendList-AddFriend { 
-  font-size: 16pt;
+  font-size: 18pt;
 }
+
+.FriendList-AddFriendSubText { 
+  font-size: 12pt;
+}
+
 
 .FriendList-AddFriendError { 
   font-size: 16pt;
