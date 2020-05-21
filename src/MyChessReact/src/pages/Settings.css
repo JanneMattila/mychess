@@ -21,3 +21,9 @@
 .Settings-SubText { 
   font-size: 12pt;
 }
+
+.Settings-Identifier { 
+  font-size: 10pt;
+  width: 300px;
+  background-color: lightgray;
+}

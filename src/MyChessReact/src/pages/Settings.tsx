@@ -5,6 +5,7 @@ import "./Settings.css";
 
 export function Settings() {
 
+    const playerIdentifier = "example";
     const [isNotificationsEnabled, setNotifications] = useState(false);
 
     useEffect(() => {
@@ -17,6 +18,12 @@ export function Settings() {
 
     const cancel = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
+    }
+
+    const copy = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+
+        navigator.clipboard.writeText(playerIdentifier);
     }
 
     const handleNotificationChange = (checked: boolean): void => {
@@ -33,7 +40,8 @@ export function Settings() {
                     <div className="Settings-SubText">
                         Share this to your friend so that they can connect to you
                     </div>
-                    <input type="text" />
+                    <input type="text" value={playerIdentifier} readOnly={true} className="Settings-Identifier" />
+                    <button onClick={copy}><span role="img" aria-label="Copy">&#128203;</span> Copy</button>
                 </label>
 
                 <Link to="/friends" className="Settings-link">
