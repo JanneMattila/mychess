@@ -75,8 +75,12 @@ POST `https://{host}/api/users/me/settings`
 
 GET `https://{host}/api/users/me`
 
-- Return current users all data
+- Return current user's identifier
+
+POST `https://{host}/api/users/me`
+
+- Return current user's data specified by body
 
 DELETE `https://{host}/api/users/me`
 
-- Delete current users all data
+- Delete current user's *all* data
