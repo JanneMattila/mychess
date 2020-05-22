@@ -61,8 +61,8 @@ namespace MyChess.Functions
         private async Task<IActionResult> Get(AuthenticatedUser authenticatedUser)
         {
             _log.FuncMeFetchMe();
-            var Me = await _meHandler.LoginAsync(authenticatedUser);
-            return new OkObjectResult(Me);
+            var me = await _meHandler.LoginAsync(authenticatedUser);
+            return new OkObjectResult(me);
         }
 
         private IActionResult PostAsync(AuthenticatedUser authenticatedUser, HttpRequest req)

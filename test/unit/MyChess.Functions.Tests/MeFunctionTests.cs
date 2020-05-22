@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
 using MyChess.Functions.Tests.Helpers;
 using MyChess.Functions.Tests.Stubs;
+using MyChess.Interfaces;
 using Xunit;
 
 namespace MyChess.Functions.Tests
@@ -55,7 +56,7 @@ namespace MyChess.Functions.Tests
             var expected = typeof(OkObjectResult);
             var expectedUserID = "abc";
 
-            _meHandlerStub.UserID = "abc";
+            _meHandlerStub.User.ID = "abc";
             
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
@@ -69,8 +70,8 @@ namespace MyChess.Functions.Tests
             // Assert
             Assert.IsType(expected, actual);
             var body = actual as OkObjectResult;
-            var actualUserID = body?.Value as string;
-            Assert.Equal(expectedUserID, actualUserID);
+            var actualUser = body?.Value as Player;
+            Assert.Equal(expectedUserID, actualUser.ID);
         }
     }
 }

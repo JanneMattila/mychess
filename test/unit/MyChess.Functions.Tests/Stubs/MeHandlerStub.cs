@@ -6,11 +6,11 @@ namespace MyChess.Functions.Tests.Stubs
 {
     public class MeHandlerStub : IMeHandler
     {
-        public string UserID { get; set; } = string.Empty;
+        public Player User { get; set; } = new Player();
 
-        public async Task<string> LoginAsync(AuthenticatedUser authenticatedUser)
+        public async Task<Player> LoginAsync(AuthenticatedUser authenticatedUser)
         {
-            return await Task.FromResult(UserID);
+            return await Task.FromResult(User);
         }
     }
 }
