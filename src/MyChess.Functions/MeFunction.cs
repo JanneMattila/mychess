@@ -31,8 +31,8 @@ namespace MyChess.Functions
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "delete", Route = "users/me")] HttpRequest req)
         {
-            using var _ = _log.FuncFriendsScope();
-            _log.FuncFriendsStarted();
+            using var _ = _log.FuncMeScope();
+            _log.FuncMeStarted();
 
             var principal = await _securityValidator.GetClaimsPrincipalAsync(req);
             if (principal == null)
@@ -42,13 +42,13 @@ namespace MyChess.Functions
 
             if (!principal.HasPermission(PermissionConstants.UserReadWrite))
             {
-                _log.FuncFriendsUserDoesNotHavePermission(principal.Identity.Name, PermissionConstants.UserReadWrite);
+                _log.FuncMeUserDoesNotHavePermission(principal.Identity.Name, PermissionConstants.UserReadWrite);
                 return new UnauthorizedResult();
             }
 
             var authenticatedUser = principal.ToAuthenticatedUser();
 
-            _log.FuncFriendsProcessingMethod(req.Method);
+            _log.FuncMeProcessingMethod(req.Method);
             return req.Method switch
             {
                 "GET" => await Get(authenticatedUser),
@@ -60,9 +60,9 @@ namespace MyChess.Functions
 
         private async Task<IActionResult> Get(AuthenticatedUser authenticatedUser)
         {
-            _log.FuncFriendsFetchAllFriends();
-            var friends = await _meHandler.LoginAsync(authenticatedUser);
-            return new OkObjectResult(friends);
+            _log.FuncMeFetchMe();
+            var Me = await _meHandler.LoginAsync(authenticatedUser);
+            return new OkObjectResult(Me);
         }
 
         private IActionResult PostAsync(AuthenticatedUser authenticatedUser, HttpRequest req)

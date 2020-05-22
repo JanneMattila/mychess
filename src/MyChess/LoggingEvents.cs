@@ -33,6 +33,11 @@
         public const int FuncFriendsFetchSingleFriend = 1304;
         public const int FuncFriendsAddNewFriend = 1305;
 
+        public const int FuncMeStarted = 1400;
+        public const int FuncMeUserDoesNotHavePermission = 1401;
+        public const int FuncMeProcessingMethod = 1402;
+        public const int FuncMeFetchMe = 1403;
+
         public const int BaseHandlerCreateNewUser = 2000;
         public const int BaseHandlerNewUserCreated = 2001;
         public const int BaseHandlerExistingUserFound = 2002;
