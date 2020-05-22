@@ -9,9 +9,7 @@ Here is example user payload:
 ```json
 {
   "id": "123-abc-123",
-  "name": "John Doe",
-  "created": "2020-04-05T15:48:57.484Z",
-  "timestamp": "2020-04-06T15:48:57.484Z"
+  "name": "John Doe"
 }
 ```
 
@@ -141,8 +139,7 @@ Here is example new game payload:
   "name": "Example game",
   "players": {
     "black": {
-      "id": "123-def-123",
-      "name": "Jane Doe"
+      "id": "123-def-123"
     }
   },
   "moves": [
@@ -190,7 +187,7 @@ Note: `Enabled` field is used only if for some reason we need to disable login o
 | user-abc-123 | user-def-123 | John  |
 | user-abc-123 | user-fgh-456 | Jane  |
 
-*) Default value from friend name when friend is added but can be updated.
+*) Name provided when user add another player as friend.
 
 ### UserID2User table
 
