@@ -4,6 +4,7 @@ import { useTypedSelector } from "../reducers";
 import { loginEvent, RootState, ProcessState } from "../actions";
 import { UserAgentApplication, Configuration } from "msal";
 import { Link, useHistory, useLocation } from "react-router-dom";
+import { getAppInsights } from "./TelemetryService";
 import "./Auth.css";
 import { Database, DatabaseFields } from "../data/Database";
 
@@ -25,6 +26,7 @@ export function Auth(props: AuthProps) {
     const account = useTypedSelector(selectorAccount);
 
     const dispatch = useDispatch();
+    const ai = getAppInsights();
 
     const accessTokenRequest = {
         scopes: [
@@ -32,6 +34,28 @@ export function Auth(props: AuthProps) {
             props.applicationIdURI + "/Games.ReadWrite"
         ]
     };
+
+    const preAuthEvent = () => {
+        if (location.pathname !== "/") {
+            Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
+        }
+    }
+
+    const authEvent = (accessToken: string) => {
+        const loggedInAccount = userAgentApplication.getAccount();
+        if (loggedInAccount) {
+            dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessToken));
+        }
+        postAuthEvent();
+    }
+
+    const postAuthEvent = () => {
+        const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
+        Database.delete(DatabaseFields.AUTH_REDIRECT);
+        if (redirectUrl) {
+            history.push(redirectUrl);
+        }
+    }
 
     useEffect(() => {
         if (!userAgentApplication) {
@@ -60,45 +84,22 @@ export function Auth(props: AuthProps) {
                     dispatch(loginEvent(ProcessState.Error, errorMessage));
                 }
                 else if (response) {
-                    const loggedInAccount = userAgentApplication.getAccount();
-                    if (loggedInAccount) {
-                        dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, response.accessToken));
-                    }
-
-                    postLogin();
+                    // Acquire token after login
+                    authEvent(response.accessToken);
                 }
             });
 
             userAgentApplication.acquireTokenSilent(accessTokenRequest).then(function (accessTokenResponse) {
                 // Acquire token silent success
-                const loggedInAccount = userAgentApplication.getAccount();
-                if (loggedInAccount) {
-                    dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessTokenResponse.accessToken));
-                }
-
-                postLogin();
+                authEvent(accessTokenResponse.accessToken);
             }).catch(function (error) {
                 // Acquire token silent failure, wait for user sign in
             });
         }
     });
 
-    const preLogin = () => {
-        if (location.pathname !== "/") {
-            Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
-        }
-    }
-
-    const postLogin = () => {
-        const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
-        Database.delete(DatabaseFields.AUTH_REDIRECT);
-        if (redirectUrl) {
-            history.push(redirectUrl);
-        }
-    }
-
     const onSignIn = () => {
-        preLogin();
+        preAuthEvent();
         return userAgentApplication.loginRedirect(accessTokenRequest);
     }
 
