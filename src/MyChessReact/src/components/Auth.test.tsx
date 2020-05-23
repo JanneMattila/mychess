@@ -9,7 +9,7 @@ import rootReducer from "../reducers";
 const store = createStore(rootReducer);
 
 test("renders sign in", () => {
-  const { getByText } = render(<Provider store={store}><Router><Auth clientId="a" applicationIdURI="b" /></Router></Provider>);
+  const { getByText } = render(<Provider store={store}><Router><Auth clientId="a" applicationIdURI="b" endpoint="c" /></Router></Provider>);
   const signInElement = getByText(/Sign In/i);
   expect(signInElement).toBeInTheDocument();
 });
