@@ -173,7 +173,7 @@
               "rules": [
                 {
                   "name": "HttpsRedirect",
-                  "order": "1",
+                  "order": 1,
                   "conditions": [
                     {
                       "name": "RequestScheme",
@@ -205,7 +205,7 @@
             {
               "name": "[variables('cdnCustomDomainName')]",
               "type": "customdomains",
-              "apiVersion": "2016-04-02",
+              "apiVersion": "2019-04-15",
               "dependsOn": [
                 "[parameters('cdn')]"
               ],
@@ -431,7 +431,8 @@
               "dimensions": [
               ],
               "operator": "GreaterThan",
-              "threshold": "50",
+              "criterionType": "StaticThresholdCriterion",
+              "threshold": 50,
               "timeAggregation": "Total"
             }
           ]
