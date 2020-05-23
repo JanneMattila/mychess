@@ -25,7 +25,7 @@ function App() {
                 <img src={logo} alt="My Chess" className="App-link-image" />
               </Link>
               <div className="App-auth">
-                <Auth clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} />
+                <Auth clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
               </div>
               <div className="App-privacy-container">
                 <Link to="/privacy" className="App-privacy">

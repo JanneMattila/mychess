@@ -10,6 +10,7 @@ import { Database, DatabaseFields } from "../data/Database";
 type AuthProps = {
     clientId: string;
     applicationIdURI: string;
+    endpoint: string;
 };
 
 let userAgentApplication: UserAgentApplication;
