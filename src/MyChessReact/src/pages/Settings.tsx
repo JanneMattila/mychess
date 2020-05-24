@@ -2,15 +2,53 @@ import React, { useEffect, MouseEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import "./Settings.css";
+import { RootState } from "../actions";
+import { useTypedSelector } from "../reducers";
+import { getAppInsights } from "../components/TelemetryService";
 
-export function Settings() {
+type SettingsProps = {
+    endpoint: string;
+};
+
+export function Settings(props: SettingsProps) {
 
     const playerIdentifier = "example";
+    const selectorLoginState = (state: RootState) => state.loginState;
+    const selectorAccessToken = (state: RootState) => state.accessToken;
+
+    const loginState = useTypedSelector(selectorLoginState);
+    const accessToken = useTypedSelector(selectorAccessToken);
+
     const [isNotificationsEnabled, setNotifications] = useState(false);
+    const ai = getAppInsights();
 
     useEffect(() => {
+        const populateUserInformation = async (accessToken: string) => {
+            const request: RequestInit = {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
 
-    });
+            try {
+                const response = await fetch(props.endpoint + "/api/me", request);
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                ai.trackException(error);
+                console.log(error);
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve settings.";
+                console.log(errorMessage);
+            }
+        }
+
+        if (accessToken !== undefined) {
+            populateUserInformation(accessToken);
+        }
+    }, [accessToken, ai, props.endpoint]);
 
     const confirm = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();

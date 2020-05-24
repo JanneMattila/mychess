@@ -38,7 +38,7 @@ function App() {
               <Route exact path="/privacy" component={Privacy} />
               <Route exact path="/play/local" component={PlayLocal} />
               <Route exact path="/play/:id" component={Play} />
-              <Route path="/settings" component={Settings} />
+              <Route path="/settings" component={() => <Settings endpoint={configuration.endpoint} />} />
               <Route path="/friends" component={Friends} />
             </Switch>
           </div>
