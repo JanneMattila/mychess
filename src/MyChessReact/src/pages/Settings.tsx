@@ -33,7 +33,7 @@ export function Settings(props: SettingsProps) {
             };
 
             try {
-                const response = await fetch(props.endpoint + "/api/me", request);
+                const response = await fetch(props.endpoint + "/api/users/me", request);
                 const data = await response.json();
                 console.log(data);
             } catch (error) {
