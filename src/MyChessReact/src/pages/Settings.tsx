@@ -5,6 +5,7 @@ import "./Settings.css";
 import { RootState } from "../actions";
 import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "../components/TelemetryService";
+import { Player } from "../models/Player";
 
 type SettingsProps = {
     endpoint: string;
@@ -12,13 +13,13 @@ type SettingsProps = {
 
 export function Settings(props: SettingsProps) {
 
-    const playerIdentifier = "example";
     const selectorLoginState = (state: RootState) => state.loginState;
     const selectorAccessToken = (state: RootState) => state.accessToken;
 
     const loginState = useTypedSelector(selectorLoginState);
     const accessToken = useTypedSelector(selectorAccessToken);
 
+    const [playerIdentifier, setPlayerIdentifier] = useState("");
     const [isNotificationsEnabled, setNotifications] = useState(false);
     const ai = getAppInsights();
 
@@ -34,8 +35,9 @@ export function Settings(props: SettingsProps) {
 
             try {
                 const response = await fetch(props.endpoint + "/api/users/me", request);
-                const data = await response.json();
+                const data = await response.json() as Player;
                 console.log(data);
+                setPlayerIdentifier(data.id);
             } catch (error) {
                 ai.trackException(error);
                 console.log(error);
