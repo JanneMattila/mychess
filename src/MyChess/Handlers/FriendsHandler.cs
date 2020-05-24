@@ -25,7 +25,7 @@ namespace MyChess.Handlers
                 return (null, new HandlerError()
                 {
                     Instance = LoggingEvents.CreateLinkToProblemDescription(LoggingEvents.FriendHandlerPlayerNotFound),
-                    Status = (int)HttpStatusCode.NotFound,
+                    Status = (int)HttpStatusCode.BadRequest,
                     Title = "User not found",
                     Detail = "For some reason player could not be found"
                 });
