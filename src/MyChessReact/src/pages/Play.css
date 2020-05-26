@@ -1,4 +1,5 @@
 .Play-header {
+  padding-top: 100px;
   min-height: 10vh;
   display: flex;
   flex-direction: column;
