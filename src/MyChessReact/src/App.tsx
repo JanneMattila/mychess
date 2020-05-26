@@ -27,9 +27,13 @@ function App() {
               <div className="App-auth">
                 <Auth clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
               </div>
-              <div className="App-privacy-container">
-                <Link to="/privacy" className="App-privacy">
+              <div className="App-footer-container">
+                <Link to="/privacy" className="App-footer-link">
                   Privacy
+                </Link>
+                <span className="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+                <Link to="/play/local" className="App-footer-link">
+                  Play locally
                 </Link>
               </div>
             </div>

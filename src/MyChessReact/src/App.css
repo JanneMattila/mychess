@@ -16,16 +16,23 @@
   float: right;
 }
 
-.App-privacy-container {
-  position: relative;
+.App-footer-container {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  text-align: center;
 }
 
-.App-privacy {
-  color: #ffffff;
-  position: fixed;
+.App-footer-link {
+  color: white;
   text-decoration: none;
-  bottom: 0; 
-  width: 0%;
+  margin-bottom: 25px;
+}
+
+.App-footer-link-separator {
+  color: gray;
   margin-bottom: 25px;
 }
 
