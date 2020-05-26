@@ -4,7 +4,7 @@ import { MyChessGame } from "../models/MyChessGame";
 import { useTypedSelector } from "../reducers";
 import { gamesLoadingEvent, RootState, ProcessState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import "./GameList.css";
 
 type GameListProps = {
@@ -23,6 +23,7 @@ export function GameList(props: GameListProps) {
     const gamesState = useTypedSelector(selectorGamesState);
     const games = useTypedSelector(selectorGames);
 
+    const { push } = useHistory();
     const dispatch = useDispatch();
     const ai = getAppInsights();
 
@@ -89,6 +90,7 @@ export function GameList(props: GameListProps) {
     }
 
     const addNewGame = () => {
+        push("/play/new");
     }
 
     if (loginState === ProcessState.Success) {
