@@ -62,6 +62,10 @@ export function FriendList(props: FriendListProps) {
         if (loginState && !friendsState) {
             populateFriends();
         }
+
+        if (location.search) {
+            showAddNewFriend();
+        }
     }, [loginState, friendsState, accessToken, ai, props, dispatch]);
 
     const renderFriends = (friends?: Player[]) => {

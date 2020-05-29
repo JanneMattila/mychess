@@ -91,7 +91,7 @@ export function Settings(props: SettingsProps) {
                 </label>
 
                 <Link to="/friends" className="Settings-link">
-                    <span role="img" aria-label="Invite friend">👥</span> Invite Friends
+                    <span role="img" aria-label="Manage your friends">👥</span> Manage your friends
                 </Link>
 
                 <h4>Settings</h4>
