@@ -90,7 +90,7 @@ export function GameList(props: GameListProps) {
     }
 
     const addNewGame = () => {
-        push("/play/new");
+        push("/friends");
     }
 
     if (loginState === ProcessState.Success) {
