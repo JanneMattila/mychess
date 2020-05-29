@@ -156,7 +156,7 @@ export function FriendList(props: FriendListProps) {
                                         This is your friends identifier.<br />
                                         You need this in order to connect to your friend.
                                     </div>
-                                    <input type="text" value={friendID} onChange={e => setFriendID(e.target.value)} />
+                                    <input type="text" value={friendID} className="FriendList-Identifier" onChange={e => setFriendID(e.target.value)} />
                                 </label>
                                 <br />
                                 <label className="FriendList-AddFriend">

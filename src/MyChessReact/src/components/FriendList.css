@@ -21,6 +21,12 @@
   text-decoration: none;
 }
 
+.FriendList-Identifier { 
+  font-size: 10pt;
+  width: 300px;
+  background-color: lightgray;
+}
+
 .template-1 { width: 30%; }
 
 [class*="template-"] {
