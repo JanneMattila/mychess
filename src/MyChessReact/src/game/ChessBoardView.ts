@@ -1,39 +1,123 @@
 import { ChessBoard } from "./ChessBoard";
-// import { ChessBoardChange } from "./ChessBoardChange";
 import { ChessMove } from "./ChessMove";
-// import { ChessSpecialMove } from "./ChessSpecialMove";
 import { ChessBoardPiece } from "./ChessBoardPiece";
 import { ChessPiece } from "./ChessPiece";
-// import { ChessBoardLocation } from "./ChessBoardLocation";
-// import { ChessPieceSelection } from "./ChessPieceSelection";
 import { ChessBoardState } from "./ChessBoardState";
 import { MyChessGame } from "../models/MyChessGame";
-// import { MoveModel } from "../models/MoveModel";
 import { setTimeout } from "timers";
 import { ChessPlayer } from "./ChessPlayer";
 
 export class ChessBoardView {
     private board: ChessBoard = new ChessBoard();
     private previousAvailableMoves: ChessMove[] = []
-    private currentPlayerTurn: boolean = false;
     private game: MyChessGame = new MyChessGame();
-    private url: string = "";
     private currentMoveNumber: number = 0;
+    private waitingForConfirmation = false;
+
+    private imagesLoaded = 0;
+    private imagesToLoad = -1;
+    private images: HTMLImageElement[] = [];
+
+    private touch?: Touch;
 
     public initialize(currentPlayerTurn: boolean = false) {
         // Start preparing the board
         this.board = new ChessBoard();
         this.board.initialize();
         this.previousAvailableMoves = [];
-        this.currentPlayerTurn = currentPlayerTurn;
 
         // Update game board to the screen
         this.drawBoard();
+
+        // Add "de-selection" when clicking outside the board
+        document.addEventListener("click", (event: MouseEvent) => {
+            if (!event.defaultPrevented) {
+                this.pieceSelected("9-9");
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            console.log(event.keyCode);
+            switch (event.keyCode) {
+                case 36: // Home
+                    this.firstMove();
+                    break;
+                case 37: // LeftArrow
+                case 40: // DownArrow
+                    this.previousMove();
+                    break;
+                case 39: // RightArrow
+                case 38: // UpArrow
+                    this.nextMove();
+                    break;
+                case 35: // End
+                    this.lastMove();
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        document.addEventListener('touchstart', (event) => {
+            this.touch = undefined;
+            if (event.changedTouches.length === 1) {
+                this.touch = event.changedTouches[0];
+            }
+        });
+
+        document.addEventListener('touchend', (event) => {
+            if (this.touch !== undefined &&
+                event.changedTouches.length === 1) {
+                const delta = 40;
+                let touchEnd = event.changedTouches[0];
+                if (Math.abs(touchEnd.clientY - this.touch.clientY) > delta) {
+                    if (touchEnd.clientY < this.touch.clientY - delta) {
+                        this.firstMove();
+                    }
+                    else {
+                        this.lastMove();
+                    }
+                }
+                else if (Math.abs(touchEnd.clientX - this.touch.clientX) > delta) {
+                    if (touchEnd.clientX < this.touch.clientX - delta) {
+                        this.previousMove();
+                    }
+                    else {
+                        this.nextMove();
+                    }
+                }
+            }
+        });
     }
 
-    public async load(url: string, time: string) {
+    private loadImages() {
+        const files = [
+            "Empty",
+            "PawnWhite", "BishopWhite", "KnightWhite", "RookWhite", "QueenWhite", "KingWhite",
+            "PawnBlack", "BishopBlack", "KnightBlack", "RookBlack", "QueenBlack", "KingBlack",
+        ];
+        this.imagesToLoad = files.length;
+
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            let img = new Image();
+            img.onload = (evt) => {
+                this.imagesLoaded++;
+                if (this.imagesLoaded === this.imagesToLoad) {
+                    this.drawBoard();
+                }
+            };
+            img.src = "/images/" + file + ".svg";
+            this.images[i] = img;
+        }
+    }
+
+    public async load(url: string, friendID: string) {
         this.initialize();
-        this.url = url;
+        console.log("local game");
+        this.loadImages();
+        this.game = new MyChessGame();
+
         if (url.indexOf("/new") === -1) {
             console.log("get form url " + url);
 
@@ -54,15 +138,10 @@ export class ChessBoardView {
                 // $("#errorDialog").dialog();
             }
         }
-        else {
-            console.log("new game");
-            this.currentPlayerTurn = true;
-            this.game = new MyChessGame();
-        }
     }
 
     private makeNumberOfMoves(game: MyChessGame, movesCount: number): number {
-        this.initialize(true /* game.currentPlayerStarted*/);
+        this.initialize(true);
         this.game = game;
 
         let count = Math.min(game.moves.length, movesCount);
@@ -81,53 +160,11 @@ export class ChessBoardView {
         return count;
     }
 
-    public post() {
-
-        console.log("post to url " + this.url);
-
-        // $("#errorDialog").hide();
-        // $("#commentDialog").hide();
-        // let gameNameElement = document.getElementById("gameName") as HTMLTextAreaElement;
-        // let opponentElement = document.getElementById("opponent") as HTMLTextAreaElement;
-        // let commentElement = document.getElementById("comment") as HTMLTextAreaElement;
-
-        /*
-        let update = new GameUpdateViewModel();
-        update.name = gameNameElement.value;
-        update.opponent = opponentElement.value;
-        update.comment = commentElement.value;
-        update.move = this.getLastMoveAsString();
-        update.promotion = this.getLastMovePromotionAsString();
-        // update.time = this.game.time;
-
-        $.ajax({
-            type: "POST",
-            url: this.url,
-            contentType: "application/json",
-            data: JSON.stringify(update)
-        }).done(function (response: string) {
-            console.log(response);
-            if (response !== null && response.length > 0) {
-                this.url = response;
-            }
-            //this.setThinkTime(update.time);
-            this.setComment(update.comment);
-
-            let moveUpdate = new MovesViewModel();
-            moveUpdate.move = update.move;
-            moveUpdate.promotion = update.promotion;
-            moveUpdate.comment = update.comment;
-            moveUpdate.time = 0; // TODO: Get real time from server.
-
-            this.game.moves.push(moveUpdate);
-        }).fail(function (jqXHR, textStatus: string) {
-            $("#errorText").text(jqXHR.responseText);
-            $("#errorDialog").dialog();
-        });
-        */
-    }
-
     public drawBoard() {
+        if (this.imagesLoaded !== this.imagesToLoad) {
+            console.log(`images not yet loaded: ${this.imagesLoaded} / ${this.imagesToLoad}`);
+            return;
+        }
         console.log("drawBoard");
 
         // Update game board table
@@ -146,58 +183,46 @@ export class ChessBoardView {
 
                 let piece: ChessBoardPiece = this.board.getPiece(column, row);
                 let cell: HTMLTableCellElement = document.createElement("td") as HTMLTableCellElement;
-                let image: HTMLImageElement = document.createElement("img") as HTMLImageElement;
 
                 rowElement.appendChild(cell);
-                cell.appendChild(image);
 
                 cell.id = "" + row + "-" + column;
                 cell.addEventListener('click', (evt) => {
                     console.log("onCellClick event");
                     let element = evt.currentTarget as HTMLElement;
                     this.pieceSelected(element.id);
+                    evt.preventDefault();
                 });
 
-                let pieceColor: string = "";
-                let pieceRank: string = "";
-
+                let imageIndex;
                 switch (piece.piece) {
-                    case ChessPiece.Bishop:
-                        pieceRank = "Bishop";
+                    case ChessPiece.Pawn:
+                        imageIndex = 1;
                         break;
-                    case ChessPiece.King:
-                        pieceRank = "King";
+                    case ChessPiece.Bishop:
+                        imageIndex = 2;
                         break;
                     case ChessPiece.Knight:
-                        pieceRank = "Knight";
-                        break;
-                    case ChessPiece.Queen:
-                        pieceRank = "Queen";
+                        imageIndex = 3;
                         break;
                     case ChessPiece.Rook:
-                        pieceRank = "Rook";
+                        imageIndex = 4;
                         break;
-                    case ChessPiece.Pawn:
-                        pieceRank = "Pawn";
+                    case ChessPiece.Queen:
+                        imageIndex = 5;
+                        break;
+                    case ChessPiece.King:
+                        imageIndex = 6;
                         break;
                     default:
-                        pieceRank = "Empty";
+                        imageIndex = 0;
                         break;
                 }
-
-                if (piece.player === ChessPlayer.None) {
-                    image.src = "/images/Empty.svg";
+                if (piece.player === ChessPlayer.Black) {
+                    imageIndex += 6;
                 }
-                else {
-                    if (piece.player === ChessPlayer.White) {
-                        pieceColor = "White";
-                    }
-                    else if (piece.player === ChessPlayer.Black) {
-                        pieceColor = "Black";
-                    }
 
-                    image.src = "/images/" + pieceRank + pieceColor + ".svg";
-                }
+                cell.appendChild(this.images[imageIndex].cloneNode());
 
                 if ((row + column) % 2 === 0) {
                     cell.classList.add("lightCell");
@@ -231,12 +256,15 @@ export class ChessBoardView {
         if (promotion.length > 0) {
             this.changePromotionFromString(promotion);
         }
-
-        this.currentPlayerTurn = !this.currentPlayerTurn;
     }
 
     public pieceSelected(id: string) {
         console.log("pieceSelected to " + id);
+
+        if (this.waitingForConfirmation) {
+            console.log("Waiting for confirmation");
+            return;
+        }
 
         if (this.game !== null && this.game.moves !== null &&
             this.game.moves.length !== this.currentMoveNumber) {
@@ -244,10 +272,6 @@ export class ChessBoardView {
             return;
         }
 
-        if (this.currentPlayerTurn === false) {
-            console.log("Current player cannot make move");
-            return;
-        }
         let rowIndex: number = parseInt(id[0]);
         let columnIndex: number = parseInt(id[2]);
         let identifier = rowIndex + "-" + columnIndex;
@@ -279,40 +303,23 @@ export class ChessBoardView {
 
                     let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
                     queenPromotionElement.checked = true;
-                    /*
-                    setTimeout(() => {
-                        $("#promotionDialog").dialog({
-                            beforeClose: function (event, ui) {
-                                if (event.cancelable === true) {
-                                    this.changePromotion('Promotion');
-                                    this.showCommentDialog();
-                                }
-                            },
-                            buttons: [
-                                {
-                                    text: "Promote",
-                                    icon: "ui-icon-mail-closed",
-                                    click: function () {
-                                        $(this).dialog("close");
-                                        this.changePromotion('Promotion');
-                                        this.showCommentDialog();
-                                    }
-                                }
-                            ]
-                        });
-                        $("#promotionDialog").dialog({ position: { my: "center top", at: "center top", of: "#table-game" } });
-                    }, 1000);
-                    */
+
+                    this.showPromotionDialog(true);
                 }
-                else if (this.currentPlayerTurn) {
-                    this.currentPlayerTurn = false;
+                else {
                     this.setBoardStatus(0, 0);
 
-                    this.showCommentDialog();
+                    this.showConfirmationDialog(true);
                 }
 
                 return;
             }
+        }
+
+        if (columnIndex >= ChessBoard.BOARD_SIZE ||
+            rowIndex >= ChessBoard.BOARD_SIZE) {
+            console.log("Only de-select the current selection");
+            return;
         }
 
         let moves: ChessMove[] = this.board.getAvailableMoves(columnIndex, rowIndex);
@@ -327,60 +334,32 @@ export class ChessBoardView {
         }
     }
 
-    private showCommentDialog() {
-        let commentDialogElement = document.getElementById("commentDialog");
+    public confirm = (): void => {
+        console.log("confirmed");
+        this.showConfirmationDialog(false);
+        this.showPromotionDialog(false);
+    }
 
-        /*
-        setTimeout(() => {
-            $("#commentDialog").dialog({
-                beforeClose: function (event, ui) {
-                    if (event.cancelable === true) {
-                        this.undo();
-                    }
-                },
-                buttons: [
-                    {
-                        text: "Submit",
-                        icon: "ui-icon-mail-closed",
-                        click: function () {
-                            $(this).dialog("close");
-                            this.post();
-                        }
-                    },
-                    {
-                        text: "Cancel",
-                        icon: "ui-icon-cancel",
-                        click: function () {
-                            $(this).dialog("close");
-                            this.undo();
-                        }
-                    }
-                ]
-            });
-            $("#commentDialog").dialog({ position: { my: "center top", at: "center top", of: "#table-game" } });
-        }, 1000);
-        */
-        let totalMoves = this.board.totalMoves();
-        console.log("pieceSelected with moves " + totalMoves);
+    public cancel = (): void => {
+        console.log("cancel");
+        this.showConfirmationDialog(false);
+        this.showPromotionDialog(false);
+        this.undo();
+    }
 
-        if (totalMoves === 1) {
-            // First move of the game
-            let newGameDialogElement = document.getElementById("newGameDialog");
-            if (newGameDialogElement !== null) {
-                newGameDialogElement.style.display = "inline";
-                let gameNameElement = document.getElementById("gameName");
-                if (gameNameElement !== null) {
-                    gameNameElement.focus();
-                }
-            }
+    private showConfirmationDialog(show: boolean) {
+        this.waitingForConfirmation = show;
+        let confirmationDialogElement = document.getElementById("confirmation");
+        if (confirmationDialogElement !== null) {
+            confirmationDialogElement.style.display = show ? "inline" : "none";
         }
-        else {
-            if (commentDialogElement !== null) {
-                let textAreaElement = document.getElementById("comment");
-                if (textAreaElement !== null) {
-                    textAreaElement.focus();
-                }
-            }
+    }
+
+    private showPromotionDialog(show: boolean) {
+        this.waitingForConfirmation = show;
+        let promotionDialogElement = document.getElementById("promotionDialog");
+        if (promotionDialogElement !== null) {
+            promotionDialogElement.style.display = show ? "inline" : "none";
         }
     }
 
@@ -412,8 +391,6 @@ export class ChessBoardView {
             for (let i: number = 0; i < nodes.length; i++) {
                 let radioElement = nodes[i] as HTMLInputElement;
                 if (radioElement.checked === true) {
-                    this.currentPlayerTurn = false;
-
                     if (this.changePromotionFromString(radioElement.value)) {
                         this.drawBoard();
                     }
@@ -431,7 +408,6 @@ export class ChessBoardView {
         }
 
         this.board.undo();
-        this.currentPlayerTurn = true;
         this.drawBoard();
     }
 
@@ -474,13 +450,13 @@ export class ChessBoardView {
     }
 
     public setBoardStatus(currentMoveIndex: number, moves: number) {
-        let statusElement = document.getElementById("Status") as HTMLDivElement;
+        let statusElement = document.getElementById("status") as HTMLDivElement;
         let status = this.board.GetBoardState();
-        let gameStatusMessage = this.currentPlayerTurn ? "Your turn" : "Waiting for opponent";
+        let gameStatusMessage = "";
 
         console.log("currentMoveIndex: " + currentMoveIndex + ", moves: " + moves);
         if (currentMoveIndex !== moves) {
-            gameStatusMessage = this.currentPlayerTurn ? "Opponent's move " : "Your move ";
+            gameStatusMessage = "Move ";
             gameStatusMessage += currentMoveIndex;
         }
 
@@ -494,12 +470,7 @@ export class ChessBoardView {
                 break;
 
             case ChessBoardState.CheckMate:
-                if (this.currentPlayerTurn === true) {
-                    gameStatusMessage = "Opponent won!";
-                }
-                else {
-                    gameStatusMessage = "You won!";
-                }
+                gameStatusMessage = "Checkmate!";
                 break;
 
             default:
