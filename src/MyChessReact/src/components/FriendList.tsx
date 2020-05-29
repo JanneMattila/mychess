@@ -3,10 +3,11 @@ import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { RootState, ProcessState, friendsLoadingEvent } from "../actions";
 import { getAppInsights } from "./TelemetryService";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useHistory, useParams } from "react-router-dom";
 import "./FriendList.css";
 import { Player } from "../models/Player";
 import { ProblemDetail } from "../models/ProblemDetail";
+import { QueryStringParser } from "../helpers/QueryStringParser";
 
 type FriendListProps = {
     title: string;
@@ -14,6 +15,9 @@ type FriendListProps = {
 };
 
 export function FriendList(props: FriendListProps) {
+    const location = useLocation();
+    const history = useHistory();
+
     const selectorLoginState = (state: RootState) => state.loginState;
     const selectorAccessToken = (state: RootState) => state.accessToken;
     const selectorFriendsState = (state: RootState) => state.friendsState;
@@ -26,7 +30,7 @@ export function FriendList(props: FriendListProps) {
 
     const [isFriendDialogOpen, showFriendDialog] = useState(false);
     const [friendName, setFriendName] = useState("");
-    const [friendID, setFriendID] = useState("");
+    const [friendIDField, setFriendIDField] = useState("");
     const [friendError, setFriendError] = useState({ title: "", link: "" });
 
     const dispatch = useDispatch();
@@ -72,16 +76,19 @@ export function FriendList(props: FriendListProps) {
                                     {friend?.name}
                                 </div>
 
-                                <Link to={{ pathname: "/friend/" + friend?.id }} key={friend?.id}>
-                                    <button className="manageTemplate">Manage friend</button>
-                                </Link>
+                                <button className="manageTemplate" onClick={(e) => manageFriend(e, friend?.id)}>Manage friend</button>
                             </div>
                         </Link>
                     )
                     }
                 </div >
-            </div>
+            </div >
         );
+    }
+
+    const manageFriend = (event: any, friendID: string) => {
+        event.preventDefault();
+        history.push("/friend/" + friendID);
     }
 
     const refresh = () => {
@@ -90,13 +97,20 @@ export function FriendList(props: FriendListProps) {
     }
 
     const showAddNewFriend = () => {
+        if (location.search) {
+            const map = QueryStringParser.parse(location.search);
+            const friendID = map.get("friendID");
+            if (friendID !== undefined) {
+                setFriendIDField(friendID);
+            }
+        }
         showFriendDialog(true)
     }
 
     const addFriend = async () => {
         setFriendError({ title: "", link: "" });
         const json: Player = {
-            "id": friendID,
+            "id": friendIDField,
             "name": friendName,
         };
 
@@ -121,6 +135,10 @@ export function FriendList(props: FriendListProps) {
                 }
             }
             console.log(data);
+
+            if (location.search) {
+                history.push("/friends");
+            }
         } catch (error) {
             ai.trackException(error);
 
@@ -131,7 +149,7 @@ export function FriendList(props: FriendListProps) {
     }
 
     const cancel = () => {
-        setFriendID("");
+        setFriendIDField("");
         setFriendName("");
         showFriendDialog(false);
         setFriendError({ title: "", link: "" });
@@ -173,7 +191,7 @@ export function FriendList(props: FriendListProps) {
                                     This is your friends identifier.<br />
                                         You need this in order to connect to your friend.
                                     </div>
-                                <input type="text" value={friendID} className="FriendList-Identifier" onChange={e => setFriendID(e.target.value)} />
+                                <input type="text" value={friendIDField} className="FriendList-Identifier" onChange={e => setFriendIDField(e.target.value)} />
                             </label>
                             <br />
                             <label className="FriendList-AddFriend">

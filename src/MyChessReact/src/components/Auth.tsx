@@ -17,7 +17,7 @@ type AuthProps = {
 let userAgentApplication: UserAgentApplication;
 
 export function Auth(props: AuthProps) {
-    let location = useLocation();
+    const location = useLocation();
     const history = useHistory();
     const selectorLoginState = (state: RootState) => state.loginState;
     const selectorAccount = (state: RootState) => state.account;
