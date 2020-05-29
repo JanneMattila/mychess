@@ -10,6 +10,7 @@ import "./App.css";
 import logo from "./pages/logo.svg";
 import TelemetryProvider from "./components/TelemetryProvider";
 import { GetConfiguration } from "./ConfigurationManager";
+import { ModifyFriendPage } from "./pages/ModifyFriendPage";
 
 let configuration = GetConfiguration();
 
@@ -42,6 +43,8 @@ function App() {
               <Route exact path="/play/local" component={Play} />
               <Route exact path="/play/:id" component={Play} />
               <Route path="/settings" component={() => <Settings endpoint={configuration.endpoint} />} />
+              <Route path="/friends/add" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
+              <Route path="/friends/modify" component={() => <ModifyFriendPage title="Modify friend" endpoint={configuration.endpoint} />} />
               <Route path="/friends" component={Friends} />
             </Switch>
           </div>
