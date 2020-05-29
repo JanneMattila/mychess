@@ -68,7 +68,7 @@ export function Settings(props: SettingsProps) {
     const share = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
 
-        navigator.clipboard.writeText(window.origin + "/friends?friendID=" + playerIdentifier);
+        navigator.clipboard.writeText(window.origin + "/friends/add/" + playerIdentifier);
     }
 
     const handleNotificationChange = (checked: boolean): void => {
@@ -90,10 +90,6 @@ export function Settings(props: SettingsProps) {
                     <button onClick={share}><span role="img" aria-label="Share">&#128203;</span> Share link</button>
                 </label>
 
-                <Link to="/friends" className="Settings-link">
-                    <span role="img" aria-label="Manage your friends">👥</span> Manage your friends
-                </Link>
-
                 <h4>Settings</h4>
                 <label>
                     Notifications<br />
@@ -104,6 +100,10 @@ export function Settings(props: SettingsProps) {
                     <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Save</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
+
+                <Link to="/friends" className="Settings-link">
+                    <span role="img" aria-label="Manage your friends">👥</span> Manage your friends
+                </Link>
             </header>
         </div>
     );
