@@ -10,6 +10,7 @@ import { ProblemDetail } from "../models/ProblemDetail";
 import { QueryStringParser } from "../helpers/QueryStringParser";
 
 type ModifyFriendProps = {
+    id?: string;
     title: string;
     endpoint: string;
 };
@@ -32,14 +33,10 @@ export function ModifyFriend(props: ModifyFriendProps) {
     const ai = getAppInsights();
 
     useEffect(() => {
-        if (location.search) {
-            const map = QueryStringParser.parse(location.search);
-            const friendID = map.get("friendID");
-            if (friendID !== undefined) {
-                setFriendIDField(friendID);
-            }
+        if (props.id) {
+            setFriendIDField(props.id);
         }
-    });
+    }, [props]);
 
     const addFriend = async () => {
         setFriendError({ title: "", link: "" });
@@ -60,18 +57,16 @@ export function ModifyFriend(props: ModifyFriendProps) {
         try {
             const response = await fetch(props.endpoint + "/api/users/me/friends", request);
             const data = await response.json();
+            console.log(data);
 
-            if (response.status !== 200) {
+            if (response.ok) {
+                history.push("/friends");
+            } else {
                 const ex = data as ProblemDetail;
                 if (ex.title !== undefined && ex.instance !== undefined) {
                     console.log(ex);
                     setFriendError({ title: ex.title, link: ex.instance });
                 }
-            }
-            console.log(data);
-
-            if (location.search) {
-                history.push("/friends");
             }
         } catch (error) {
             ai.trackException(error);

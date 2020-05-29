@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ModifyFriend } from "../components/ModifyFriend";
 import "./Friends.css";
+import { useParams, useRouteMatch } from "react-router-dom";
 
 type ModifyFriendPageProps = {
     title: string;
@@ -8,10 +9,11 @@ type ModifyFriendPageProps = {
 };
 
 export function ModifyFriendPage(props: ModifyFriendPageProps) {
+    const { id } = useParams();
     return (
         <div>
             <header className="Friends-header">
-                <ModifyFriend title={props.title} endpoint={props.endpoint} />
+                <ModifyFriend id={id} title={props.title} endpoint={props.endpoint} />
             </header>
         </div>
     );
