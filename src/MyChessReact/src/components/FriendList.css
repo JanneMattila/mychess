@@ -14,7 +14,6 @@
   font-size: 12pt;
 }
 
-
 .FriendList-AddFriendError { 
   font-size: 16pt;
   color: red;
@@ -40,6 +39,7 @@
     text-align: center;
     font-size: 18pt;
     text-overflow: ellipsis;
+    color: white;
     overflow: hidden;
     height: 40px;
 }

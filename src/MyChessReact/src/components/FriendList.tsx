@@ -144,41 +144,47 @@ export function FriendList(props: FriendListProps) {
             case ProcessState.Success:
                 if (friends && friends?.length === 0) {
                     contents =
-                        <div>
-                            <h6>
-                                No friends found. Click to <button onClick={refresh}>refresh</button> or
-                                <button onClick={showAddNewFriend}>add new</button> friend.
-                            </h6>
-                            <div id="addFriend" style={(isFriendDialogOpen ? visible : hidden)}>
-                                <label className="FriendList-AddFriend">
-                                    Friend identifier<br />
-                                    <div className="FriendList-AddFriendSubText">
-                                        This is your friends identifier.<br />
-                                        You need this in order to connect to your friend.
-                                    </div>
-                                    <input type="text" value={friendID} className="FriendList-Identifier" onChange={e => setFriendID(e.target.value)} />
-                                </label>
-                                <br />
-                                <label className="FriendList-AddFriend">
-                                    Friend name<br />
-                                    <div className="FriendList-AddFriendSubText">
-                                        This is your friends name.<br />
-                                        This is <b>only visible to you</b>.
-                                    </div>
-                                    <input type="text" value={friendName} onChange={e => setFriendName(e.target.value)} />
-                                </label>
-                                <br />
-                                <button onClick={addFriend}><span role="img" aria-label="Add friend">✅</span> Add friend</button>
-                                <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
-                                <div>
-                                    <a className="FriendList-AddFriendError" href={friendError.link} target="_blank" rel="noopener noreferrer">{friendError.title}</a>
-                                </div>
-                            </div>
-                        </div>;
+                        <h6>
+                            No friends found. Click to <button onClick={refresh}>refresh</button> or
+                            <button onClick={showAddNewFriend}>add new</button> friend.
+                        </h6>;
                 }
                 else {
                     contents = renderFriends(friends);
                 }
+
+                contents =
+                    <div>
+                        {contents}
+                        <h6>
+                            Or <button onClick={showAddNewFriend}>add new</button> friend
+                        </h6>
+                        <div id="addFriend" style={(isFriendDialogOpen ? visible : hidden)}>
+                            <label className="FriendList-AddFriend">
+                                Friend identifier<br />
+                                <div className="FriendList-AddFriendSubText">
+                                    This is your friends identifier.<br />
+                                        You need this in order to connect to your friend.
+                                    </div>
+                                <input type="text" value={friendID} className="FriendList-Identifier" onChange={e => setFriendID(e.target.value)} />
+                            </label>
+                            <br />
+                            <label className="FriendList-AddFriend">
+                                Friend name<br />
+                                <div className="FriendList-AddFriendSubText">
+                                    This is your friends name.<br />
+                                        This is <b>only visible to you</b>.
+                                    </div>
+                                <input type="text" value={friendName} onChange={e => setFriendName(e.target.value)} />
+                            </label>
+                            <br />
+                            <button onClick={addFriend}><span role="img" aria-label="Add friend">✅</span> Add friend</button>
+                            <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+                            <div>
+                                <a className="FriendList-AddFriendError" href={friendError.link} target="_blank" rel="noopener noreferrer">{friendError.title}</a>
+                            </div>
+                        </div>
+                    </div>;
                 break;
             case ProcessState.Error:
                 contents = <h6>Oh no! Couldn't retrieve friends. Click to <button onClick={refresh}>refresh</button></h6>;
