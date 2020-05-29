@@ -26,39 +26,27 @@
   background-color: lightgray;
 }
 
-.template-1 { width: 30%; }
+.template-1 { width: 300px; }
 
 [class*="template-"] {
   float: left;
   padding: 10px 25px;
   margin: 10px;
-  height: 190px;
+  height: 160px;
 }
 
 .nameTemplate { 
-    text-align: center;
-    font-size: 18pt;
-    text-overflow: ellipsis;
-    color: white;
-    overflow: hidden;
-    height: 40px;
+  text-align: center;
+  font-size: 18pt;
+  text-overflow: ellipsis;
+  color: white;
+  overflow: hidden;
+  height: 40px;
 }
 
-.commentTemplate { 
-    text-align: left;
-    font-size: 14pt;
-    text-overflow: ellipsis;
-    overflow-wrap: break-word;
-    overflow: hidden;
-    height: 100px;
-}
-
-.opponentTemplate {
-    margin: 10px;
-    text-align: right;
-    font-size: 12pt;
-    color: #959595;
-    height: 25px;
+.manageTemplate {
+  margin-top: 50px;
+  width: 90%;
 }
 
 .row::after {

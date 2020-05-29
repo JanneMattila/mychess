@@ -62,18 +62,25 @@ export function FriendList(props: FriendListProps) {
 
     const renderFriends = (friends?: Player[]) => {
         return (
-            <div className="row">
-                {friends?.map(friend =>
-                    <Link to={{ pathname: "/friend/" + friend?.id }} className="FriendList-link" key={friend?.id}>
-                        <div className="template-1">
-                            <div className="nameTemplate">
-                                {friend?.name}
+            <div>
+                <h6>Click to play with friend</h6>
+                <div className="row">
+                    {friends?.map(friend =>
+                        <Link to={{ pathname: "/play/new?friendID=" + friend?.id }} className="FriendList-link" key={friend?.id}>
+                            <div className="template-1">
+                                <div className="nameTemplate">
+                                    {friend?.name}
+                                </div>
+
+                                <Link to={{ pathname: "/friend/" + friend?.id }} key={friend?.id}>
+                                    <button className="manageTemplate">Manage friend</button>
+                                </Link>
                             </div>
-                        </div>
-                    </Link>
-                )
-                }
-            </div >
+                        </Link>
+                    )
+                    }
+                </div >
+            </div>
         );
     }
 
