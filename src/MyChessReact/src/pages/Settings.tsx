@@ -12,7 +12,6 @@ type SettingsProps = {
 };
 
 export function Settings(props: SettingsProps) {
-
     const selectorLoginState = (state: RootState) => state.loginState;
     const selectorAccessToken = (state: RootState) => state.accessToken;
 
@@ -66,6 +65,12 @@ export function Settings(props: SettingsProps) {
         navigator.clipboard.writeText(playerIdentifier);
     }
 
+    const share = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+
+        navigator.clipboard.writeText(window.origin + "/friends?friendID=" + playerIdentifier);
+    }
+
     const handleNotificationChange = (checked: boolean): void => {
         setNotifications(!isNotificationsEnabled);
     }
@@ -80,8 +85,9 @@ export function Settings(props: SettingsProps) {
                     <div className="Settings-SubText">
                         Share this to your friend so that they can connect to you
                     </div>
-                    <input type="text" value={playerIdentifier} readOnly={true} className="Settings-Identifier" />
-                    <button onClick={copy}><span role="img" aria-label="Copy">&#128203;</span> Copy</button>
+                    <input type="text" value={playerIdentifier} readOnly={true} className="Settings-Identifier" /><br />
+                    <button onClick={copy}><span role="img" aria-label="Copy">&#128203;</span> Copy id</button>
+                    <button onClick={share}><span role="img" aria-label="Share">&#128203;</span> Share link</button>
                 </label>
 
                 <Link to="/friends" className="Settings-link">
