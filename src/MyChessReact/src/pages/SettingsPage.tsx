@@ -1,7 +1,7 @@
 import React, { useEffect, MouseEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
-import "./Settings.css";
+import "./SettingsPage.css";
 import { RootState } from "../actions";
 import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "../components/TelemetryService";
@@ -11,7 +11,7 @@ type SettingsProps = {
     endpoint: string;
 };
 
-export function Settings(props: SettingsProps) {
+export function SettingsPage(props: SettingsProps) {
     const selectorLoginState = (state: RootState) => state.loginState;
     const selectorAccessToken = (state: RootState) => state.accessToken;
 

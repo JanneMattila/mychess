@@ -1,7 +1,7 @@
 import React from "react";
 import "./HomePage.css";
 
-export function Privacy() {
+export function PrivacyPage() {
     return (
         <div>
             <header className="Home-header">

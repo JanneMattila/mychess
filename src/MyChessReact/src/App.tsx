@@ -2,8 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Auth } from "./components/Auth";
 import { HomePage } from "./pages/HomePage";
-import { Privacy } from "./pages/Privacy";
-import { Settings } from "./pages/Settings";
+import { PrivacyPage } from "./pages/PrivacyPage";
+import { SettingsPage } from "./pages/SettingsPage";
 import { FriendsPage } from "./pages/FriendsPage";
 import "./App.css";
 import logo from "./pages/logo.svg";
@@ -39,10 +39,10 @@ function App() {
             </div>
             <Switch>
               <Route exact path="/" component={HomePage} />
-              <Route exact path="/privacy" component={Privacy} />
+              <Route exact path="/privacy" component={PrivacyPage} />
               <Route exact path="/play/local" component={() => <PlayPage endpoint={configuration.endpoint} />} />
               <Route exact path="/play/:id" component={() => <PlayPage endpoint={configuration.endpoint} />} />
-              <Route path="/settings" component={() => <Settings endpoint={configuration.endpoint} />} />
+              <Route path="/settings" component={() => <SettingsPage endpoint={configuration.endpoint} />} />
               <Route exact path="/friends/add" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
               <Route path="/friends/add/:id" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
               <Route path="/friends/:id" component={() => <ModifyFriendPage title="Modify friend" endpoint={configuration.endpoint} />} />
