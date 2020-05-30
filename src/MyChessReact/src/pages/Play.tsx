@@ -14,14 +14,14 @@ export function Play() {
         // - local game
         // - new game *WITH* friendID in url
         // - existing game
-        board.load("", "");
+        board.load();
     });
 
     const closeModal = () => {
         isOpen = false;
     }
 
-    const confirm = (event: MouseEvent<HTMLButtonElement>) => {
+    const confirmMove = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         board.confirm();
     }
@@ -29,6 +29,11 @@ export function Play() {
     const confirmPromotion = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         board.changePromotion("Promotion");
+        board.confirm();
+    }
+
+    const confirmComment = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         board.confirm();
     }
 
@@ -53,9 +58,9 @@ export function Play() {
     return (
         <div>
             <header className="Play-header">
-                <table className="table" id="table-game"><tr><td>Loading...</td></tr></table>
+                <table className="table" id="table-game"><tbody><tr><td>Loading...</td></tr></tbody></table>
                 <div id="confirmation" className="Play-Form">
-                    <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Confirm</button>
+                    <button onClick={confirmMove}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
                 <div id="promotionDialog" className="Play-Form">
@@ -79,12 +84,20 @@ export function Play() {
                     <button onClick={confirmPromotion}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
+                <div id="commentDialog" className="Play-Form">
+                    Comment:<br />
+                    <label>
+                        <textarea id="comment" name="comment" title="Comment" />
+                    </label><br />
+                    <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
+                    <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+                </div>
                 <div id="status" style={hidden}></div>
                 <div id="ellipse">
                     <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
                 </div>
                 <div id="ellipseContent" style={hidden}>
-                    No content yet
+                    <button onClick={cancel}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
                 </div>
                 <ReactModal isOpen={isOpen} contentLabel="Promotion">
                     <button onClick={closeModal}>Undo</button>

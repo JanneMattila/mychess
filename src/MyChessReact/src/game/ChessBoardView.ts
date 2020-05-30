@@ -4,8 +4,9 @@ import { ChessBoardPiece } from "./ChessBoardPiece";
 import { ChessPiece } from "./ChessPiece";
 import { ChessBoardState } from "./ChessBoardState";
 import { MyChessGame } from "../models/MyChessGame";
-import { setTimeout } from "timers";
 import { ChessPlayer } from "./ChessPlayer";
+import { setTimeout } from "timers";
+import { QueryStringParser } from "../helpers/QueryStringParser";
 
 export class ChessBoardView {
     private board: ChessBoard = new ChessBoard();
@@ -19,6 +20,9 @@ export class ChessBoardView {
     private images: HTMLImageElement[] = [];
 
     private touch?: Touch;
+
+    private isLocalGameOnly: boolean = true;
+    private isNewGame: boolean = false;
 
     public initialize(currentPlayerTurn: boolean = false) {
         // Start preparing the board
@@ -112,32 +116,47 @@ export class ChessBoardView {
         }
     }
 
-    public async load(url: string, friendID: string) {
+    public async load() {
+        const path = window.location.pathname;
+        const query = window.location.search;
+        const queryString = QueryStringParser.parse(query);
+        const url = query;
+
         this.initialize();
-        console.log("local game");
-        this.loadImages();
-        this.game = new MyChessGame();
 
-        if (url.indexOf("/new") === -1) {
-            console.log("get form url " + url);
+        if (path.indexOf("/local")) {
+            console.log("local game");
+            this.isLocalGameOnly = true;
+        }
+        else {
+            this.isLocalGameOnly = false;
+            if (path.indexOf("/new")) {
+                console.log("new game");
+                this.isNewGame = true;
+            }
+            else {
+                console.log("existing game");
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    this.game = JSON.parse(data) as MyChessGame;
 
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                this.game = JSON.parse(data) as MyChessGame;
-
-                let animatedMoves = Math.min(3, this.game.moves.length);
-                let moves = this.game.moves.length - animatedMoves;
-                this.currentMoveNumber = this.makeNumberOfMoves(this.game, moves);
-                setTimeout(() => {
-                    this.animateNextMove();
-                }, 1000);
-            } catch (error) {
-                console.log(error);
-                // $("#errorText").text(textStatus);
-                // $("#errorDialog").dialog();
+                    let animatedMoves = Math.min(3, this.game.moves.length);
+                    let moves = this.game.moves.length - animatedMoves;
+                    this.currentMoveNumber = this.makeNumberOfMoves(this.game, moves);
+                    setTimeout(() => {
+                        this.animateNextMove();
+                    }, 1000);
+                } catch (error) {
+                    console.log(error);
+                    // $("#errorText").text(textStatus);
+                    // $("#errorDialog").dialog();
+                }
             }
         }
+
+        this.loadImages();
+        this.game = new MyChessGame();
     }
 
     private makeNumberOfMoves(game: MyChessGame, movesCount: number): number {
