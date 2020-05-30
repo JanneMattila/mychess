@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { ModifyFriend } from "../components/ModifyFriend";
 import "./FriendsPage.css";
-import { useParams, useRouteMatch } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 type ModifyFriendPageProps = {
     title: string;

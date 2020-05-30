@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { RootState, ProcessState, friendsLoadingEvent } from "../actions";
 import { getAppInsights } from "./TelemetryService";
-import { Link, useLocation, useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import "./FriendList.css";
 import { Player } from "../models/Player";
 import { Database, DatabaseFields } from "../data/Database";

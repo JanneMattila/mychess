@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
-import { RootState, ProcessState, friendsLoadingEvent } from "../actions";
+import { RootState, ProcessState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
-import { Link, useLocation, useHistory, useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import "./FriendList.css";
 import { Player } from "../models/Player";
 import { ProblemDetail } from "../models/ProblemDetail";
-import { QueryStringParser } from "../helpers/QueryStringParser";
 import { Database, DatabaseFields } from "../data/Database";
 
 type ModifyFriendProps = {
@@ -17,7 +15,6 @@ type ModifyFriendProps = {
 };
 
 export function ModifyFriend(props: ModifyFriendProps) {
-    const location = useLocation();
     const history = useHistory();
 
     const selectorLoginState = (state: RootState) => state.loginState;
@@ -30,7 +27,6 @@ export function ModifyFriend(props: ModifyFriendProps) {
     const [friendID, setFriendID] = useState("");
     const [friendError, setFriendError] = useState({ title: "", link: "" });
 
-    const dispatch = useDispatch();
     const ai = getAppInsights();
 
     useEffect(() => {
@@ -39,7 +35,7 @@ export function ModifyFriend(props: ModifyFriendProps) {
 
             const friends = Database.get<Array<Player>>(DatabaseFields.FRIEND_LIST);
             if (friends) {
-                const existingFriend = friends.find(f => f.id == props.id);
+                const existingFriend = friends.find(f => f.id === props.id);
                 if (existingFriend) {
                     setFriendName(existingFriend.name);
                 }
