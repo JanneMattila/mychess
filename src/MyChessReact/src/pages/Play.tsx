@@ -53,7 +53,7 @@ export function Play() {
     return (
         <div>
             <header className="Play-header">
-                <table className="table" id="table-game"></table>
+                <table className="table" id="table-game"><tr><td>Loading...</td></tr></table>
                 <div id="confirmation" className="Play-Form">
                     <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
