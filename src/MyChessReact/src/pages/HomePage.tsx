@@ -1,11 +1,11 @@
 import React from 'react';
 import { GameList } from "../components/GameList";
-import "./Home.css";
+import "./HomePage.css";
 import { GetConfiguration } from "../ConfigurationManager";
 
 let configuration = GetConfiguration();
 
-export function Home() {
+export function HomePage() {
     return (
         <div>
             <header className="Home-header">

@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Auth } from "./components/Auth";
-import { Home } from "./pages/Home";
+import { HomePage } from "./pages/HomePage";
 import { Privacy } from "./pages/Privacy";
 import { Settings } from "./pages/Settings";
 import { Friends } from "./pages/Friends";
@@ -38,7 +38,7 @@ function App() {
               </div>
             </div>
             <Switch>
-              <Route exact path="/" component={Home} />
+              <Route exact path="/" component={HomePage} />
               <Route exact path="/privacy" component={Privacy} />
               <Route exact path="/play/local" component={() => <PlayPage endpoint={configuration.endpoint} />} />
               <Route exact path="/play/:id" component={() => <PlayPage endpoint={configuration.endpoint} />} />
