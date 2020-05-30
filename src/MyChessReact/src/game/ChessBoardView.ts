@@ -361,11 +361,25 @@ export class ChessBoardView {
         console.log("move confirmed");
         this.showConfirmationDialog(false);
         this.showPromotionDialog(false);
+        this.showGameNameDialog(!this.isLocalGame && this.isNewGame);
         this.showCommentDialog(!this.isLocalGame);
     }
 
     public confirmComment = (): void => {
         console.log("comment confirmed");
+        if (this.isNewGame) {
+            const gameNameElement = <HTMLInputElement>document.getElementById("gameName");
+            const gameName = gameNameElement?.value;
+            if (!gameName) {
+                console.log("no mandatory game name provided");
+                return;
+            }
+        }
+        const commentElement = <HTMLTextAreaElement>document.getElementById("comment");
+        const content = commentElement?.value;
+        const comment = content ? content : "";
+
+        this.showGameNameDialog(false);
         this.showCommentDialog(false);
     }
 
@@ -389,6 +403,14 @@ export class ChessBoardView {
         let promotionDialogElement = document.getElementById("promotionDialog");
         if (promotionDialogElement !== null) {
             promotionDialogElement.style.display = show ? "inline" : "none";
+        }
+    }
+
+    private showGameNameDialog(show: boolean) {
+        this.waitingForConfirmation = show;
+        let gameNameDialogElement = document.getElementById("gameNameDialog");
+        if (gameNameDialogElement !== null) {
+            gameNameDialogElement.style.display = show ? "inline" : "none";
         }
     }
 

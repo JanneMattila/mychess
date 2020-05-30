@@ -93,9 +93,14 @@ export function PlayPage(props: PlayProps) {
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
                 <div id="commentDialog" className="Play-Form">
+                    <div id="gameNameDialog">
+                        Game name:<br />
+                        <input id="gameName" type="text" name="gameName" title="Game name" placeholder="Name of the game" />
+                        <br />
+                    </div>
                     Comment:<br />
                     <label>
-                        <textarea id="comment" name="comment" title="Comment" rows={3} cols={40} />
+                        <textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows={3} cols={40} />
                     </label><br />
                     <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
