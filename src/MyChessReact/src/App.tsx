@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { Auth } from "./components/Auth";
 import { Home } from "./pages/Home";
-import { Play } from "./pages/Play";
 import { Privacy } from "./pages/Privacy";
 import { Settings } from "./pages/Settings";
 import { Friends } from "./pages/Friends";
@@ -11,6 +10,7 @@ import logo from "./pages/logo.svg";
 import TelemetryProvider from "./components/TelemetryProvider";
 import { GetConfiguration } from "./ConfigurationManager";
 import { ModifyFriendPage } from "./pages/ModifyFriendPage";
+import { PlayPage } from "./pages/PlayPage";
 
 let configuration = GetConfiguration();
 
@@ -40,8 +40,8 @@ function App() {
             <Switch>
               <Route exact path="/" component={Home} />
               <Route exact path="/privacy" component={Privacy} />
-              <Route exact path="/play/local" component={Play} />
-              <Route exact path="/play/:id" component={Play} />
+              <Route exact path="/play/local" component={() => <PlayPage endpoint={configuration.endpoint} />} />
+              <Route exact path="/play/:id" component={() => <PlayPage endpoint={configuration.endpoint} />} />
               <Route path="/settings" component={() => <Settings endpoint={configuration.endpoint} />} />
               <Route exact path="/friends/add" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
               <Route path="/friends/add/:id" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />

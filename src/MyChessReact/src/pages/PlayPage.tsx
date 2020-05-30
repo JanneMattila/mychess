@@ -1,9 +1,21 @@
 import React, { useEffect, MouseEvent } from "react";
-import "./Play.css";
+import "./PlayPage.css";
 import { ChessBoardView } from "../game/ChessBoardView";
 import ReactModal from "react-modal";
+import { RootState } from "../actions";
+import { useTypedSelector } from "../reducers";
 
-export function Play() {
+type PlayProps = {
+    endpoint: string;
+};
+
+export function PlayPage(props: PlayProps) {
+
+    const selectorLoginState = (state: RootState) => state.loginState;
+    const selectorAccessToken = (state: RootState) => state.accessToken;
+
+    const loginState = useTypedSelector(selectorLoginState);
+    const accessToken = useTypedSelector(selectorAccessToken);
 
     let board = new ChessBoardView();
     let isOpen = false;
