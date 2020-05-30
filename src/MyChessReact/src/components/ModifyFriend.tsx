@@ -8,6 +8,7 @@ import "./FriendList.css";
 import { Player } from "../models/Player";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { QueryStringParser } from "../helpers/QueryStringParser";
+import { Database, DatabaseFields } from "../data/Database";
 
 type ModifyFriendProps = {
     id?: string;
@@ -26,7 +27,7 @@ export function ModifyFriend(props: ModifyFriendProps) {
     const accessToken = useTypedSelector(selectorAccessToken);
 
     const [friendName, setFriendName] = useState("");
-    const [friendIDField, setFriendIDField] = useState("");
+    const [friendID, setFriendID] = useState("");
     const [friendError, setFriendError] = useState({ title: "", link: "" });
 
     const dispatch = useDispatch();
@@ -34,14 +35,22 @@ export function ModifyFriend(props: ModifyFriendProps) {
 
     useEffect(() => {
         if (props.id) {
-            setFriendIDField(props.id);
+            setFriendID(props.id);
+
+            const friends = Database.get<Array<Player>>(DatabaseFields.FRIEND_LIST);
+            if (friends) {
+                const existingFriend = friends.find(f => f.id == props.id);
+                if (existingFriend) {
+                    setFriendName(existingFriend.name);
+                }
+            }
         }
     }, [props]);
 
     const addFriend = async () => {
         setFriendError({ title: "", link: "" });
         const json: Player = {
-            "id": friendIDField,
+            "id": friendID,
             "name": friendName,
         };
 
@@ -92,7 +101,7 @@ export function ModifyFriend(props: ModifyFriendProps) {
                             This is your friends identifier.<br />
                             You need this in order to connect to your friend.
                         </div>
-                        <input type="text" value={friendIDField} className="FriendList-Identifier" onChange={e => setFriendIDField(e.target.value)} />
+                        <input type="text" value={friendID} className="FriendList-Identifier" onChange={e => setFriendID(e.target.value)} />
                     </label>
                     <br />
                     <label className="FriendList-AddFriend">

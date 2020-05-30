@@ -6,6 +6,7 @@ import { getAppInsights } from "./TelemetryService";
 import { Link, useLocation, useHistory } from "react-router-dom";
 import "./FriendList.css";
 import { Player } from "../models/Player";
+import { Database, DatabaseFields } from "../data/Database";
 
 type FriendListProps = {
     title: string;
@@ -41,6 +42,8 @@ export function FriendList(props: FriendListProps) {
             try {
                 const response = await fetch(props.endpoint + "/api/users/me/friends", request);
                 const data = await response.json();
+
+                Database.set(DatabaseFields.FRIEND_LIST, data);
 
                 dispatch(friendsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
             } catch (error) {
