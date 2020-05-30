@@ -86,8 +86,8 @@ export function Settings(props: SettingsProps) {
                         Share this to your friend so that they can connect to you
                     </div>
                     <input type="text" value={playerIdentifier} readOnly={true} className="Settings-Identifier" /><br />
-                    <button onClick={copy}><span role="img" aria-label="Copy">&#128203;</span> Copy id</button>
-                    <button onClick={share}><span role="img" aria-label="Share">&#128203;</span> Share link</button>
+                    <button onClick={copy}><span role="img" aria-label="Copy">&#128203;</span> Copy your identifier</button>
+                    <button onClick={share}><span role="img" aria-label="Share">&#128203;</span> Copy "Add as friend" link</button>
                 </label>
 
                 <h4>Settings</h4>
