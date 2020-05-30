@@ -22,11 +22,7 @@ export function PlayPage(props: PlayProps) {
     let isEllipse = false;
 
     useEffect(() => {
-        // Determine is this is
-        // - local game
-        // - new game *WITH* friendID in url
-        // - existing game
-        board.load();
+        board.load(props.endpoint, accessToken);
     });
 
     const closeModal = () => {
@@ -35,18 +31,18 @@ export function PlayPage(props: PlayProps) {
 
     const confirmMove = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        board.confirm();
+        board.confirmMove();
     }
 
     const confirmPromotion = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         board.changePromotion("Promotion");
-        board.confirm();
+        board.confirmMove();
     }
 
     const confirmComment = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        board.confirm();
+        board.confirmComment();
     }
 
     const cancel = (event: MouseEvent<HTMLButtonElement>) => {
@@ -99,7 +95,7 @@ export function PlayPage(props: PlayProps) {
                 <div id="commentDialog" className="Play-Form">
                     Comment:<br />
                     <label>
-                        <textarea id="comment" name="comment" title="Comment" />
+                        <textarea id="comment" name="comment" title="Comment" rows={3} cols={40} />
                     </label><br />
                     <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>

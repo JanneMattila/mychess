@@ -21,7 +21,7 @@ export class ChessBoardView {
 
     private touch?: Touch;
 
-    private isLocalGameOnly: boolean = true;
+    private isLocalGame: boolean = true;
     private isNewGame: boolean = false;
 
     public initialize(currentPlayerTurn: boolean = false) {
@@ -116,7 +116,11 @@ export class ChessBoardView {
         }
     }
 
-    public async load() {
+    public async load(endpoint: string, accessToken?: string) {
+        // Determine if this game is:
+        // - local game
+        // - new game *WITH* friendID in url
+        // - existing game
         const path = window.location.pathname;
         const query = window.location.search;
         const queryString = QueryStringParser.parse(query);
@@ -124,13 +128,13 @@ export class ChessBoardView {
 
         this.initialize();
 
-        if (path.indexOf("/local")) {
+        if (path.indexOf("/local") !== -1) {
             console.log("local game");
-            this.isLocalGameOnly = true;
+            this.isLocalGame = true;
         }
         else {
-            this.isLocalGameOnly = false;
-            if (path.indexOf("/new")) {
+            this.isLocalGame = false;
+            if (path.indexOf("/new") !== -1) {
                 console.log("new game");
                 this.isNewGame = true;
             }
@@ -353,10 +357,16 @@ export class ChessBoardView {
         }
     }
 
-    public confirm = (): void => {
-        console.log("confirmed");
+    public confirmMove = (): void => {
+        console.log("move confirmed");
         this.showConfirmationDialog(false);
         this.showPromotionDialog(false);
+        this.showCommentDialog(!this.isLocalGame);
+    }
+
+    public confirmComment = (): void => {
+        console.log("comment confirmed");
+        this.showCommentDialog(false);
     }
 
     public cancel = (): void => {
@@ -379,6 +389,14 @@ export class ChessBoardView {
         let promotionDialogElement = document.getElementById("promotionDialog");
         if (promotionDialogElement !== null) {
             promotionDialogElement.style.display = show ? "inline" : "none";
+        }
+    }
+
+    private showCommentDialog(show: boolean) {
+        this.waitingForConfirmation = show;
+        let commentDialogElement = document.getElementById("commentDialog");
+        if (commentDialogElement !== null) {
+            commentDialogElement.style.display = show ? "inline" : "none";
         }
     }
 
