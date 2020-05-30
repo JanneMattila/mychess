@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { ModifyFriend } from "../components/ModifyFriend";
-import "./Friends.css";
+import "./FriendsPage.css";
 import { useParams, useRouteMatch } from "react-router-dom";
 
 type ModifyFriendPageProps = {

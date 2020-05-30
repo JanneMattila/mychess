@@ -1,11 +1,11 @@
 import React from "react";
 import { GetConfiguration } from "../ConfigurationManager";
 import { FriendList } from "../components/FriendList";
-import "./Friends.css";
+import "./FriendsPage.css";
 
 let configuration = GetConfiguration();
 
-export function Friends() {
+export function FriendsPage() {
     return (
         <div>
             <header className="Friends-header">

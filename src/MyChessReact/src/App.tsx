@@ -4,7 +4,7 @@ import { Auth } from "./components/Auth";
 import { HomePage } from "./pages/HomePage";
 import { Privacy } from "./pages/Privacy";
 import { Settings } from "./pages/Settings";
-import { Friends } from "./pages/Friends";
+import { FriendsPage } from "./pages/FriendsPage";
 import "./App.css";
 import logo from "./pages/logo.svg";
 import TelemetryProvider from "./components/TelemetryProvider";
@@ -46,7 +46,7 @@ function App() {
               <Route exact path="/friends/add" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
               <Route path="/friends/add/:id" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
               <Route path="/friends/:id" component={() => <ModifyFriendPage title="Modify friend" endpoint={configuration.endpoint} />} />
-              <Route path="/friends" component={Friends} />
+              <Route path="/friends" component={FriendsPage} />
             </Switch>
           </div>
         </div>

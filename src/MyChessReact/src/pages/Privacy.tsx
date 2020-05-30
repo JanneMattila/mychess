@@ -1,5 +1,5 @@
 import React from "react";
-import "./Home.css";
+import "./HomePage.css";
 
 export function Privacy() {
     return (
