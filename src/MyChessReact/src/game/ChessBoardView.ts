@@ -157,10 +157,19 @@ export class ChessBoardView {
             }
             else {
                 console.log("existing game");
+                const gameID = path.substring(path.lastIndexOf("/") + 1);
                 try {
-                    const response = await fetch(url);
+                    const request: RequestInit = {
+                        method: "GET",
+                        headers: {
+                            "Accept": "application/json",
+                            "Authorization": "Bearer " + this.accessToken
+                        }
+                    };
+                    const response = await fetch(this.endpoint + "/api/games/" + gameID, request);
                     const data = await response.json();
-                    this.game = JSON.parse(data) as MyChessGame;
+                    console.log(data);
+                    this.game = data as MyChessGame;
 
                     let animatedMoves = Math.min(3, this.game.moves.length);
                     let moves = this.game.moves.length - animatedMoves;
