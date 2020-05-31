@@ -81,6 +81,9 @@ export function GameList(props: GameListProps) {
                     </Link>
                 )
                 }
+                <br />
+                 or
+                <button onClick={addNewGame}>add new</button> game.
             </div >
         );
     }
