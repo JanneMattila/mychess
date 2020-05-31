@@ -9,14 +9,21 @@ namespace MyChess.Functions.Tests.Helpers
 {
     public static class HttpRequestHelper
     {
-        public static HttpRequest Create(string method, Dictionary<string, StringValues> query = null, object body = null)
+        public static HttpRequest Create(string method, 
+            Dictionary<string, StringValues> query = null,
+            Dictionary<string, StringValues> headers = null,
+            object body = null)
         {
             var reqMock = new Mock<HttpRequest>();
             reqMock.Setup(req => req.Method).Returns(method);
-
             if (query != null)
             {
                 reqMock.Setup(req => req.Query).Returns(new QueryCollection(query));
+            }
+
+            if (headers != null)
+            {
+                reqMock.Setup(req => req.Headers).Returns(new HeaderDictionary(headers));
             }
 
             if (body != null)

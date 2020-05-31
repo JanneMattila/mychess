@@ -66,7 +66,7 @@ namespace MyChess.Functions
             return true;
         }
 
-        public async Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(HttpRequest req)
+        public string? ParseAccessToken(HttpRequest req)
         {
             if (!req.Headers.ContainsKey(HeaderNames.Authorization))
             {
@@ -75,14 +75,24 @@ namespace MyChess.Functions
             }
 
             var authorizationValue = req.Headers[HeaderNames.Authorization].ToString().Split(' ');
-            if (authorizationValue.Length != 2 &&
+            if (authorizationValue.Length != 2 ||
                 authorizationValue[0] != JwtBearerDefaults.AuthenticationScheme)
             {
                 _log.FuncSecNoBearerToken();
                 return null;
             }
 
-            var accessToken = authorizationValue[1];
+            return authorizationValue[1];
+        }
+
+        public async Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(HttpRequest req)
+        {
+            var accessToken = ParseAccessToken(req);
+            if (accessToken == null)
+            {
+                return null;
+            }
+
             var tokenHandler = new JwtSecurityTokenHandler();
 
             if (_tokenValidationParameters == null)
