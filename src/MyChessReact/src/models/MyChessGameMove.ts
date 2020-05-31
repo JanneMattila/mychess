@@ -2,14 +2,16 @@ export class MyChessGameMove {
     move: string;
     comment: string;
     capture: string;
-    time: number;
+    start: string;
+    end: string;
     promotion: string;
 
     constructor() {
         this.move = "";
         this.comment = "";
         this.capture = "";
-        this.time = 0;
+        this.start = "";
+        this.end = "";
         this.promotion = "";
     }
 }

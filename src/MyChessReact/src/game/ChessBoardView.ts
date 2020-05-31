@@ -26,6 +26,7 @@ export class ChessBoardView {
     private isNewGame: boolean = false;
     private friendID: string = "";
 
+    private start: string = "";
     private endpoint: string = "";
     private accessToken: string = "";
 
@@ -144,6 +145,8 @@ export class ChessBoardView {
         }
         else {
             this.isLocalGame = false;
+            this.start = new Date().toISOString();
+
             if (path.indexOf("/new") !== -1) {
                 console.log("new game");
                 this.isNewGame = true;
@@ -222,7 +225,11 @@ export class ChessBoardView {
         }
         this.setBoardStatus(count, game.moves.length);
         let move = game.moves[count - 1];
-        this.setThinkTime(count, move.time);
+
+        const start = Date.parse(move.start);
+        const end = Date.parse(move.end);
+
+        this.setThinkTime(count, end - start);
         this.setComment(move.comment);
         this.drawBoard();
 
@@ -438,6 +445,9 @@ export class ChessBoardView {
             move.move = lastMove;
             move.promotion = lastPromotion;
             move.comment = comment;
+            move.start = this.start;
+            move.end = new Date().toISOString();
+
             const game = new MyChessGame()
             game.players.black.id = this.friendID;
             game.name = gameName;
