@@ -7,6 +7,7 @@ import { MyChessGame } from "../models/MyChessGame";
 import { ChessPlayer } from "./ChessPlayer";
 import { setTimeout } from "timers";
 import { QueryStringParser } from "../helpers/QueryStringParser";
+import { MyChessGameMove } from "../models/MyChessGameMove";
 
 export class ChessBoardView {
     private board: ChessBoard = new ChessBoard();
@@ -23,6 +24,10 @@ export class ChessBoardView {
 
     private isLocalGame: boolean = true;
     private isNewGame: boolean = false;
+    private friendID: string = "";
+
+    private endpoint: string = "";
+    private accessToken: string = "";
 
     public initialize(currentPlayerTurn: boolean = false) {
         // Start preparing the board
@@ -126,6 +131,11 @@ export class ChessBoardView {
         const queryString = QueryStringParser.parse(query);
         const url = query;
 
+        this.endpoint = endpoint;
+        if (accessToken) {
+            this.accessToken = accessToken;
+        }
+
         this.initialize();
 
         if (path.indexOf("/local") !== -1) {
@@ -137,6 +147,13 @@ export class ChessBoardView {
             if (path.indexOf("/new") !== -1) {
                 console.log("new game");
                 this.isNewGame = true;
+                const friendIDParameter = queryString.get("friendID");
+                if (friendIDParameter) {
+                    this.friendID = friendIDParameter;
+                }
+                else {
+                    throw new Error("Required parameter for friend is missing!");
+                }
             }
             else {
                 console.log("existing game");
@@ -161,6 +178,26 @@ export class ChessBoardView {
 
         this.loadImages();
         this.game = new MyChessGame();
+    }
+
+    public async postNewGame(game: MyChessGame) {
+        const request: RequestInit = {
+            method: "POST",
+            body: JSON.stringify(game),
+            headers: {
+                "Accept": "application/json",
+                "Authorization": "Bearer " + this.accessToken
+            }
+        };
+
+        try {
+            const response = await fetch(this.endpoint + "/api/games", request);
+            const data = await response.json() as MyChessGame;
+        } catch (error) {
+            //ai.trackException(error);
+
+            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create new game.";
+        }
     }
 
     private makeNumberOfMoves(game: MyChessGame, movesCount: number): number {
@@ -367,17 +404,38 @@ export class ChessBoardView {
 
     public confirmComment = (): void => {
         console.log("comment confirmed");
+
+        const commentElement = document.getElementById("comment") as HTMLTextAreaElement;
+        const content = commentElement?.value;
+        const comment = content ? content : "";
+
         if (this.isNewGame) {
-            const gameNameElement = <HTMLInputElement>document.getElementById("gameName");
+            const gameNameElement = document.getElementById("gameName") as HTMLInputElement;
             const gameName = gameNameElement?.value;
             if (!gameName) {
                 console.log("no mandatory game name provided");
                 return;
             }
+
+            const lastMove = this.getLastMoveAsString();
+            const lastPromotion = this.getLastMovePromotionAsString();
+            if (!lastMove) {
+                console.log("no last move available");
+                return;
+            }
+
+
+            const move = new MyChessGameMove()
+            move.move = lastMove;
+            move.promotion = lastPromotion;
+            move.comment = comment;
+            const game = new MyChessGame()
+            game.players.black.id = this.friendID;
+            game.name = gameName;
+            game.moves.push(move)
+
+            this.postNewGame(game);
         }
-        const commentElement = <HTMLTextAreaElement>document.getElementById("comment");
-        const content = commentElement?.value;
-        const comment = content ? content : "";
 
         this.showGameNameDialog(false);
         this.showCommentDialog(false);
