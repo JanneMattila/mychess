@@ -55,7 +55,7 @@ export function GameList(props: GameListProps) {
             }
         }
 
-        if (loginState && !gamesState) {
+        if (loginState) {
             populateGames();
         }
     }, [loginState, gamesState, accessToken, ai, props, dispatch]);
