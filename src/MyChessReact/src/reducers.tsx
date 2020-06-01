@@ -39,6 +39,14 @@ export default function appReducer(state: RootState = getInitialState(), action:
             })
         }
 
+        case EventTypes.ME_LOADING: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                meState: action.meState,
+                error: action.error,
+                me: action.me
+            })
+        }
+
         case EventTypes.FRIENDS_LOADING: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 friendsState: action.friendsState,

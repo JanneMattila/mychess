@@ -2,10 +2,12 @@ import React, { useEffect, MouseEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import "./SettingsPage.css";
-import { RootState, ProcessState } from "../actions";
+import { RootState, ProcessState, meLoadingEvent } from "../actions";
 import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "../components/TelemetryService";
 import { Player } from "../models/Player";
+import { useDispatch } from "react-redux";
+import { Database, DatabaseFields } from "../data/Database";
 
 type SettingsProps = {
     endpoint: string;
@@ -22,8 +24,11 @@ export function SettingsPage(props: SettingsProps) {
     const [isNotificationsEnabled, setNotifications] = useState(false);
     const ai = getAppInsights();
 
+    const dispatch = useDispatch();
+
     useEffect(() => {
         const populateUserInformation = async (accessToken: string) => {
+            dispatch(meLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
             const request: RequestInit = {
                 method: "GET",
                 headers: {
@@ -37,19 +42,24 @@ export function SettingsPage(props: SettingsProps) {
                 const data = await response.json() as Player;
                 console.log(data);
                 setPlayerIdentifier(data.id);
+
+                Database.set(DatabaseFields.ME_ID, data.id);
+
+                dispatch(meLoadingEvent(ProcessState.Success, "" /* Clear error message */, data.id));
             } catch (error) {
                 ai.trackException(error);
                 console.log(error);
 
                 const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve settings.";
                 console.log(errorMessage);
+                dispatch(meLoadingEvent(ProcessState.Error, errorMessage));
             }
         }
 
         if (accessToken !== undefined) {
             populateUserInformation(accessToken);
         }
-    }, [accessToken, ai, props.endpoint]);
+    }, [accessToken, ai, props.endpoint, dispatch]);
 
     const confirm = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();

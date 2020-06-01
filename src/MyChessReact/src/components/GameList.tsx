@@ -6,6 +6,8 @@ import { gamesLoadingEvent, RootState, ProcessState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { Link, useHistory } from "react-router-dom";
 import "./GameList.css";
+import { Database, DatabaseFields } from "../data/Database";
+import { Player } from "../models/Player";
 
 type GameListProps = {
     title: string;
@@ -26,6 +28,9 @@ export function GameList(props: GameListProps) {
     const { push } = useHistory();
     const dispatch = useDispatch();
     const ai = getAppInsights();
+
+    const friends = Database.get<Player[]>(DatabaseFields.FRIEND_LIST);
+    const meID = Database.get<string>(DatabaseFields.ME_ID);
 
     useEffect(() => {
         const populateGames = async () => {
@@ -56,10 +61,18 @@ export function GameList(props: GameListProps) {
     }, [loginState, gamesState, accessToken, ai, props, dispatch]);
 
     const getOpponent = (game: MyChessGame) => {
-        if (game.players.white.name) {
-            return game.players.white.name;
+        if (friends) {
+            let friendID = game.players.white.id;
+            if (game.players.white.id === meID) {
+                friendID = game.players.black.id;
+            }
+
+            const friend = friends.find(p => p.id === friendID);
+            if (friend) {
+                return friend.name;
+            }
         }
-        return game.players.black.name;
+        return "";
     }
 
     const renderGames = (games?: MyChessGame[]) => {

@@ -5,6 +5,9 @@ export enum DatabaseFields {
     // Game related fields
     GAMES_LIST = "Games/List",
 
+    // ME related fields
+    ME_ID = "Me/ID",
+
     // Friend related fields
     FRIEND_LIST = "Friends/List"
 };

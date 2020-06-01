@@ -28,6 +28,9 @@ export enum EventTypes {
     // Game loading related events
     GAMES_LOADING = "Games/Load",
 
+    // Me loading related events
+    ME_LOADING = "Me/Load",
+
     // Game loading related events
     FRIENDS_LOADING = "Friends/Load",
 
@@ -40,6 +43,7 @@ type LoginAction = { type: EventTypes.AUTH_LOGIN, loginState: ProcessState, erro
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
+type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: Player[] }
 type PlayShowDialogAction = { type: EventTypes.PLAY_SHOW_DIALOG, dialog: DialogType, show: boolean }
 
@@ -49,6 +53,7 @@ export type RootAction =
     | LogoutAction
     | LoginExpiredAction
     | GamesLoadingAction
+    | MeLoadingAction
     | FriendsLoadingAction
     | PlayShowDialogAction
 
@@ -60,6 +65,9 @@ export interface RootState {
 
     readonly gamesState?: ProcessState
     readonly games?: MyChessGame[]
+
+    readonly me?: string;
+    readonly meState?: ProcessState
 
     readonly friendsState?: ProcessState
     readonly friends?: Player[]
@@ -76,6 +84,10 @@ export function loginEvent(loginState: ProcessState, error?: string, account?: A
 
 export function gamesLoadingEvent(gamesState: ProcessState, error?: string, games?: MyChessGame[]): GamesLoadingAction {
     return { type: EventTypes.GAMES_LOADING, gamesState, error, games };
+}
+
+export function meLoadingEvent(meState: ProcessState, error?: string, me?: string): MeLoadingAction {
+    return { type: EventTypes.ME_LOADING, meState, error, me };
 }
 
 export function friendsLoadingEvent(friendsState: ProcessState, error?: string, friends?: Player[]): FriendsLoadingAction {
