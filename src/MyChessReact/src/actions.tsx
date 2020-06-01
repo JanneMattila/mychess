@@ -33,6 +33,7 @@ export enum EventTypes {
 
     // Game loading related events
     FRIENDS_LOADING = "Friends/Load",
+    FRIENDS_UPSERT = "Friends/Upsert",
 
     // Game playing related events
     PLAY_LOADING = "Play/Load",
@@ -45,6 +46,7 @@ type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: Player[] }
+type FriendUpsertAction = { type: EventTypes.FRIENDS_UPSERT, friendUpsertState: ProcessState, error?: string, errorLink?: string }
 type PlayShowDialogAction = { type: EventTypes.PLAY_SHOW_DIALOG, dialog: DialogType, show: boolean }
 
 // Root action
@@ -55,11 +57,13 @@ export type RootAction =
     | GamesLoadingAction
     | MeLoadingAction
     | FriendsLoadingAction
+    | FriendUpsertAction
     | PlayShowDialogAction
 
 export interface RootState {
     readonly loginState?: ProcessState
     readonly error?: string
+    readonly errorLink?: string
     readonly account?: Account
     readonly accessToken?: string
 
@@ -71,6 +75,8 @@ export interface RootState {
 
     readonly friendsState?: ProcessState
     readonly friends?: Player[]
+
+    readonly friendUpsertState?: ProcessState
 
     readonly activeDialog?: DialogType
 }
@@ -94,6 +100,9 @@ export function friendsLoadingEvent(friendsState: ProcessState, error?: string, 
     return { type: EventTypes.FRIENDS_LOADING, friendsState, error, friends };
 }
 
+export function friendUpsertEvent(friendUpsertState: ProcessState, error?: string, errorLink?: string): FriendUpsertAction {
+    return { type: EventTypes.FRIENDS_UPSERT, friendUpsertState, error, errorLink };
+}
 export function showDialogEvent(dialog: DialogType, show: boolean): PlayShowDialogAction {
     return { type: EventTypes.PLAY_SHOW_DIALOG, dialog, show };
 }

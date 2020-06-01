@@ -55,6 +55,13 @@ export default function appReducer(state: RootState = getInitialState(), action:
             })
         }
 
+        case EventTypes.FRIENDS_UPSERT: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                friendUpsertState: action.friendUpsertState,
+                error: action.error,
+                errorLink: action.errorLink
+            })
+        }
         case EventTypes.PLAY_SHOW_DIALOG: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 activeDialog: action.show ? action.dialog : DialogType.None,
