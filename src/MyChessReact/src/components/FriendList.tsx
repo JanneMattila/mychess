@@ -54,7 +54,7 @@ export function FriendList(props: FriendListProps) {
             }
         }
 
-        if (loginState && !friendsState) {
+        if (loginState) {
             populateFriends();
         }
     }, [loginState, friendsState, accessToken, ai, props, dispatch]);
