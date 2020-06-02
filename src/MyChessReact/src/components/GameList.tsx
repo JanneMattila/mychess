@@ -1,13 +1,13 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useRef } from "react";
 import { MyChessGame } from "../models/MyChessGame";
 import { useTypedSelector } from "../reducers";
-import { gamesLoadingEvent, RootState, ProcessState } from "../actions";
+import { ProcessState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { Link, useHistory } from "react-router-dom";
 import "./GameList.css";
 import { Database, DatabaseFields } from "../data/Database";
 import { Player } from "../models/Player";
+import { BackendService } from "../data/BackendService";
 
 type GameListProps = {
     title: string;
@@ -15,50 +15,24 @@ type GameListProps = {
 };
 
 export function GameList(props: GameListProps) {
-    const selectorLoginState = (state: RootState) => state.loginState;
-    const selectorAccessToken = (state: RootState) => state.accessToken;
-    const selectorGamesState = (state: RootState) => state.gamesState;
-    const selectorGames = (state: RootState) => state.games;
-
-    const loginState = useTypedSelector(selectorLoginState);
-    const accessToken = useTypedSelector(selectorAccessToken);
-    const gamesState = useTypedSelector(selectorGamesState);
-    const games = useTypedSelector(selectorGames);
+    const loginState = useTypedSelector(state => state.loginState);
+    const accessToken = useTypedSelector(state => state.accessToken);
+    const gamesState = useTypedSelector(state => state.gamesState);
+    const games = useTypedSelector(state => state.games);
 
     const { push } = useHistory();
-    const dispatch = useDispatch();
     const ai = getAppInsights();
 
     const friends = Database.get<Player[]>(DatabaseFields.FRIEND_LIST);
     const meID = Database.get<string>(DatabaseFields.ME_ID);
 
+    const backendService = useRef(new BackendService(props.endpoint, accessToken ? accessToken : ""));
+
     useEffect(() => {
-        const populateGames = async () => {
-            const request: RequestInit = {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                    "Authorization": "Bearer " + accessToken
-                }
-            };
-
-            try {
-                const response = await fetch(props.endpoint + "/api/games", request);
-                const data = await response.json();
-
-                dispatch(gamesLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
-            } catch (error) {
-                ai.trackException(error);
-
-                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
-                dispatch(gamesLoadingEvent(ProcessState.Error, errorMessage));
-            }
-        }
-
         if (loginState) {
-            populateGames();
+            backendService.current.getGames();
         }
-    }, [loginState, gamesState, accessToken, ai, props, dispatch]);
+    }, [loginState, backendService]);
 
     const getOpponent = (game: MyChessGame) => {
         if (friends) {
@@ -102,7 +76,7 @@ export function GameList(props: GameListProps) {
     }
 
     const refresh = () => {
-        dispatch(gamesLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
+        backendService.current.getGames();
     }
 
     const addNewGame = () => {

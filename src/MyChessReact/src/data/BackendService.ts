@@ -10,10 +10,10 @@ export class BackendService {
     private dispatch = useDispatch();
     private ai = getAppInsights();
 
-    private endpoint: string;
-    private accessToken: string;
+    private endpoint: string = "";
+    private accessToken: string = "";
 
-    constructor(endpoint: string, accessToken: string) {
+    public constructor(endpoint: string, accessToken: string) {
         this.endpoint = endpoint;
         this.accessToken = accessToken;
     }
