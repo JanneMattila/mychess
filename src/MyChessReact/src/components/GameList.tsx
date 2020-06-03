@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { MyChessGame } from "../models/MyChessGame";
 import { useTypedSelector } from "../reducers";
 import { ProcessState } from "../actions";
@@ -7,7 +7,7 @@ import { Link, useHistory } from "react-router-dom";
 import "./GameList.css";
 import { Database, DatabaseFields } from "../data/Database";
 import { Player } from "../models/Player";
-import { BackendService } from "../data/BackendService";
+import { BackendService } from "./BackendService";
 
 type GameListProps = {
     title: string;
@@ -25,14 +25,6 @@ export function GameList(props: GameListProps) {
 
     const friends = Database.get<Player[]>(DatabaseFields.FRIEND_LIST);
     const meID = Database.get<string>(DatabaseFields.ME_ID);
-
-    const backendService = useRef(new BackendService(props.endpoint, accessToken ? accessToken : ""));
-
-    useEffect(() => {
-        if (loginState) {
-            backendService.current.getGames();
-        }
-    }, [loginState, backendService]);
 
     const getOpponent = (game: MyChessGame) => {
         if (friends) {
@@ -76,7 +68,7 @@ export function GameList(props: GameListProps) {
     }
 
     const refresh = () => {
-        backendService.current.getGames();
+        // backendService.current.getGames();
     }
 
     const addNewGame = () => {
@@ -108,6 +100,7 @@ export function GameList(props: GameListProps) {
             <div>
                 <h4>{props.title}</h4>
                 {contents}
+                <BackendService endpoint={props.endpoint} accessToken={accessToken} getGames={true} />
             </div>
         );
     }
