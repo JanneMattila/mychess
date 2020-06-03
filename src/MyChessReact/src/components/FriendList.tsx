@@ -7,6 +7,7 @@ import { Link, useHistory } from "react-router-dom";
 import "./FriendList.css";
 import { Player } from "../models/Player";
 import { Database, DatabaseFields } from "../data/Database";
+import { BackendService } from "./BackendService";
 
 type FriendListProps = {
     title: string;
@@ -16,48 +17,11 @@ type FriendListProps = {
 export function FriendList(props: FriendListProps) {
     const history = useHistory();
 
-    const selectorLoginState = (state: RootState) => state.loginState;
-    const selectorAccessToken = (state: RootState) => state.accessToken;
-    const selectorFriendsState = (state: RootState) => state.friendsState;
-    const selectorFriends = (state: RootState) => state.friends;
+    const loginState = useTypedSelector(state => state.loginState);
+    const friendsState = useTypedSelector(state => state.friendsState);
+    const friends = useTypedSelector(state => state.friends);
 
-    const loginState = useTypedSelector(selectorLoginState);
-    const accessToken = useTypedSelector(selectorAccessToken);
-    const friendsState = useTypedSelector(selectorFriendsState);
-    const friends = useTypedSelector(selectorFriends);
-
-    const dispatch = useDispatch();
     const ai = getAppInsights();
-
-    useEffect(() => {
-        const populateFriends = async () => {
-            const request: RequestInit = {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                    "Authorization": "Bearer " + accessToken
-                }
-            };
-
-            try {
-                const response = await fetch(props.endpoint + "/api/users/me/friends", request);
-                const data = await response.json();
-
-                Database.set(DatabaseFields.FRIEND_LIST, data);
-
-                dispatch(friendsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
-            } catch (error) {
-                ai.trackException(error);
-
-                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve friends.";
-                dispatch(friendsLoadingEvent(ProcessState.Error, errorMessage));
-            }
-        }
-
-        if (loginState) {
-            populateFriends();
-        }
-    }, [loginState, friendsState, accessToken, ai, props, dispatch]);
 
     const renderFriends = (friends?: Player[]) => {
         return (
@@ -87,7 +51,6 @@ export function FriendList(props: FriendListProps) {
     }
 
     const refresh = () => {
-        dispatch(friendsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
     }
 
     const addNewFriend = () => {
@@ -95,7 +58,6 @@ export function FriendList(props: FriendListProps) {
     }
 
     if (loginState === ProcessState.Success) {
-
         let contents: JSX.Element;
         switch (friendsState) {
             case ProcessState.Success:
@@ -130,6 +92,7 @@ export function FriendList(props: FriendListProps) {
             <div>
                 <h4>{props.title}</h4>
                 {contents}
+                <BackendService endpoint={props.endpoint} getFriends={true} />
             </div>
         );
     }

@@ -18,7 +18,6 @@ export function ModifyFriend(props: ModifyFriendProps) {
     const history = useHistory();
 
     const loginState = useTypedSelector(state => state.loginState);
-    const accessToken = useTypedSelector(state => state.accessToken);
     const friendUpsertState = useTypedSelector(state => state.friendUpsertState);
     const error = useTypedSelector(state => state.error);
     const errorLink = useTypedSelector(state => state.errorLink);
@@ -89,7 +88,7 @@ export function ModifyFriend(props: ModifyFriendProps) {
                     <div style={friendUpsertState === ProcessState.Error ? visible : hidden}>
                         <a className="FriendList-AddFriendError" href={errorLink} target="_blank" rel="noopener noreferrer">{error}</a>
                     </div>
-                    <BackendService endpoint={props.endpoint} accessToken={accessToken} upsertFriend={player} />
+                    <BackendService endpoint={props.endpoint} upsertFriend={player} />
                 </div>
             </div>
         );

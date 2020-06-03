@@ -16,7 +16,6 @@ type GameListProps = {
 
 export function GameList(props: GameListProps) {
     const loginState = useTypedSelector(state => state.loginState);
-    const accessToken = useTypedSelector(state => state.accessToken);
     const gamesState = useTypedSelector(state => state.gamesState);
     const games = useTypedSelector(state => state.games);
 
@@ -68,7 +67,6 @@ export function GameList(props: GameListProps) {
     }
 
     const refresh = () => {
-        // backendService.current.getGames();
     }
 
     const addNewGame = () => {
@@ -100,7 +98,7 @@ export function GameList(props: GameListProps) {
             <div>
                 <h4>{props.title}</h4>
                 {contents}
-                <BackendService endpoint={props.endpoint} accessToken={accessToken} getGames={true} />
+                <BackendService endpoint={props.endpoint} getGames={true} />
             </div>
         );
     }

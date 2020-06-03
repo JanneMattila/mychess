@@ -6,10 +6,10 @@ import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { Player } from "../models/Player";
 import { useHistory } from "react-router-dom";
+import { useTypedSelector } from "../reducers";
 
 type BackendServiceProps = {
     endpoint: string;
-    accessToken?: string;
 
     getFriends?: boolean;
     upsertFriend?: Player;
@@ -18,12 +18,12 @@ type BackendServiceProps = {
 
 export function BackendService(props: BackendServiceProps) {
 
+    const accessToken = useTypedSelector(state => state.accessToken);
     const dispatch = useDispatch();
     const history = useHistory();
     const ai = getAppInsights();
 
     const endpoint = props.endpoint;
-    const accessToken = props.accessToken;
 
     useEffect(() => {
         const getFriends = async () => {
