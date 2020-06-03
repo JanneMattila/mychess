@@ -11,9 +11,9 @@ import { useTypedSelector } from "../reducers";
 type BackendServiceProps = {
     endpoint: string;
 
-    getFriends?: boolean;
+    getFriends?: number;
+    getGames?: number;
     upsertFriend?: Player;
-    getGames?: boolean;
 };
 
 export function BackendService(props: BackendServiceProps) {
@@ -52,7 +52,7 @@ export function BackendService(props: BackendServiceProps) {
         }
 
         if (accessToken) {
-            if (props.getFriends) {
+            if (props.getFriends !== 0) {
                 getFriends();
             }
         }
@@ -84,7 +84,7 @@ export function BackendService(props: BackendServiceProps) {
         }
 
         if (accessToken) {
-            if (props.getGames) {
+            if (props.getGames !== 0) {
                 getGames();
             }
         }

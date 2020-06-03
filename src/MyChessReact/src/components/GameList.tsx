@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { MyChessGame } from "../models/MyChessGame";
 import { useTypedSelector } from "../reducers";
 import { ProcessState } from "../actions";
@@ -18,6 +18,8 @@ export function GameList(props: GameListProps) {
     const loginState = useTypedSelector(state => state.loginState);
     const gamesState = useTypedSelector(state => state.gamesState);
     const games = useTypedSelector(state => state.games);
+
+    const [executeGetGames, setExecuteGetGames] = useState(1);
 
     const { push } = useHistory();
     const ai = getAppInsights();
@@ -67,6 +69,7 @@ export function GameList(props: GameListProps) {
     }
 
     const refresh = () => {
+        setExecuteGetGames(executeGetGames + 1);
     }
 
     const addNewGame = () => {
@@ -98,7 +101,7 @@ export function GameList(props: GameListProps) {
             <div>
                 <h4>{props.title}</h4>
                 {contents}
-                <BackendService endpoint={props.endpoint} getGames={true} />
+                <BackendService endpoint={props.endpoint} getGames={executeGetGames} />
             </div>
         );
     }

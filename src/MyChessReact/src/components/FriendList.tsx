@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { RootState, ProcessState, friendsLoadingEvent } from "../actions";
@@ -20,6 +20,8 @@ export function FriendList(props: FriendListProps) {
     const loginState = useTypedSelector(state => state.loginState);
     const friendsState = useTypedSelector(state => state.friendsState);
     const friends = useTypedSelector(state => state.friends);
+
+    const [executeGetFriends, setExecuteGetFriends] = useState(1);
 
     const ai = getAppInsights();
 
@@ -51,6 +53,7 @@ export function FriendList(props: FriendListProps) {
     }
 
     const refresh = () => {
+        setExecuteGetFriends(executeGetFriends + 1);
     }
 
     const addNewFriend = () => {
@@ -92,7 +95,7 @@ export function FriendList(props: FriendListProps) {
             <div>
                 <h4>{props.title}</h4>
                 {contents}
-                <BackendService endpoint={props.endpoint} getFriends={true} />
+                <BackendService endpoint={props.endpoint} getFriends={executeGetFriends} />
             </div>
         );
     }
