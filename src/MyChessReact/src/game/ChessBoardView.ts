@@ -47,7 +47,6 @@ export class ChessBoardView {
         });
 
         document.addEventListener('keyup', (event) => {
-            console.log(event.keyCode);
             switch (event.keyCode) {
                 case 36: // Home
                     this.firstMove();
@@ -174,12 +173,12 @@ export class ChessBoardView {
                     console.log(data);
                     this.game = data as MyChessGame;
 
-                    let animatedMoves = Math.min(3, this.game.moves.length);
-                    let moves = this.game.moves.length - animatedMoves;
-                    this.currentMoveNumber = this.makeNumberOfMoves(this.game, moves);
-                    setTimeout(() => {
-                        this.animateNextMove();
-                    }, 1000);
+                    // let animatedMoves = Math.min(3, this.game.moves.length);
+                    // let moves = this.game.moves.length - animatedMoves;
+                    this.currentMoveNumber = this.makeNumberOfMoves(this.game, this.game.moves.length);
+                    // setTimeout(() => {
+                    //     this.animateNextMove();
+                    // }, 1000);
                 } catch (error) {
                     console.log(error);
                     // $("#errorText").text(textStatus);
@@ -224,6 +223,7 @@ export class ChessBoardView {
             this.makeMove(move.move, promotion);
         }
         this.setBoardStatus(count, game.moves.length);
+
         let move = game.moves[count - 1];
 
         const start = Date.parse(move.start);
