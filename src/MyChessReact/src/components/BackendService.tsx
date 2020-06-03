@@ -116,7 +116,6 @@ export function BackendService(props: BackendServiceProps) {
                     if (ex.title !== undefined && ex.instance !== undefined) {
                         console.log(ex);
                         dispatch(friendUpsertEvent(ProcessState.Error, ex.title, ex.instance));
-                        //setFriendError({ title: ex.title, link: ex.instance });
                     }
                 }
             } catch (error) {
@@ -135,7 +134,7 @@ export function BackendService(props: BackendServiceProps) {
                 upsertFriend(props.upsertFriend);
             }
         }
-    }, [props.upsertFriend, ai, dispatch, endpoint, accessToken]);
+    }, [props.upsertFriend, ai, dispatch, history, endpoint, accessToken]);
 
     return (
         <>

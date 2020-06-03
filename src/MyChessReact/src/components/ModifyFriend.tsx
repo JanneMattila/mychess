@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useTypedSelector } from "../reducers";
-import { RootState, ProcessState } from "../actions";
+import { ProcessState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { useHistory } from "react-router-dom";
 import "./FriendList.css";
 import { Player } from "../models/Player";
-import { ProblemDetail } from "../models/ProblemDetail";
 import { Database, DatabaseFields } from "../data/Database";
+import { BackendService } from "./BackendService";
 
 type ModifyFriendProps = {
     id?: string;
@@ -17,15 +17,15 @@ type ModifyFriendProps = {
 export function ModifyFriend(props: ModifyFriendProps) {
     const history = useHistory();
 
-    const selectorLoginState = (state: RootState) => state.loginState;
-    const selectorAccessToken = (state: RootState) => state.accessToken;
-
-    const loginState = useTypedSelector(selectorLoginState);
-    const accessToken = useTypedSelector(selectorAccessToken);
+    const loginState = useTypedSelector(state => state.loginState);
+    const accessToken = useTypedSelector(state => state.accessToken);
+    const friendUpsertState = useTypedSelector(state => state.friendUpsertState);
+    const error = useTypedSelector(state => state.error);
+    const errorLink = useTypedSelector(state => state.errorLink);
 
     const [friendName, setFriendName] = useState("");
     const [friendID, setFriendID] = useState("");
-    const [friendError, setFriendError] = useState({ title: "", link: "" });
+    const [player, setPlayer] = useState<Player | undefined>(undefined);
 
     const ai = getAppInsights();
 
@@ -43,47 +43,22 @@ export function ModifyFriend(props: ModifyFriendProps) {
         }
     }, [props]);
 
-    const addFriend = async () => {
-        setFriendError({ title: "", link: "" });
-        const json: Player = {
-            "id": friendID,
-            "name": friendName,
-        };
-
-        const request: RequestInit = {
-            method: "POST",
-            body: JSON.stringify(json),
-            headers: {
-                "Accept": "application/json",
-                "Authorization": "Bearer " + accessToken
-            }
-        };
-
-        try {
-            const response = await fetch(props.endpoint + "/api/users/me/friends", request);
-            const data = await response.json();
-            console.log(data);
-
-            if (response.ok) {
-                history.push("/friends");
-            } else {
-                const ex = data as ProblemDetail;
-                if (ex.title !== undefined && ex.instance !== undefined) {
-                    console.log(ex);
-                    setFriendError({ title: ex.title, link: ex.instance });
-                }
-            }
-        } catch (error) {
-            ai.trackException(error);
-
-            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to modify friend.";
-            console.log(error);
-            console.log(errorMessage);
-        }
+    const addFriend = () => {
+        setPlayer({
+            id: friendID,
+            name: friendName
+        });
     }
 
     const cancel = () => {
         history.push("/friends");
+    }
+
+    const visible = {
+    }
+
+    const hidden = {
+        display: "none",
     }
 
     if (loginState === ProcessState.Success) {
@@ -111,9 +86,10 @@ export function ModifyFriend(props: ModifyFriendProps) {
                     <br />
                     <button onClick={addFriend}><span role="img" aria-label={props.title}>✅</span> {props.title}</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
-                    <div>
-                        <a className="FriendList-AddFriendError" href={friendError.link} target="_blank" rel="noopener noreferrer">{friendError.title}</a>
+                    <div style={friendUpsertState === ProcessState.Error ? visible : hidden}>
+                        <a className="FriendList-AddFriendError" href={errorLink} target="_blank" rel="noopener noreferrer">{error}</a>
                     </div>
+                    <BackendService endpoint={props.endpoint} accessToken={accessToken} upsertFriend={player} />
                 </div>
             </div>
         );
