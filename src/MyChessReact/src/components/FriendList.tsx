@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState } from "react";
 import { useTypedSelector } from "../reducers";
-import { RootState, ProcessState, friendsLoadingEvent } from "../actions";
+import { ProcessState, friendsLoadingEvent } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { Link, useHistory } from "react-router-dom";
 import "./FriendList.css";
 import { Player } from "../models/Player";
-import { Database, DatabaseFields } from "../data/Database";
 import { BackendService } from "./BackendService";
 
 type FriendListProps = {
