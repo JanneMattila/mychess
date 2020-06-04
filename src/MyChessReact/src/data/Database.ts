@@ -25,6 +25,10 @@ export class Database {
     }
 
     public static set(key: string, value: any): void {
+        if (value === undefined) {
+            throw new Error(`Cannot set key ${key} since it's value is undefined.`)
+        }
+
         const json = JSON.stringify(value);
         localStorage.setItem(`${this.prefix}-${key}`, json);
     }
