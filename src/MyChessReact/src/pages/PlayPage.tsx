@@ -2,7 +2,6 @@ import React, { useEffect, MouseEvent } from "react";
 import "./PlayPage.css";
 import { ChessBoardView } from "../game/ChessBoardView";
 import ReactModal from "react-modal";
-import { RootState } from "../actions";
 import { useTypedSelector } from "../reducers";
 
 type PlayProps = {
@@ -10,19 +9,15 @@ type PlayProps = {
 };
 
 export function PlayPage(props: PlayProps) {
-
-    const selectorLoginState = (state: RootState) => state.loginState;
-    const selectorAccessToken = (state: RootState) => state.accessToken;
-
-    const loginState = useTypedSelector(selectorLoginState);
-    const accessToken = useTypedSelector(selectorAccessToken);
+    const accessToken = useTypedSelector(state => state.accessToken);
+    const me = useTypedSelector(state => state.me);
 
     let board = new ChessBoardView();
     let isOpen = false;
     let isEllipse = false;
 
     useEffect(() => {
-        board.load(props.endpoint, accessToken);
+        board.load(props.endpoint, accessToken, me);
     });
 
     const closeModal = () => {

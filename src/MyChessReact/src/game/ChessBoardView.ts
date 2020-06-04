@@ -29,8 +29,9 @@ export class ChessBoardView {
     private start: string = "";
     private endpoint: string = "";
     private accessToken: string = "";
+    private me: string = "";
 
-    public initialize(currentPlayerTurn: boolean = false) {
+    public initialize() {
         // Start preparing the board
         this.board = new ChessBoard();
         this.board.initialize();
@@ -121,7 +122,7 @@ export class ChessBoardView {
         }
     }
 
-    public async load(endpoint: string, accessToken?: string) {
+    public async load(endpoint: string, accessToken?: string, me?: string) {
         // Determine if this game is:
         // - local game
         // - new game *WITH* friendID in url
@@ -129,7 +130,6 @@ export class ChessBoardView {
         const path = window.location.pathname;
         const query = window.location.search;
         const queryString = QueryStringParser.parse(query);
-        const url = query;
 
         this.endpoint = endpoint;
         if (accessToken) {
@@ -144,6 +144,13 @@ export class ChessBoardView {
         }
         else {
             this.isLocalGame = false;
+            if (me) {
+                this.me = me;
+            }
+            else {
+                throw new Error("Player identity information is missing!");
+            }
+
             this.start = new Date().toISOString();
 
             if (path.indexOf("/new") !== -1) {
@@ -212,7 +219,7 @@ export class ChessBoardView {
     }
 
     private makeNumberOfMoves(game: MyChessGame, movesCount: number): number {
-        this.initialize(true);
+        this.initialize();
         this.game = game;
 
         let count = Math.min(game.moves.length, movesCount);
@@ -346,6 +353,19 @@ export class ChessBoardView {
             this.game.moves.length !== this.currentMoveNumber) {
             console.log("Not in last move");
             return;
+        }
+
+        if (!this.isLocalGame) {
+            if (this.board.currentPlayer === ChessPlayer.White &&
+                this.game.players.white.id !== this.me) {
+                console.log("Not current players turn");
+                return;
+            }
+            else if (this.board.currentPlayer === ChessPlayer.Black &&
+                this.game.players.black.id !== this.me) {
+                console.log("Not current players turn");
+                return;
+            }
         }
 
         let rowIndex: number = parseInt(id[0]);
