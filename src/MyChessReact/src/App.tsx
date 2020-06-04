@@ -11,6 +11,7 @@ import TelemetryProvider from "./components/TelemetryProvider";
 import { GetConfiguration } from "./ConfigurationManager";
 import { ModifyFriendPage } from "./pages/ModifyFriendPage";
 import { PlayPage } from "./pages/PlayPage";
+import CookieConsent from "react-cookie-consent";
 
 let configuration = GetConfiguration();
 
@@ -49,9 +50,17 @@ function App() {
               <Route path="/friends" component={FriendsPage} />
             </Switch>
           </div>
+          <CookieConsent
+            location="bottom"
+            buttonText="Accept"
+            cookieName="mychess-cookie-consent"
+            style={{ background: "darkgrey", color: "black", display: "" }}
+            buttonStyle={{ color: "#4e503b" }}>
+            This website uses cookies to enhance the user experience.
+          </CookieConsent>
         </div>
       </TelemetryProvider>
-    </Router>
+    </Router >
   );
 }
 

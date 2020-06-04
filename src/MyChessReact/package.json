@@ -8,6 +8,7 @@
     "@types/react-modal": "^3.10.5",
     "msal": "^1.2.2",
     "react": "^16.13.1",
+    "react-cookie-consent": "^5.0.1",
     "react-dom": "^16.13.1",
     "react-modal": "^3.11.2",
     "react-redux": "^7.2.0",
