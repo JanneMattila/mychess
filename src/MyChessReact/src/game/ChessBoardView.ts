@@ -147,9 +147,6 @@ export class ChessBoardView {
             if (me) {
                 this.me = me;
             }
-            else {
-                throw new Error("Player identity information is missing!");
-            }
 
             this.start = new Date().toISOString();
 
@@ -336,7 +333,7 @@ export class ChessBoardView {
     public makeMove(move: string, promotion: string) {
         console.log("Making move " + move + " with promotion " + promotion);
         this.board.makeMoveFromString(move);
-        if (promotion.length > 0) {
+        if (promotion !== undefined && promotion.length > 0) {
             this.changePromotionFromString(promotion);
         }
     }
@@ -358,12 +355,12 @@ export class ChessBoardView {
         if (!this.isLocalGame) {
             if (this.board.currentPlayer === ChessPlayer.White &&
                 this.game.players.white.id !== this.me) {
-                console.log("Not current players turn");
+                console.log(`Not current players turn. Player is ${this.me} and turn is on player ${this.game.players.white.id}`);
                 return;
             }
             else if (this.board.currentPlayer === ChessPlayer.Black &&
                 this.game.players.black.id !== this.me) {
-                console.log("Not current players turn");
+                console.log(`Not current players turn. Player is ${this.me} and turn is on player ${this.game.players.black.id}`);
                 return;
             }
         }
