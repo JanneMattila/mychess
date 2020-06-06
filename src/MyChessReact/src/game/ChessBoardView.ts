@@ -173,9 +173,8 @@ export class ChessBoardView {
                         }
                     };
                     const response = await fetch(this.endpoint + "/api/games/" + gameID, request);
-                    const data = await response.json();
-                    console.log(data);
-                    this.game = data as MyChessGame;
+                    this.game = await response.json() as MyChessGame;
+                    console.log(this.game);
 
                     // let animatedMoves = Math.min(3, this.game.moves.length);
                     // let moves = this.game.moves.length - animatedMoves;
@@ -207,10 +206,34 @@ export class ChessBoardView {
 
         try {
             const response = await fetch(this.endpoint + "/api/games", request);
-            const data = await response.json() as MyChessGame;
+            this.game = await response.json() as MyChessGame;
+            console.log(this.game);
+
+            document.location.pathname = `/play/${this.game.id}`;
         } catch (error) {
             //ai.trackException(error);
 
+            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create new game.";
+        }
+    }
+
+    public async postMove(move: MyChessGameMove) {
+        const request: RequestInit = {
+            method: "POST",
+            body: JSON.stringify(move),
+            headers: {
+                "Accept": "application/json",
+                "Authorization": "Bearer " + this.accessToken
+            }
+        };
+
+        try {
+            const response = await fetch(this.endpoint + `/api/games/${this.game.id}/move`, request);
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+            //ai.trackException(error);
             const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create new game.";
         }
     }
@@ -442,6 +465,20 @@ export class ChessBoardView {
         const content = commentElement?.value;
         const comment = content ? content : "";
 
+        const lastMove = this.getLastMoveAsString();
+        const lastPromotion = this.getLastMovePromotionAsString();
+        if (!lastMove) {
+            console.log("no last move available");
+            return;
+        }
+
+        const move = new MyChessGameMove()
+        move.move = lastMove;
+        move.promotion = lastPromotion;
+        move.comment = comment;
+        move.start = this.start;
+        move.end = new Date().toISOString();
+
         if (this.isNewGame) {
             const gameNameElement = document.getElementById("gameName") as HTMLInputElement;
             const gameName = gameNameElement?.value;
@@ -450,27 +487,14 @@ export class ChessBoardView {
                 return;
             }
 
-            const lastMove = this.getLastMoveAsString();
-            const lastPromotion = this.getLastMovePromotionAsString();
-            if (!lastMove) {
-                console.log("no last move available");
-                return;
-            }
-
-
-            const move = new MyChessGameMove()
-            move.move = lastMove;
-            move.promotion = lastPromotion;
-            move.comment = comment;
-            move.start = this.start;
-            move.end = new Date().toISOString();
-
             const game = new MyChessGame()
             game.players.black.id = this.friendID;
             game.name = gameName;
             game.moves.push(move)
 
-            this.postNewGame(game);
+        }
+        else {
+            this.postMove(move);
         }
 
         this.showGameNameDialog(false);
