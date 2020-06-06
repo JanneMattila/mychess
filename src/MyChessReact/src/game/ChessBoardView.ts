@@ -228,7 +228,7 @@ export class ChessBoardView {
         };
 
         try {
-            const response = await fetch(this.endpoint + `/api/games/${this.game.id}/move`, request);
+            const response = await fetch(this.endpoint + `/api/games/${this.game.id}/moves`, request);
             const data = await response.json();
             console.log(data);
         } catch (error) {
