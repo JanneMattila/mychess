@@ -371,7 +371,7 @@ export class ChessBoardView {
 
         if (this.game !== null && this.game.moves !== null &&
             this.game.moves.length !== this.currentMoveNumber) {
-            console.log("Not in last move");
+            console.log(`Not in last move: ${this.game.moves.length} <> ${this.currentMoveNumber}`);
             return;
         }
 

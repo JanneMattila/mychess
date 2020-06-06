@@ -61,6 +61,7 @@ export function PlayPage(props: PlayProps) {
     return (
         <div>
             <header className="Play-header">
+                <div id="status"></div>
                 <table className="table" id="table-game"><tbody><tr><td>Loading...</td></tr></tbody></table>
                 <div id="confirmation" className="Play-Form">
                     <button onClick={confirmMove}><span role="img" aria-label="OK">✅</span> Confirm</button>
@@ -100,12 +101,13 @@ export function PlayPage(props: PlayProps) {
                     <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
                     <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                 </div>
-                <div id="status" style={hidden}></div>
+                <div id="LastComment"></div>
                 <div id="ellipse">
                     <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
                 </div>
                 <div id="ellipseContent" style={hidden}>
                     <button onClick={cancel}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
+                    <div id="ThinkTime"></div>
                 </div>
                 <ReactModal isOpen={isOpen} contentLabel="Promotion">
                     <button onClick={closeModal}>Undo</button>
