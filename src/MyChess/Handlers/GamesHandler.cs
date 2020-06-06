@@ -86,5 +86,11 @@ namespace MyChess.Handlers
             _log.GameHandlerGamesFound(games.Count);
             return games;
         }
+
+        public async Task<HandlerError?> AddMoveAsync(AuthenticatedUser authenticatedUser, string gameID, MyChessGameMove move)
+        {
+            var userID = await GetOrCreateUserAsync(authenticatedUser);
+            throw new NotImplementedException();
+        }
     }
 }

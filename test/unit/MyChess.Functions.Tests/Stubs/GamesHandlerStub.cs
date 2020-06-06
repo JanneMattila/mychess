@@ -29,5 +29,11 @@ namespace MyChess.Functions.Tests.Stubs
         {
             return await Task.FromResult(Games);
         }
+
+        public async Task<HandlerError?> AddMoveAsync(AuthenticatedUser authenticatedUser, string gameID, MyChessGameMove move)
+        {
+            return await Task.FromResult(Error);
+        }
+
     }
 }
