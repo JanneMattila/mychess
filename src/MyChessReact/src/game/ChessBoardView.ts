@@ -33,6 +33,7 @@ export class ChessBoardView {
 
     public initialize() {
         // Start preparing the board
+        this.game = new MyChessGame();
         this.board = new ChessBoard();
         this.board.initialize();
         this.previousAvailableMoves = [];
@@ -191,7 +192,6 @@ export class ChessBoardView {
         }
 
         this.loadImages();
-        this.game = new MyChessGame();
     }
 
     public async postNewGame(game: MyChessGame) {
@@ -660,6 +660,7 @@ export class ChessBoardView {
     private moveHistory(direction: number) {
         this.currentMoveNumber += direction;
         console.log("direction: " + direction);
+        console.log(this.game);
         console.log("currentMoveNumber: " + this.currentMoveNumber);
 
         if (this.currentMoveNumber < 1) {
