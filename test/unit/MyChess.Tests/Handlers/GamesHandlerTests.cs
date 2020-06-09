@@ -16,7 +16,8 @@ namespace MyChess.Tests.Handlers
         public GamesHandlerTests()
         {
             _context = new MyChessContextStub();
-            _gamesHandler = new GamesHandler(NullLogger<GamesHandler>.Instance, _context);
+            var chessBoard = new ChessBoard(NullLogger<ChessBoard>.Instance);
+            _gamesHandler = new GamesHandler(NullLogger<GamesHandler>.Instance, _context, chessBoard);
         }
 
         [Fact]

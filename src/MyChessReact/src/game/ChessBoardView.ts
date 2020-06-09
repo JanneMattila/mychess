@@ -229,8 +229,9 @@ export class ChessBoardView {
 
         try {
             const response = await fetch(this.endpoint + `/api/games/${this.game.id}/moves`, request);
-            const data = await response.json();
-            console.log(data);
+            if (response.ok) {
+                console.log("Move submitted successfully");
+            }
         } catch (error) {
             console.log(error);
             //ai.trackException(error);

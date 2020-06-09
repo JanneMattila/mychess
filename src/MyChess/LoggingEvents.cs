@@ -50,6 +50,9 @@
         public const int GameHandlerGameNotFound = 2101;
         public const int GameHandlerGamesFound = 2102;
         public const int GameHandlerOpponentNotFound = 2103;
+        public const int GameHandlerMoveGameNotFound = 2104;
+        public const int GameHandlerMoveInvalidPlayer = 2105;
+        public const int GameHandlerMoveNotPlayerTurn = 2106;
 
         public const int FriendHandlerFriendFound = 2200;
         public const int FriendHandlerFriendNotFound = 2201;

@@ -122,6 +122,7 @@ namespace MyChess.Data
         {
             Initialize();
             var table = GetTable(tableName);
+            entity.ETag = "*"; // Blindly delete this.
             var deleteOperation = TableOperation.Delete(entity);
             return await table.ExecuteAsync(deleteOperation);
         }

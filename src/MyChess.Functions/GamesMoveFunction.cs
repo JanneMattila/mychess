@@ -26,7 +26,7 @@ namespace MyChess.Functions
 
         [FunctionName("GamesMove")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{id?}/moves")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{id}/moves")] HttpRequest req,
             string id,
             ILogger log)
         {

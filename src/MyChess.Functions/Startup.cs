@@ -28,6 +28,7 @@ namespace MyChess.Functions
                     settings.StorageConnectionString = configuration["Storage"];
                 });
 
+            builder.Services.AddTransient<ChessBoard>();
             builder.Services.AddSingleton<ISecurityValidator, SecurityValidator>();
             builder.Services.AddSingleton<IMyChessDataContext, MyChessDataContext>();
             builder.Services.AddSingleton<IMeHandler, MeHandler>();
