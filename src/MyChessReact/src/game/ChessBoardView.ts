@@ -99,6 +99,23 @@ export class ChessBoardView {
                 }
             }
         });
+
+        window.addEventListener('resize', () => {
+            console.log("resize");
+            this.resize();
+        });
+        this.resize();
+    }
+
+    public resize() {
+        const table = document.getElementById("table-game") as HTMLTableElement;
+        table.innerHTML = "";
+        const width = Math.floor(window.innerWidth * 0.95);
+        const height = Math.floor(window.innerHeight * 0.85);
+        const size = Math.min(width, height);
+        table.style.width = size + "px";
+        table.style.height = size + "px";
+        this.drawBoard();
     }
 
     private loadImages() {
@@ -112,6 +129,7 @@ export class ChessBoardView {
         for (let i = 0; i < files.length; i++) {
             let file = files[i];
             let img = new Image();
+            img.className = "img";
             img.onload = (evt) => {
                 this.imagesLoaded++;
                 if (this.imagesLoaded === this.imagesToLoad) {

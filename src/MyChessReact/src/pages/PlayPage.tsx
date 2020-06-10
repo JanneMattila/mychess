@@ -60,60 +60,58 @@ export function PlayPage(props: PlayProps) {
     }
 
     return (
-        <div>
-            <header className="Play-header">
-                <div id="status"></div>
-                <table className="table" id="table-game"><tbody><tr><td>Loading...</td></tr></tbody></table>
-                <div id="confirmation" className="Play-Form">
-                    <button onClick={confirmMove}><span role="img" aria-label="OK">✅</span> Confirm</button>
-                    <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
-                </div>
-                <div id="promotionDialog" className="Play-Form">
-                    Promote pawn to:<br />
-                    <label>
-                        <input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} />
+        <div className="Play-container">
+            <div id="status"></div>
+            <table id="table-game"><tbody><tr><td>Loading...</td></tr></tbody></table>
+            <div id="confirmation" className="Play-Form">
+                <button onClick={confirmMove}><span role="img" aria-label="OK">✅</span> Confirm</button>
+                <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+            </div>
+            <div id="promotionDialog" className="Play-Form">
+                Promote pawn to:<br />
+                <label>
+                    <input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} />
                         Queen
                     </label><br />
-                    <label>
-                        <input id="promotionRadioKnight" type="radio" name="Promotion" value="Knight" title="Knight" />
+                <label>
+                    <input id="promotionRadioKnight" type="radio" name="Promotion" value="Knight" title="Knight" />
                         Knight
                     </label><br />
-                    <label>
-                        <input id="promotionRadioRook" type="radio" name="Promotion" value="Rook" title="Rook" />
+                <label>
+                    <input id="promotionRadioRook" type="radio" name="Promotion" value="Rook" title="Rook" />
                         Rook
                     </label><br />
-                    <label>
-                        <input id="promotionRadioBishop" type="radio" name="Promotion" value="Bishop" title="Bishop" />
+                <label>
+                    <input id="promotionRadioBishop" type="radio" name="Promotion" value="Bishop" title="Bishop" />
                         Bishop
                     </label><br />
-                    <button onClick={confirmPromotion}><span role="img" aria-label="OK">✅</span> Confirm</button>
-                    <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+                <button onClick={confirmPromotion}><span role="img" aria-label="OK">✅</span> Confirm</button>
+                <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+            </div>
+            <div id="commentDialog" className="Play-Form">
+                <div id="gameNameDialog">
+                    Game name:<br />
+                    <input id="gameName" type="text" name="gameName" title="Game name" placeholder="Name of the game" />
+                    <br />
                 </div>
-                <div id="commentDialog" className="Play-Form">
-                    <div id="gameNameDialog">
-                        Game name:<br />
-                        <input id="gameName" type="text" name="gameName" title="Game name" placeholder="Name of the game" />
-                        <br />
-                    </div>
                     Comment:<br />
-                    <label>
-                        <textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows={3} cols={40} />
-                    </label><br />
-                    <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
-                    <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
-                </div>
-                <div id="LastComment"></div>
-                <div id="ellipse">
-                    <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
-                </div>
-                <div id="ellipseContent" style={hidden}>
-                    <button onClick={cancel}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
-                    <div id="ThinkTime"></div>
-                </div>
-                <ReactModal isOpen={isOpen} contentLabel="Promotion">
-                    <button onClick={closeModal}>Undo</button>
-                </ReactModal>
-            </header>
+                <label>
+                    <textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows={3} cols={40} />
+                </label><br />
+                <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
+                <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+            </div>
+            <div id="LastComment"></div>
+            <div id="ellipse">
+                <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
+            </div>
+            <div id="ellipseContent" style={hidden}>
+                <button onClick={cancel}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
+                <div id="ThinkTime"></div>
+            </div>
+            <ReactModal isOpen={isOpen} contentLabel="Promotion">
+                <button onClick={closeModal}>Undo</button>
+            </ReactModal>
         </div >
     );
 }

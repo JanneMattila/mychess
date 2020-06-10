@@ -1,12 +1,8 @@
-.Play-header {
-  padding-top: 100px;
-  min-height: 10vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.Play-container {
+  padding: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: calc(12px + 2vmin);
 }
 
 .Play-Form {
@@ -18,46 +14,52 @@
 }
 
 #table-game {
-    margin: 0;
-    border-spacing: 0;
+  margin-left: auto;
+  margin-right: auto;
+  border-spacing: 0;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
 }
 
 #table-game .lightCell {
-    background-color: #FFFFFF;
-    padding: 0;
+  background-color: #FFFFFF;
+  padding: 0;
 }
 
 #table-game .darkCell {
-    background-color: #A9A9A9;
-    padding: 0;
+  background-color: #A9A9A9;
+  padding: 0;
 }
 
 #table-game .darkCell.highlightSelected {
-    background: #f00;
+  background: #f00;
 }
 
 #table-game .lightCell.highlightSelected {
-    background: #f00;
+  background: #f00;
 }
 
 #table-game .darkCell.highlightCapture {
-    background: #ffd800;
+  background: #ffd800;
 }
 
 #table-game .lightCell.highlightCapture {
-    background: #ffd800;
+  background: #ffd800;
 }
 
 #table-game .darkCell.highlightPreviousFrom {
-    background: rgb(195, 140, 140);
+  background: rgb(195, 140, 140);
 }
 
 #table-game .lightCell.highlightPreviousFrom {
-    background: rgb(195, 140, 140);
+  background: rgb(195, 140, 140);
 }
 
 #table-game .darkCell.highlightPreviousTo {
-    background: rgb(140, 195, 140);
+  background: rgb(140, 195, 140);
 }
 
 #table-game .lightCell.highlightPreviousTo {
