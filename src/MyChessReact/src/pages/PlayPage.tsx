@@ -3,6 +3,7 @@ import "./PlayPage.css";
 import { ChessBoardView } from "../game/ChessBoardView";
 import ReactModal from "react-modal";
 import { useTypedSelector } from "../reducers";
+import { Database, DatabaseFields } from "../data/Database";
 
 type PlayProps = {
     endpoint: string;
@@ -10,14 +11,14 @@ type PlayProps = {
 
 export function PlayPage(props: PlayProps) {
     const accessToken = useTypedSelector(state => state.accessToken);
-    const me = useTypedSelector(state => state.me);
+    const meID = Database.get<string>(DatabaseFields.ME_ID);
 
     let board = new ChessBoardView();
     let isOpen = false;
     let isEllipse = false;
 
     useEffect(() => {
-        board.load(props.endpoint, accessToken, me);
+        board.load(props.endpoint, accessToken, meID);
     });
 
     const closeModal = () => {

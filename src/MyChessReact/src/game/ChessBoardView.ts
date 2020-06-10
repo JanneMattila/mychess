@@ -232,6 +232,9 @@ export class ChessBoardView {
             if (response.ok) {
                 console.log("Move submitted successfully");
             }
+            else {
+                throw new Error("Could not make move submit!")
+            }
         } catch (error) {
             console.log(error);
             //ai.trackException(error);
