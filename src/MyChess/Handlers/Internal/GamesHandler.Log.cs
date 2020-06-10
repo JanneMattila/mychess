@@ -13,7 +13,7 @@ namespace MyChess.Handlers.Internal
 
         private static readonly Action<ILogger, string, Exception> _gameHandlerMoveGameNotFound;
         private static readonly Action<ILogger, string, string, string, string, Exception> _gameHandlerMoveInvalidPlayer;
-        private static readonly Action<ILogger, string, string, string, string, Exception> _gameHandlerMoveNotPlayerTurn;
+        private static readonly Action<ILogger, string, string, string, Exception> _gameHandlerMoveNotPlayerTurn;
 
         static GamesHandlerLoggerExtensions()
         {
@@ -38,10 +38,10 @@ namespace MyChess.Handlers.Internal
                 LogLevel.Error,
                 new EventId(LoggingEvents.GameHandlerMoveInvalidPlayer, nameof(GameHandlerMoveInvalidPlayer)),
                 "User {UserID} is not player of game {GameID}. Reference: White: {WhiteID} and Black: {BlackID}");
-            _gameHandlerMoveNotPlayerTurn = LoggerMessage.Define<string, string, string, string>(
+            _gameHandlerMoveNotPlayerTurn = LoggerMessage.Define<string, string, string>(
                 LogLevel.Error,
                 new EventId(LoggingEvents.GameHandlerMoveNotPlayerTurn, nameof(GameHandlerMoveNotPlayerTurn)),
-                "User {UserID} is not currently in turn to make move in game {GameID}. Reference: Current players side: {PlayersSide} and current side: {CurrentSide}");
+                "User {UserID} is not currently in turn to make move in game {GameID}. Current turn: {CurrentTurn}");
         }
 
         public static void GameHandlerGameFound(this ILogger logger, string gameID) => _gameHandlerGameFound(logger, gameID, null);
@@ -50,6 +50,6 @@ namespace MyChess.Handlers.Internal
 
         public static void GameHandlerMoveGameNotFound(this ILogger logger, string gameID) => _gameHandlerMoveGameNotFound(logger, gameID, null);
         public static void GameHandlerMoveInvalidPlayer(this ILogger logger, string gameID, string userID, string whiteID, string blackID) => _gameHandlerMoveInvalidPlayer(logger, gameID, userID, whiteID, blackID, null);
-        public static void GameHandlerMoveNotPlayerTurn(this ILogger logger, string gameID, string userID, string playersSide, string currentSide) => _gameHandlerMoveInvalidPlayer(logger, gameID, userID, playersSide, currentSide, null);
+        public static void GameHandlerMoveNotPlayerTurn(this ILogger logger, string gameID, string userID, string currentTurn) => _gameHandlerMoveNotPlayerTurn(logger, gameID, userID, currentTurn, null);
     }
 }

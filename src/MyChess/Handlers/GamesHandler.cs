@@ -109,19 +109,8 @@ namespace MyChess.Handlers
             _log.GameHandlerGameFound(gameID);
             var game = _compactor.Decompress(gameEntity.Data);
 
-            PiecePlayer player;
-            string opponentID;
-            if (game.Players.White.ID == userID)
-            {
-                player = PiecePlayer.White;
-                opponentID = game.Players.Black.ID;
-            }
-            else if (game.Players.Black.ID == userID)
-            {
-                player = PiecePlayer.Black;
-                opponentID = game.Players.White.ID;
-            }
-            else
+            if (game.Players.White.ID != userID &&
+                game.Players.Black.ID != userID)
             {
                 _log.GameHandlerMoveInvalidPlayer(gameID, userID, game.Players.White.ID, game.Players.Black.ID);
                 return new HandlerError()
@@ -134,6 +123,7 @@ namespace MyChess.Handlers
             }
 
             _chessBoard.Initialize();
+            game.Moves.Add(move); // Add new move and validate the entire move chain
             foreach (var gameMove in game.Moves)
             {
                 _chessBoard.MakeMove(gameMove.Move);
@@ -154,26 +144,35 @@ namespace MyChess.Handlers
                 }
             }
 
-            if (_chessBoard.CurrentPlayer != player)
+            string opponentID;
+            if (_chessBoard.CurrentPlayer == PiecePlayer.White &&
+                game.Players.Black.ID == userID)
             {
-                _log.GameHandlerMoveNotPlayerTurn(gameID, userID, player.ToString(), _chessBoard.CurrentPlayer.ToString());
+                opponentID = game.Players.White.ID;
+            }
+            else if (_chessBoard.CurrentPlayer == PiecePlayer.Black && 
+                     game.Players.White.ID == userID)
+            {
+                opponentID = game.Players.Black.ID;
+            }
+            else
+            {
+                _log.GameHandlerMoveNotPlayerTurn(gameID, userID, _chessBoard.CurrentPlayer.ToString());
                 return new HandlerError()
                 {
                     Instance = LoggingEvents.CreateLinkToProblemDescription(LoggingEvents.GameHandlerMoveNotPlayerTurn),
-                    Status = (int)HttpStatusCode.NotFound,
+                    Status = (int)HttpStatusCode.BadRequest,
                     Title = "Not your turn to make move",
                     Detail = "It does not seem to be your turn to make the move"
                 };
             }
 
-            // TODO: Validate move availability.
             // TODO: If game is over then move to archive.
             // TODO: Add notifications from move.
-            game.Moves.Add(move);
 
             var data = _compactor.Compact(game);
 
-            // Add new ones
+            // Add new games to storage
             await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity
             {
                 PartitionKey = opponentID,
@@ -187,7 +186,7 @@ namespace MyChess.Handlers
                 Data = data
             });
 
-            // Delete old ones
+            // Delete old ones from storage
             await _context.DeleteAsync(TableNames.GamesWaitingForOpponent, new GameEntity
             {
                 PartitionKey = opponentID,
