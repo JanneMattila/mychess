@@ -44,23 +44,25 @@ export function GameList(props: GameListProps) {
 
     const renderGames = (games?: MyChessGame[]) => {
         return (
-            <div className="row">
-                {games?.map(game =>
-                    <Link to={{ pathname: "/play/" + game?.id }} className="GameList-link" key={game?.id}>
-                        <div className="template-1">
-                            <div className="nameTemplate">
-                                {game?.name}
+            <div>
+                <div className="row">
+                    {games?.map(game =>
+                        <Link to={{ pathname: "/play/" + game?.id }} className="GameList-link" key={game?.id}>
+                            <div className="template-1">
+                                <div className="nameTemplate">
+                                    {game?.name}
+                                </div>
+                                <div className="commentTemplate">
+                                    {(game?.moves.length > 0 ? game?.moves[game?.moves.length - 1].comment : "")}
+                                </div>
+                                <div className="opponentTemplate">
+                                    {getOpponent(game)}
+                                </div>
                             </div>
-                            <div className="commentTemplate">
-                                {(game?.moves.length > 0 ? game?.moves[game?.moves.length - 1].comment : "")}
-                            </div>
-                            <div className="opponentTemplate">
-                                {getOpponent(game)}
-                            </div>
-                        </div>
-                    </Link>
-                )
-                }
+                        </Link>
+                    )
+                    }
+                </div>
                 <br />
                  or
                 <button onClick={addNewGame}>add new</button> game.
@@ -99,7 +101,7 @@ export function GameList(props: GameListProps) {
 
         return (
             <div>
-                <h4>{props.title}</h4>
+                <div className="title">{props.title}</div>
                 {contents}
                 <BackendService endpoint={props.endpoint} getGames={executeGetGames} />
             </div>

@@ -19,36 +19,36 @@ function App() {
   return (
     <Router>
       <TelemetryProvider>
-        <div>
-          <div className="App">
-            <div>
-              <Link to="/" className="App-link">
-                <img src={logo} alt="My Chess" className="App-link-image" />
-              </Link>
-              <div className="App-auth">
-                <Auth clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
-              </div>
-              <div className="App-footer-container">
-                <Link to="/privacy" className="App-footer-link">
-                  Privacy
-                </Link>
-                <span className="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-                <Link to="/play/local" className="App-footer-link">
-                  Play locally
-                </Link>
-              </div>
+        <div className="App">
+          <div className="App-header-container">
+            <Link to="/">
+              <img src={logo} alt="My Chess" className="App-logo" />
+            </Link>
+            <div className="App-auth">
+              <Auth clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
             </div>
-            <Switch>
-              <Route exact path="/" component={HomePage} />
-              <Route exact path="/privacy" component={PrivacyPage} />
-              <Route exact path="/play/local" component={() => <PlayPage endpoint={configuration.endpoint} />} />
-              <Route exact path="/play/:id" component={() => <PlayPage endpoint={configuration.endpoint} />} />
-              <Route path="/settings" component={() => <SettingsPage endpoint={configuration.endpoint} />} />
-              <Route exact path="/friends/add" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
-              <Route path="/friends/add/:id" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
-              <Route path="/friends/:id" component={() => <ModifyFriendPage title="Modify friend" endpoint={configuration.endpoint} />} />
-              <Route path="/friends" component={FriendsPage} />
-            </Switch>
+          </div>
+
+          <Switch>
+            <Route exact path="/" component={HomePage} />
+            <Route exact path="/privacy" component={PrivacyPage} />
+            <Route exact path="/play/local" component={() => <PlayPage endpoint={configuration.endpoint} />} />
+            <Route exact path="/play/:id" component={() => <PlayPage endpoint={configuration.endpoint} />} />
+            <Route path="/settings" component={() => <SettingsPage endpoint={configuration.endpoint} />} />
+            <Route exact path="/friends/add" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
+            <Route path="/friends/add/:id" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
+            <Route path="/friends/:id" component={() => <ModifyFriendPage title="Modify friend" endpoint={configuration.endpoint} />} />
+            <Route path="/friends" component={FriendsPage} />
+          </Switch>
+
+          <div className="App-footer-container">
+            <Link to="/privacy" className="App-footer-link">
+              Privacy
+                </Link>
+            <span className="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <Link to="/play/local" className="App-footer-link">
+              Play locally
+                </Link>
           </div>
           <CookieConsent
             location="bottom"

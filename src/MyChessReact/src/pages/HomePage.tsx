@@ -7,10 +7,6 @@ let configuration = GetConfiguration();
 
 export function HomePage() {
     return (
-        <div>
-            <header className="Home-header">
-                <GameList title="Games waiting for you" endpoint={configuration.endpoint} />
-            </header>
-        </div>
+        <GameList title="Games waiting for you" endpoint={configuration.endpoint} />
     );
 }
