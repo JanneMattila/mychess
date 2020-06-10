@@ -397,7 +397,7 @@ export class ChessBoardView {
             return;
         }
 
-        if (!this.isLocalGame) {
+        if (!this.isLocalGame && !this.isNewGame) {
             if (this.board.currentPlayer === ChessPlayer.White &&
                 this.game.players.white.id !== this.me) {
                 console.log(`Not current players turn. Player is ${this.me} and turn is on player ${this.game.players.white.id}`);
