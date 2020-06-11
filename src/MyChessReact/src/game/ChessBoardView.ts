@@ -264,7 +264,7 @@ export class ChessBoardView {
         this.initialize();
         this.game = game;
 
-        let count = Math.min(game.moves.length, movesCount);
+        let count = Math.max(Math.min(game.moves.length, movesCount), 1);
         console.log("going to make " + count + " moves");
         for (let i = 0; i < count; i++) {
             let move = game.moves[i];
@@ -501,6 +501,7 @@ export class ChessBoardView {
         move.start = this.start;
         move.end = new Date().toISOString();
 
+        console.log(this.isNewGame);
         if (this.isNewGame) {
             const gameNameElement = document.getElementById("gameName") as HTMLInputElement;
             const gameName = gameNameElement?.value;
@@ -514,6 +515,7 @@ export class ChessBoardView {
             game.name = gameName;
             game.moves.push(move)
 
+            this.postNewGame(game);
         }
         else {
             this.postMove(move);
@@ -665,7 +667,7 @@ export class ChessBoardView {
                 break;
 
             case ChessBoardState.Check:
-                gameStatusMessage = "Check => " + gameStatusMessage;
+                gameStatusMessage = "Check " + gameStatusMessage;
                 break;
 
             case ChessBoardState.CheckMate:
@@ -673,6 +675,7 @@ export class ChessBoardView {
                 break;
 
             default:
+                gameStatusMessage += " "
                 break;
         }
 
