@@ -197,6 +197,35 @@
                       }
                     }
                   ]
+                },
+                {
+                  "name": "SPARewrite",
+                  "order": 2,
+                  "conditions": [
+                    {
+                      "name": "UrlFileExtension",
+                      "parameters": {
+                        "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleUrlFileExtensionMatchConditionParameters",
+                        "operator": "GreaterThan",
+                        "negateCondition": true,
+                        "matchValues": [
+                          "0"
+                        ],
+                        "transforms": []
+                      }
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "name": "UrlRewrite",
+                      "parameters": {
+                        "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleUrlRewriteActionParameters",
+                        "sourcePattern": "/",
+                        "destination": "/index.html",
+                        "preserveUnmatchedPath": false
+                      }
+                    }
+                  ]
                 }
               ]
             }
