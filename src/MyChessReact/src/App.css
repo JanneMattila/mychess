@@ -60,9 +60,15 @@ button {
 }
 
 input,
-select,
-textarea {
+select {
   font-size: medium;
   padding: 5px;
   margin: 10px;
+}
+
+textarea {
+  font-size: calc(12px + 2vmin);
+  padding: 5px;
+  margin: 10px;
+  width: 80%;
 }

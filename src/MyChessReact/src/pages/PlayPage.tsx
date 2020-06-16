@@ -1,7 +1,6 @@
 import React, { useEffect, MouseEvent } from "react";
 import "./PlayPage.css";
 import { ChessBoardView } from "../game/ChessBoardView";
-import ReactModal from "react-modal";
 import { useTypedSelector } from "../reducers";
 import { Database, DatabaseFields } from "../data/Database";
 
@@ -96,7 +95,7 @@ export function PlayPage(props: PlayProps) {
                 </div>
                     Comment:<br />
                 <label>
-                    <textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows={3} cols={40} />
+                    <textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows={4} cols={50} />
                 </label><br />
                 <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
                 <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
@@ -109,9 +108,6 @@ export function PlayPage(props: PlayProps) {
                 <button onClick={cancel}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
                 <div id="ThinkTime"></div>
             </div>
-            <ReactModal isOpen={isOpen} contentLabel="Promotion">
-                <button onClick={closeModal}>Undo</button>
-            </ReactModal>
         </div >
     );
 }
