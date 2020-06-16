@@ -1,6 +1,5 @@
 .App {
-  /* text-align: center; */
-  color: #ffffff;
+  color: white;
 }
 
 .App-header-container {
@@ -21,10 +20,15 @@
 .title {
   height: 10vmin;
   font-size: calc(14px + 2vmin);
-  color: white;
   text-align: center;
   width: 100%;
-  margin: 20px;
+  margin: 10px;
+}
+
+.subtitle {
+  height: 8vmin;
+  font-size: calc(10px + 2vmin);
+  text-align: center;
 }
 
 .App-footer-container {

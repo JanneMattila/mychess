@@ -7,10 +7,6 @@ let configuration = GetConfiguration();
 
 export function FriendsPage() {
     return (
-        <div>
-            <header className="Friends-header">
-                <FriendList title="Friends" endpoint={configuration.endpoint} />
-            </header>
-        </div>
+        <FriendList title="Friends" endpoint={configuration.endpoint} />
     );
 }

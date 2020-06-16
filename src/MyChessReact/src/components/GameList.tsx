@@ -63,9 +63,10 @@ export function GameList(props: GameListProps) {
                     )
                     }
                 </div>
-                <br />
-                 or
-                <button onClick={addNewGame}>add new</button> game.
+                <div className="subtitle">
+                    Or <button onClick={addNewGame}>add new</button> game.
+                </div>
+
             </div >
         );
     }
@@ -84,18 +85,18 @@ export function GameList(props: GameListProps) {
         switch (gamesState) {
             case ProcessState.Success:
                 if (games && games?.length === 0) {
-                    contents = <h6>No games found. Click to <button onClick={refresh}>refresh</button> or
-                                <button onClick={addNewGame}>add new</button> game.</h6>;
+                    contents = <div className="subtitle">No games found. Click to <button onClick={refresh}>refresh</button> or
+                                <button onClick={addNewGame}>add new</button> game.</div>;
                 }
                 else {
                     contents = renderGames(games);
                 }
                 break;
             case ProcessState.Error:
-                contents = <h6>Oh no! Couldn't retrieve games. Click to <button onClick={refresh}>refresh</button></h6>;
+                contents = <div className="subtitle">Oh no! Couldn't retrieve games. Click to <button onClick={refresh}>refresh</button></div>;
                 break;
             default:
-                contents = <h6><em>Loading...</em></h6>;
+                contents = <div className="subtitle"><em>Loading...</em></div>;
                 break;
         }
 

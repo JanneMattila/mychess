@@ -26,7 +26,7 @@ export function FriendList(props: FriendListProps) {
     const renderFriends = (friends?: Player[]) => {
         return (
             <div>
-                <h6>Click to play with friend</h6>
+                <div className="title">Click to play with friend</div>
                 <div className="row">
                     {friends?.map(friend =>
                         <Link to={{ pathname: "/play/new?friendID=" + friend?.id }} className="FriendList-link" key={friend?.id}>
@@ -64,10 +64,10 @@ export function FriendList(props: FriendListProps) {
             case ProcessState.Success:
                 if (friends && friends?.length === 0) {
                     contents =
-                        <h6>
+                        <div className="subtitle">
                             No friends found. Click to <button onClick={refresh}>refresh</button> or
                             <button onClick={addNewFriend}>add new</button> friend.
-                        </h6>;
+                        </div>;
                 }
                 else {
                     contents = renderFriends(friends);
@@ -76,22 +76,22 @@ export function FriendList(props: FriendListProps) {
                 contents =
                     <div>
                         {contents}
-                        <h6>
+                        <div className="subtitle">
                             Or <button onClick={addNewFriend}>add new</button> friend
-                        </h6>
+                        </div>
                     </div>;
                 break;
             case ProcessState.Error:
-                contents = <h6>Oh no! Couldn't retrieve friends. Click to <button onClick={refresh}>refresh</button></h6>;
+                contents = <div className="subtitle">Oh no! Couldn't retrieve friends. Click to <button onClick={refresh}>refresh</button></div>;
                 break;
             default:
-                contents = <h6><em>Loading...</em></h6>;
+                contents = <div className="subtitle"><em>Loading...</em></div>;
                 break;
         }
 
         return (
             <div>
-                <h4>{props.title}</h4>
+                <div className="title">{props.title}</div>
                 {contents}
                 <BackendService endpoint={props.endpoint} getFriends={executeGetFriends} />
             </div>
