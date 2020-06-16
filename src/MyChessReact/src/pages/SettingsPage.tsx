@@ -89,34 +89,33 @@ export function SettingsPage(props: SettingsProps) {
     if (loginState === ProcessState.Success) {
         return (
             <div>
-                <header className="Settings-header">
-                    <h4>Profile</h4>
-
-                    <label className="Settings-Text">
+                <div className="title">Profile</div>
+                <div className="Settings-Container">
+                    <label className="subtitle">
                         Your player identifier<br />
                         <div className="Settings-SubText">
                             Share this to your friend so that they can connect to you
-                    </div>
+                        </div>
                         <input type="text" value={playerIdentifier} readOnly={true} className="Settings-Identifier" /><br />
                         <button onClick={copy}><span role="img" aria-label="Copy">&#128203;</span> Copy your identifier</button>
                         <button onClick={share}><span role="img" aria-label="Share">&#128203;</span> Copy "Add as friend" link</button>
                     </label>
 
-                    <h4>Settings</h4>
+                    <div className="subtitle">Settings</div>
                     <label>
                         Notifications<br />
                         <Switch onChange={handleNotificationChange} checked={isNotificationsEnabled} />
                     </label>
 
-                    <div>
+                    <div className="title">
                         <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Save</button>
                         <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                     </div>
 
                     <Link to="/friends" className="Settings-link">
                         <span role="img" aria-label="Manage your friends">👥</span> Manage your friends
-                </Link>
-                </header>
+                    </Link>
+                </div>
             </div>
         );
     }
