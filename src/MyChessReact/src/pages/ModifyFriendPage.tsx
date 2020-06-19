@@ -11,10 +11,6 @@ type ModifyFriendPageProps = {
 export function ModifyFriendPage(props: ModifyFriendPageProps) {
     const { id } = useParams();
     return (
-        <div>
-            <header className="Friends-header">
-                <ModifyFriend id={id} title={props.title} endpoint={props.endpoint} />
-            </header>
-        </div>
+        <ModifyFriend id={id} title={props.title} endpoint={props.endpoint} />
     );
 }

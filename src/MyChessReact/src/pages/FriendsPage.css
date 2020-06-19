@@ -7,3 +7,13 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
+.Friends-SubText { 
+  font-size: 12pt;
+}
+
+.Friends-Container {
+  padding: 10px;
+  width: 100%;
+  text-align: center;
+}

@@ -63,9 +63,9 @@ export function ModifyFriend(props: ModifyFriendProps) {
     if (loginState === ProcessState.Success) {
         return (
             <div>
-                <h4>{props.title}</h4>
-                <div id="addFriend">
-                    <label className="FriendList-AddFriend">
+                <div className="title">{props.title}</div>
+                <div id="addFriend" className="Friends-Container">
+                    <label className="subtitle">
                         Friend identifier<br />
                         <div className="FriendList-AddFriendSubText">
                             This is your friends identifier.<br />
@@ -74,7 +74,7 @@ export function ModifyFriend(props: ModifyFriendProps) {
                         <input type="text" value={friendID} className="FriendList-Identifier" onChange={e => setFriendID(e.target.value)} />
                     </label>
                     <br />
-                    <label className="FriendList-AddFriend">
+                    <label className="subtitle">
                         Friend name<br />
                         <div className="FriendList-AddFriendSubText">
                             This is your friends name.<br />
