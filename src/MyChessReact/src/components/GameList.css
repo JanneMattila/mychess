@@ -6,13 +6,18 @@
   color: #ffffff;
 }
 
-.template-1 { width: 40%; }
-
-[class*="template-"] {
+.gameTemplate { 
   float: left;
   padding: 10px 25px;
   margin: 10px;
   height: 190px;
+  background-color: #454545;
+  width: 30%; 
+}
+
+.gameTemplate:hover {
+  background-color: #656565;
+  cursor: pointer;
 }
 
 .nameTemplate { 
@@ -40,23 +45,19 @@
     height: 25px;
 }
 
+.row {
+    text-align: center;
+    justify-content: center;
+}
+
 .row::after {
   content: "";
   clear: both;
   display: table;
 }
 
-[class*="template-"] {
-  background-color: #454545;
-}
-
-[class*="template-"]:hover {
-  background-color: #656565;
-  cursor: pointer;
-}
-
 @media only screen and (max-width: 768px) {
-  [class*="template-"] {
+  .gameTemplate {
     width: 85%;
   }
 }

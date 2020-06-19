@@ -48,7 +48,7 @@ export function GameList(props: GameListProps) {
                 <div className="row">
                     {games?.map(game =>
                         <Link to={{ pathname: "/play/" + game?.id }} className="GameList-link" key={game?.id}>
-                            <div className="template-1">
+                            <div className="gameTemplate">
                                 <div className="nameTemplate">
                                     {game?.name}
                                 </div>

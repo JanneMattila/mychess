@@ -26,6 +26,7 @@ export class ChessBoardView {
     private isNewGame: boolean = false;
     private friendID: string = "";
 
+    private pieceSize: number = 45;
     private start: string = "";
     private endpoint: string = "";
     private accessToken: string = "";
@@ -109,13 +110,16 @@ export class ChessBoardView {
 
     public resize() {
         const table = document.getElementById("table-game") as HTMLTableElement;
-        table.innerHTML = "";
-        const width = Math.floor(window.innerWidth * 0.95);
-        const height = Math.floor(window.innerHeight * 0.85);
-        const size = Math.min(width, height);
-        table.style.width = size + "px";
-        table.style.height = size + "px";
-        this.drawBoard();
+        if (table) {
+            const width = Math.floor(window.innerWidth * 0.95);
+            const height = Math.floor(window.innerHeight * 0.85);
+            const size = Math.min(width, height);
+            console.log("" + width + "x" + height + " => " + size);
+            table.style.width = size + "px";
+            table.style.height = size + "px";
+            this.pieceSize = Math.floor(size / 8);
+            this.drawBoard();
+        }
     }
 
     private loadImages() {
@@ -312,6 +316,8 @@ export class ChessBoardView {
                 rowElement.appendChild(cell);
 
                 cell.id = "" + row + "-" + column;
+                cell.width = this.pieceSize + "px";
+                cell.height = this.pieceSize + "px";
                 cell.addEventListener('click', (evt) => {
                     console.log("onCellClick event");
                     let element = evt.currentTarget as HTMLElement;
