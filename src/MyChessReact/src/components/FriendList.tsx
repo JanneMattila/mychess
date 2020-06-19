@@ -26,11 +26,10 @@ export function FriendList(props: FriendListProps) {
     const renderFriends = (friends?: Player[]) => {
         return (
             <div>
-                <div className="title">Click to play with friend</div>
                 <div className="row">
                     {friends?.map(friend =>
                         <Link to={{ pathname: "/play/new?friendID=" + friend?.id }} className="FriendList-link" key={friend?.id}>
-                            <div className="template-1">
+                            <div className="friendTemplate">
                                 <div className="nameTemplate">
                                     {friend?.name}
                                 </div>

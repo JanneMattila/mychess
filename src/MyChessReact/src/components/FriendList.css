@@ -26,13 +26,18 @@
   background-color: lightgray;
 }
 
-.template-1 { width: 300px; }
-
-[class*="template-"] {
+.friendTemplate {
   float: left;
   padding: 10px 25px;
   margin: 10px;
   height: 160px;
+  background-color: #454545;
+  width: 30%;
+}
+
+.friendTemplate:hover {
+  background-color: #656565;
+  cursor: pointer;
 }
 
 .nameTemplate { 
@@ -59,13 +64,9 @@
   background-color: #454545;
 }
 
-[class*="template-"]:hover {
-  background-color: #656565;
-  cursor: pointer;
-}
 
 @media only screen and (max-width: 768px) {
-  [class*="template-"] {
-    width: 95%;
+  .friendTemplate {
+    width: 85%;
   }
 }

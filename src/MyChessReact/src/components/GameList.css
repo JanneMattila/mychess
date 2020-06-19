@@ -12,7 +12,7 @@
   margin: 10px;
   height: 190px;
   background-color: #454545;
-  width: 30%; 
+  width: 30%;
 }
 
 .gameTemplate:hover {
@@ -38,7 +38,6 @@
 }
 
 .opponentTemplate {
-    /* margin: 10px; */
     text-align: right;
     font-size: 12pt;
     color: #959595;
