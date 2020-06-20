@@ -40,16 +40,6 @@ function App() {
             <Route path="/friends/:id" component={() => <ModifyFriendPage title="Modify friend" endpoint={configuration.endpoint} />} />
             <Route path="/friends" component={FriendsPage} />
           </Switch>
-
-          <div className="App-footer-container">
-            <Link to="/privacy" className="App-footer-link">
-              Privacy
-                </Link>
-            <span className="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
-            <Link to="/play/local" className="App-footer-link">
-              Play locally
-                </Link>
-          </div>
           <CookieConsent
             location="bottom"
             buttonText="Accept"
