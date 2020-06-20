@@ -90,7 +90,7 @@ export function PlayPage(props: PlayProps) {
             <div id="commentDialog" className="Play-Form">
                 <div id="gameNameDialog">
                     Game name:<br />
-                    <input id="gameName" type="text" name="gameName" title="Game name" placeholder="Name of the game" />
+                    <input id="gameName" type="text" name="gameName" title="Game name" placeholder="Name your game here" className="Play-GameName" />
                     <br />
                 </div>
                     Comment:<br />

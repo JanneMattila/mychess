@@ -484,8 +484,8 @@ export class ChessBoardView {
         console.log("move confirmed");
         this.showConfirmationDialog(false);
         this.showPromotionDialog(false);
-        this.showGameNameDialog(!this.isLocalGame && this.isNewGame);
         this.showCommentDialog(!this.isLocalGame);
+        this.showGameNameDialog(!this.isLocalGame && this.isNewGame);
     }
 
     public confirmComment = (): void => {
@@ -561,6 +561,10 @@ export class ChessBoardView {
         let gameNameDialogElement = document.getElementById("gameNameDialog");
         if (gameNameDialogElement !== null) {
             gameNameDialogElement.style.display = show ? "inline" : "none";
+            if (show) {
+                gameNameDialogElement.scrollIntoView();
+                gameNameDialogElement.focus();
+            }
         }
     }
 
@@ -569,6 +573,10 @@ export class ChessBoardView {
         let commentDialogElement = document.getElementById("commentDialog");
         if (commentDialogElement !== null) {
             commentDialogElement.style.display = show ? "inline" : "none";
+            if (show) {
+                commentDialogElement.scrollIntoView();
+                commentDialogElement.focus();
+            }
         }
     }
 
