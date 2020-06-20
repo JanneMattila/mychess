@@ -253,6 +253,8 @@ export class ChessBoardView {
             const response = await fetch(this.endpoint + `/api/games/${this.game.id}/moves`, request);
             if (response.ok) {
                 console.log("Move submitted successfully");
+                this.game.moves.push(move);
+                this.makeNumberOfMoves(this.game, this.game.moves.length);
             }
             else {
                 throw new Error("Could not make move submit!")
