@@ -1,6 +1,5 @@
 import React from 'react';
 import { GameList } from "../components/GameList";
-import "./HomePage.css";
 import { GetConfiguration } from "../ConfigurationManager";
 
 let configuration = GetConfiguration();
