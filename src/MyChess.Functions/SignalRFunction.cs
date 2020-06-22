@@ -7,12 +7,12 @@ namespace MyChess.Functions
 {
     public class SignalRFunction
     {
-        [FunctionName("negotiate")]
-        public static SignalRConnectionInfo GetSignalRInfo(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
-            [SignalRConnectionInfo(HubName = "game")] SignalRConnectionInfo connectionInfo)
-        {
-            return connectionInfo;
-        }
+        //[FunctionName("negotiate")]
+        //public static SignalRConnectionInfo GetSignalRInfo(
+        //    [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+        //    [SignalRConnectionInfo(HubName = "game")] SignalRConnectionInfo connectionInfo)
+        //{
+        //    return connectionInfo;
+        //}
     }
 }
