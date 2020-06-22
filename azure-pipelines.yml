@@ -101,6 +101,7 @@ stages:
       resourceGroupName: "rg-mychess-dev"
       cdn: "$(CDN-Dev)"
       customDomain: "$(CustomDomain-Dev)"
+      alertEmailAddress: "$(AlertEmailAddress-Dev)"
 
   - template: azure-pipelines-deploy.yml
     parameters:
@@ -110,3 +111,4 @@ stages:
       resourceGroupName: "rg-mychess-prod"
       cdn: "$(CDN-Prod)"
       customDomain: "$(CustomDomain-Prod)"
+      alertEmailAddress: "$(AlertEmailAddress-Prod)"

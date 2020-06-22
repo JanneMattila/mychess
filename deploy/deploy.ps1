@@ -14,6 +14,9 @@ Param (
     [Parameter(Mandatory = $true, HelpMessage = "Custom domain name for the CDN")] 
     [string] $CustomDomain,
 
+    [Parameter(Mandatory = $true, HelpMessage = "Alert email address")]
+    [string] $AlertEmailAddress,
+
     [Parameter(HelpMessage = "App root folder path to publish e.g. ..\src\MyChessReact\build\")] 
     [string] $AppRootFolder,
 
@@ -51,6 +54,7 @@ $additionalParameters['cdn'] = $CDN
 $additionalParameters['customDomain'] = $CustomDomain
 $additionalParameters['clientId'] = $azureADdeployment.ApiApp
 $additionalParameters['applicationIdURI'] = $azureADdeployment.ApplicationIdURI
+$additionalParameters['alertEmailAddress'] = $AlertEmailAddress
 
 $result = New-AzResourceGroupDeployment `
     -DeploymentName $deploymentName `
