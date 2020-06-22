@@ -7,13 +7,18 @@ import { ProblemDetail } from "../models/ProblemDetail";
 import { Player } from "../models/Player";
 import { useHistory } from "react-router-dom";
 import { useTypedSelector } from "../reducers";
+import { PlayerSettings } from "../models/PlayerSettings";
 
 type BackendServiceProps = {
     endpoint: string;
 
     getFriends?: number;
-    getGames?: number;
     upsertFriend?: Player;
+
+    getGames?: number;
+
+    getSettings?: number;
+    upsertSettings?: PlayerSettings;
 };
 
 export function BackendService(props: BackendServiceProps) {
@@ -90,7 +95,6 @@ export function BackendService(props: BackendServiceProps) {
         }
     }, [props.getGames, ai, dispatch, endpoint, accessToken]);
 
-
     useEffect(() => {
         const upsertFriend = async (player: Player) => {
             dispatch(friendUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
@@ -135,6 +139,51 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
     }, [props.upsertFriend, ai, dispatch, history, endpoint, accessToken]);
+
+    useEffect(() => {
+        const upsertSettings = async (playerSettings: PlayerSettings) => {
+            dispatch(friendUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
+            const request: RequestInit = {
+                method: "POST",
+                body: JSON.stringify(playerSettings),
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
+
+            try {
+                const response = await fetch(endpoint + "/api/users/me/settings", request);
+                const data = await response.json();
+                console.log(data);
+
+                if (response.ok) {
+                    dispatch(friendUpsertEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
+                    history.push("/friends");
+                } else {
+                    const ex = data as ProblemDetail;
+                    if (ex.title !== undefined && ex.instance !== undefined) {
+                        console.log(ex);
+                        dispatch(friendUpsertEvent(ProcessState.Error, ex.title, ex.instance));
+                    }
+                }
+            } catch (error) {
+                ai.trackException(error);
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to modify friend.";
+                dispatch(friendUpsertEvent(ProcessState.Error, errorMessage, ""));
+
+                console.log(error);
+                console.log(errorMessage);
+            }
+        }
+
+        if (accessToken) {
+            if (props.upsertSettings) {
+                upsertSettings(props.upsertSettings);
+            }
+        }
+    }, [props.upsertSettings, ai, dispatch, history, endpoint, accessToken]);
 
     return (
         <>

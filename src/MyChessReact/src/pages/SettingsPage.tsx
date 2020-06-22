@@ -82,8 +82,16 @@ export function SettingsPage(props: SettingsProps) {
         navigator.clipboard.writeText(window.origin + "/friends/add/" + playerIdentifier);
     }
 
-    const handleNotificationChange = (checked: boolean): void => {
+    const handleNotificationChange = async (checked: boolean) => {
         setNotifications(!isNotificationsEnabled);
+
+        if (navigator.serviceWorker) {
+            console.log(navigator.serviceWorker);
+            const registration = await navigator.serviceWorker.getRegistration();
+            if (registration) {
+                console.log(registration.pushManager.permissionState);
+            }
+        }
     }
 
     if (loginState === ProcessState.Success) {
