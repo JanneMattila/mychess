@@ -273,6 +273,7 @@ export class ChessBoardView {
             if (response.ok) {
                 console.log("Move submitted successfully");
                 this.game.moves.push(move);
+                this.currentMoveNumber++;
                 this.makeNumberOfMoves(this.game, this.game.moves.length);
             }
             else {
