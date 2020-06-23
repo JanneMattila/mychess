@@ -32,6 +32,12 @@ export class ChessBoardView {
     private accessToken: string = "";
     private me: string = "";
 
+    private click = this.clickHandler.bind(this);
+    private keyup = this.keyupHandler.bind(this);
+    private touchstart = this.touchstartHandler.bind(this);
+    private touchend = this.touchendHandler.bind(this);
+    private resize = this.resizeHandler.bind(this);
+
     public initialize() {
         // Start preparing the board
         this.game = new MyChessGame();
@@ -42,73 +48,86 @@ export class ChessBoardView {
         // Update game board to the screen
         this.drawBoard();
 
-        // Add "de-selection" when clicking outside the board
-        document.addEventListener("click", (event: MouseEvent) => {
-            if (!event.defaultPrevented) {
-                this.pieceSelected("9-9");
-            }
-        });
-
-        document.addEventListener('keyup', (event) => {
-            switch (event.keyCode) {
-                case 36: // Home
-                    this.firstMove();
-                    break;
-                case 37: // LeftArrow
-                case 40: // DownArrow
-                    this.previousMove();
-                    break;
-                case 39: // RightArrow
-                case 38: // UpArrow
-                    this.nextMove();
-                    break;
-                case 35: // End
-                    this.lastMove();
-                    break;
-                default:
-                    break;
-            }
-        });
-
-        document.addEventListener('touchstart', (event) => {
-            this.touch = undefined;
-            if (event.changedTouches.length === 1) {
-                this.touch = event.changedTouches[0];
-            }
-        });
-
-        document.addEventListener('touchend', (event) => {
-            if (this.touch !== undefined &&
-                event.changedTouches.length === 1) {
-                const delta = 40;
-                let touchEnd = event.changedTouches[0];
-                if (Math.abs(touchEnd.clientY - this.touch.clientY) > delta) {
-                    if (touchEnd.clientY < this.touch.clientY - delta) {
-                        this.firstMove();
-                    }
-                    else {
-                        this.lastMove();
-                    }
-                }
-                else if (Math.abs(touchEnd.clientX - this.touch.clientX) > delta) {
-                    if (touchEnd.clientX < this.touch.clientX - delta) {
-                        this.previousMove();
-                    }
-                    else {
-                        this.nextMove();
-                    }
-                }
-            }
-        });
-
-        window.addEventListener('resize', () => {
-            console.log("resize");
-            this.resize();
-        });
-        this.resize();
+        this.resizeHandler();
     }
 
-    public resize() {
+    private clickHandler(event: MouseEvent) {
+        if (!event.defaultPrevented) {
+            // Add "de-selection" when clicking outside the board
+            this.pieceSelected("9-9");
+        }
+    }
+
+    private touchstartHandler(event: TouchEvent) {
+        this.touch = undefined;
+        if (event.changedTouches.length === 1) {
+            this.touch = event.changedTouches[0];
+        }
+    }
+
+    private touchendHandler(event: TouchEvent) {
+        if (this.touch !== undefined &&
+            event.changedTouches.length === 1) {
+            const delta = 40;
+            let touchEnd = event.changedTouches[0];
+            if (Math.abs(touchEnd.clientY - this.touch.clientY) > delta) {
+                if (touchEnd.clientY < this.touch.clientY - delta) {
+                    this.firstMove();
+                }
+                else {
+                    this.lastMove();
+                }
+            }
+            else if (Math.abs(touchEnd.clientX - this.touch.clientX) > delta) {
+                if (touchEnd.clientX < this.touch.clientX - delta) {
+                    this.previousMove();
+                }
+                else {
+                    this.nextMove();
+                }
+            }
+        }
+    }
+
+    private keyupHandler(event: KeyboardEvent) {
+        switch (event.keyCode) {
+            case 36: // Home
+                this.firstMove();
+                break;
+            case 37: // LeftArrow
+            case 40: // DownArrow
+                this.previousMove();
+                break;
+            case 39: // RightArrow
+            case 38: // UpArrow
+                this.nextMove();
+                break;
+            case 35: // End
+                this.lastMove();
+                break;
+            default:
+                break;
+        }
+        event.preventDefault();
+    }
+
+    public addEventHandlers() {
+        document.addEventListener("click", this.click);
+        document.addEventListener('keyup', this.keyup);
+        document.addEventListener('touchstart', this.touchstart);
+        document.addEventListener('touchend', this.touchend);
+        window.addEventListener('resize', this.resize);
+    }
+
+    public removeEventHandlers() {
+        document.removeEventListener("click", this.click);
+        document.removeEventListener('keyup', this.keyup);
+        document.removeEventListener('touchstart', this.touchstart);
+        document.removeEventListener('touchend', this.touchend);
+        window.removeEventListener('resize', this.resize);;
+    }
+
+    public resizeHandler() {
         const table = document.getElementById("table-game") as HTMLTableElement;
         if (table) {
             const width = Math.floor(window.innerWidth * 0.95);

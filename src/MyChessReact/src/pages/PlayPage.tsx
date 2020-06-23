@@ -12,13 +12,17 @@ export function PlayPage(props: PlayProps) {
     const accessToken = useTypedSelector(state => state.accessToken);
     const meID = Database.get<string>(DatabaseFields.ME_ID);
 
-    let board = new ChessBoardView();
+    const board = new ChessBoardView();
     let isOpen = false;
     let isEllipse = false;
 
     useEffect(() => {
+        board.addEventHandlers();
         board.load(props.endpoint, accessToken, meID);
-    });
+        return () => {
+            board.removeEventHandlers();
+        }
+    }, [props.endpoint, accessToken, meID, window.location.href]);
 
     const closeModal = () => {
         isOpen = false;
