@@ -26,7 +26,7 @@ namespace MyChess.Handlers
 
             var uri = $"/play/{gameID}";
             var subscription = new PushSubscription(endpoint, p256dh, auth);
-            var vapidDetails = new VapidDetails($"{_options.PublicServerUri}{uri}", _options.VapIdPublicKey, _options.VapIdPrivateKey);
+            var vapidDetails = new VapidDetails($"{_options.PublicServerUri}{uri}", _options.PublicKey, _options.PrivateKey);
             var webPushClient = new WebPushClient();
             var json = JsonSerializer.Serialize(new NotificationMessage()
             {
