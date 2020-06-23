@@ -16,6 +16,9 @@ Param (
         
     [Parameter(HelpMessage = "App Insights Instrumentation Key")] 
     [string] $IntrumentationKey,
+        
+    [Parameter(HelpMessage = "WebPush Public Key")] 
+    [string] $WebPushPublicKey,
 
     [Parameter(HelpMessage = "Deployment target storage account name")] 
     [string] $WebStorageName,
@@ -57,7 +60,8 @@ Write-Host "Static website endpoint: $webStorageUri"
 { `"endpoint`": `"$FunctionsUri`", `
    `"clientId`": `"$SPAAppAppID`", `
    `"applicationIdURI`": `"$ApiApplicationIdURI`", `
-   `"instrumentationKey`": `"$IntrumentationKey`"`
+   `"instrumentationKey`": `"$IntrumentationKey`" `
+   `"webPushPublicKey`": `"$WebPushPublicKey`" `
 }" | Set-Content (Join-Path -Path $AppRootFolder -ChildPath configuration.js)
 
 Get-ChildItem -File -Recurse $AppRootFolder `

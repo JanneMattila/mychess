@@ -17,6 +17,12 @@ Param (
     [Parameter(Mandatory = $true, HelpMessage = "Alert email address")]
     [string] $AlertEmailAddress,
 
+    [Parameter(Mandatory = $true, HelpMessage = "WebPush Public Key")]
+    [string] $WebPushPublicKey,
+    
+    [Parameter(Mandatory = $true, HelpMessage = "WebPush Private Key")]
+    [string] $WebPushPrivateKey,
+
     [Parameter(HelpMessage = "App root folder path to publish e.g. ..\src\MyChessReact\build\")] 
     [string] $AppRootFolder,
 
@@ -55,6 +61,8 @@ $additionalParameters['customDomain'] = $CustomDomain
 $additionalParameters['clientId'] = $azureADdeployment.ApiApp
 $additionalParameters['applicationIdURI'] = $azureADdeployment.ApplicationIdURI
 $additionalParameters['alertEmailAddress'] = $AlertEmailAddress
+$additionalParameters['webPushPublicKey'] = $WebPushPublicKey
+$additionalParameters['webPushPrivateKey'] = $WebPushPrivateKey
 
 $result = New-AzResourceGroupDeployment `
     -DeploymentName $deploymentName `
@@ -126,6 +134,7 @@ if (![string]::IsNullOrEmpty($AppRootFolder)) {
         -ApiAppAppID $azureADdeployment.ApiApp `
         -ApiApplicationIdURI $azureADdeployment.ApplicationIdURI `
         -IntrumentationKey $instrumentationKey `
+        -WebPushPublicKey $WebPushPublicKey `
         -WebStorageName $webStorageAccount.StorageAccountName `
         -AppRootFolder $AppRootFolder
 

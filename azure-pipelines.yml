@@ -102,6 +102,8 @@ stages:
       cdn: "$(CDN-Dev)"
       customDomain: "$(CustomDomain-Dev)"
       alertEmailAddress: "$(AlertEmailAddress-Dev)"
+      webPushPublicKey: "$(WebPushPublicKey-Dev)"
+      webPushPrivateKey: "$(WebPushPrivateKey-Dev)"
 
   - template: azure-pipelines-deploy.yml
     parameters:
@@ -112,3 +114,5 @@ stages:
       cdn: "$(CDN-Prod)"
       customDomain: "$(CustomDomain-Prod)"
       alertEmailAddress: "$(AlertEmailAddress-Prod)"
+      webPushPublicKey: "$(WebPushPublicKey-Prod)"
+      webPushPrivateKey: "$(WebPushPrivateKey-Prod)"

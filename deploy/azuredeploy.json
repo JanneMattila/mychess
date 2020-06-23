@@ -43,6 +43,18 @@
         "description": "Alert email address."
       }
     },
+    "webPushPublicKey": {
+      "type": "string",
+      "metadata": {
+        "description": "WebPush Public Key. Used in sending web notifications."
+      }
+    },
+    "webPushPrivateKey": {
+      "type": "string",
+      "metadata": {
+        "description": "WebPush Private Key. Used in sending web notifications."
+      }
+    },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -353,6 +365,9 @@
         "FUNCTIONS_EXTENSION_VERSION": "~3",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+
+        "WebPush:PublicKey": "[parameters('webPushPublicKey')]",
+        "WebPush:PrivateKey": "[parameters('webPushPrivateKey')]",
 
         "AzureAD:ClientId": "[parameters('clientId')]",
         "AzureAD:Audience": "[parameters('applicationIdURI')]"
