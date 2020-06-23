@@ -205,29 +205,35 @@ export class ChessBoardView {
             }
             else {
                 console.log("existing game");
-                const gameID = path.substring(path.lastIndexOf("/") + 1);
-                try {
-                    const request: RequestInit = {
-                        method: "GET",
-                        headers: {
-                            "Accept": "application/json",
-                            "Authorization": "Bearer " + this.accessToken
-                        }
-                    };
-                    const response = await fetch(this.endpoint + "/api/games/" + gameID, request);
-                    this.game = await response.json() as MyChessGame;
-                    console.log(this.game);
+                if (!accessToken) {
+                    console.log("skip fetching game before accessToken is available")
+                }
+                else {
+                    const gameID = path.substring(path.lastIndexOf("/") + 1);
+                    try {
+                        const request: RequestInit = {
+                            method: "GET",
+                            headers: {
+                                "Accept": "application/json",
+                                "Authorization": "Bearer " + this.accessToken
+                            }
+                        };
+                        const response = await fetch(this.endpoint + "/api/games/" + gameID, request);
+                        this.game = await response.json() as MyChessGame;
+                        console.log(this.game);
 
-                    // let animatedMoves = Math.min(3, this.game.moves.length);
-                    // let moves = this.game.moves.length - animatedMoves;
-                    this.currentMoveNumber = this.makeNumberOfMoves(this.game, this.game.moves.length);
-                    // setTimeout(() => {
-                    //     this.animateNextMove();
-                    // }, 1000);
-                } catch (error) {
-                    console.log(error);
-                    // $("#errorText").text(textStatus);
-                    // $("#errorDialog").dialog();
+                        // let animatedMoves = Math.min(3, this.game.moves.length);
+                        // let moves = this.game.moves.length - animatedMoves;
+                        this.currentMoveNumber = this.makeNumberOfMoves(this.game, this.game.moves.length);
+                        // setTimeout(() => {
+                        //     this.animateNextMove();
+                        // }, 1000);
+                    }
+                    catch (error) {
+                        console.log(error);
+                        // $("#errorText").text(textStatus);
+                        // $("#errorDialog").dialog();
+                    }
                 }
             }
         }
