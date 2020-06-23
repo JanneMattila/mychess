@@ -668,10 +668,10 @@ export class ChessBoardView {
     }
 
     public setComment(commentText: string) {
-        commentText = commentText !== null ? commentText : "";
+        commentText = commentText !== null ? commentText : "&nbsp;";
 
         let commentElement = document.getElementById("LastComment") as HTMLDivElement;
-        commentElement.innerText = commentText;
+        commentElement.innerHTML = commentText;
     }
 
     public setThinkTime(moveIndex: number, thinkTime: number) {
@@ -720,11 +720,11 @@ export class ChessBoardView {
                 break;
 
             default:
-                gameStatusMessage += " "
+                gameStatusMessage += "&nbsp;"
                 break;
         }
 
-        statusElement.innerText = gameStatusMessage;
+        statusElement.innerHTML = gameStatusMessage;
     }
 
     private moveHistory(direction: number) {
