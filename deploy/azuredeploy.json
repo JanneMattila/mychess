@@ -366,6 +366,7 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
 
+        "WebPush:PublicServerUri": "[variables('customDomainUri')]",
         "WebPush:PublicKey": "[parameters('webPushPublicKey')]",
         "WebPush:PrivateKey": "[parameters('webPushPrivateKey')]",
 

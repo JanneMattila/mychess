@@ -22,6 +22,12 @@ namespace MyChess.Functions
                     configuration.GetSection("AzureAD").Bind(settings);
                 });
 
+            builder.Services.AddOptions<NotificationOptions>()
+                .Configure<IConfiguration>((settings, configuration) =>
+                {
+                    configuration.GetSection("WebPush").Bind(settings);
+                });
+
             builder.Services.AddOptions<MyChessDataContextOptions>()
                 .Configure<IConfiguration>((settings, configuration) =>
                 {
