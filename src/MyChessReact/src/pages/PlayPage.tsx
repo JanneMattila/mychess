@@ -99,7 +99,7 @@ export function PlayPage(props: PlayProps) {
                 </div>
                     Comment:<br />
                 <label>
-                    <textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows={4} cols={50} />
+                    <textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows={3} cols={50} />
                 </label><br />
                 <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
                 <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
