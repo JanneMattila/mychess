@@ -672,10 +672,13 @@ export class ChessBoardView {
         let thinkTimeElement = document.getElementById("ThinkTime") as HTMLDivElement;
 
         let minutes = 0;
-        let seconds = thinkTime;
+        let seconds = thinkTime / 1000;
         if (seconds > 60) {
             minutes = Math.floor(seconds / 60);
-            seconds %= 60;
+            seconds = Math.floor(seconds % 60);
+        }
+        else {
+            seconds = Math.floor(seconds);
         }
 
         if (minutes > 0) {
