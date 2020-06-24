@@ -12,12 +12,14 @@ namespace MyChess.Tests.Handlers
     {
         private readonly GamesHandler _gamesHandler;
         private readonly MyChessContextStub _context;
+        private readonly NotificationHandlerStub _notificationHandler;
 
         public GamesHandlerTests()
         {
             _context = new MyChessContextStub();
+            _notificationHandler = new NotificationHandlerStub();
             var chessBoard = new ChessBoard(NullLogger<ChessBoard>.Instance);
-            _gamesHandler = new GamesHandler(NullLogger<GamesHandler>.Instance, _context, chessBoard);
+            _gamesHandler = new GamesHandler(NullLogger<GamesHandler>.Instance, _context, _notificationHandler, chessBoard);
         }
 
         [Fact]

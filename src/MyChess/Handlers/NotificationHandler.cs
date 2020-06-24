@@ -7,12 +7,11 @@ using WebPush;
 
 namespace MyChess.Handlers
 {
-    public class NotificationHandler : BaseHandler
+    public class NotificationHandler : INotificationHandler
     {
         private readonly NotificationOptions _options;
 
-        public NotificationHandler(ILogger<NotificationHandler> log, IMyChessDataContext context, NotificationOptions options)
-            : base(log, context)
+        public NotificationHandler(ILogger<NotificationHandler> log, NotificationOptions options)
         {
             _options = options;
         }

@@ -35,6 +35,7 @@ namespace MyChess.Functions
                 });
 
             builder.Services.AddTransient<ChessBoard>();
+            builder.Services.AddSingleton<INotificationHandler, NotificationHandler>();
             builder.Services.AddSingleton<ISecurityValidator, SecurityValidator>();
             builder.Services.AddSingleton<IMyChessDataContext, MyChessDataContext>();
             builder.Services.AddSingleton<IMeHandler, MeHandler>();

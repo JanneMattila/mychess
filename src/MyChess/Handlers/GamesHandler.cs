@@ -13,11 +13,13 @@ namespace MyChess.Handlers
     public class GamesHandler : BaseHandler, IGamesHandler
     {
         private readonly Compactor _compactor = new Compactor();
+        private readonly INotificationHandler _notificationHandler;
         private readonly ChessBoard _chessBoard;
 
-        public GamesHandler(ILogger<GamesHandler> log, IMyChessDataContext context, ChessBoard chessBoard)
+        public GamesHandler(ILogger<GamesHandler> log, IMyChessDataContext context, INotificationHandler notificationHandler, ChessBoard chessBoard)
             : base(log, context)
         {
+            _notificationHandler = notificationHandler;
             _chessBoard = chessBoard;
             _chessBoard.Initialize();
         }
