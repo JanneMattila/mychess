@@ -60,7 +60,7 @@ Write-Host "Static website endpoint: $webStorageUri"
 { `"endpoint`": `"$FunctionsUri`", `
    `"clientId`": `"$SPAAppAppID`", `
    `"applicationIdURI`": `"$ApiApplicationIdURI`", `
-   `"instrumentationKey`": `"$IntrumentationKey`" `
+   `"instrumentationKey`": `"$IntrumentationKey`", `
    `"webPushPublicKey`": `"$WebPushPublicKey`" `
 }" | Set-Content (Join-Path -Path $AppRootFolder -ChildPath configuration.js)
 
