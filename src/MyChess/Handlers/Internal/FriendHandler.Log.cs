@@ -27,8 +27,8 @@ namespace MyChess.Handlers.Internal
                 "Found {Count} friends");
         }
 
-        public static void FriendHandlerFriendFound(this ILogger logger, string FriendID) => _friendHandlerFriendFound(logger, FriendID, null);
-        public static void FriendHandlerFriendNotFound(this ILogger logger, string FriendID) => _friendHandlerFriendNotFound(logger, FriendID, null);
+        public static void FriendHandlerFriendFound(this ILogger logger, string friendID) => _friendHandlerFriendFound(logger, friendID, null);
+        public static void FriendHandlerFriendNotFound(this ILogger logger, string friendID) => _friendHandlerFriendNotFound(logger, friendID, null);
         public static void FriendHandlerFriendsFound(this ILogger logger, int count) => _friendHandlerFriendsFound(logger, count, null);
     }
 }

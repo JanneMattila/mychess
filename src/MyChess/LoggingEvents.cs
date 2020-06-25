@@ -59,6 +59,10 @@
         public const int FriendHandlerFriendsFound = 2202;
         public const int FriendHandlerPlayerNotFound = 2203;
 
+        public const int SettingsHandlerSettingsFound = 2300;
+        public const int SettingsHandlerSettingsNotFound = 2301;
+        public const int SettingsHandlerNotificationsFound = 2302;
+
         public static string CreateLinkToProblemDescription(int eventID)
         {
             return $"https://bit.ly/MyChessProblems#{eventID}";
