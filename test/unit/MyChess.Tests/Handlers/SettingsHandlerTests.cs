@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
 using MyChess.Data;
 using MyChess.Handlers;
@@ -85,6 +86,8 @@ namespace MyChess.Tests.Handlers
         public async Task Update_Settings_Test()
         {
             // Arrange
+            var expectedRows = 1;
+            var expectedPlayAlwaysUp = true;
             var user = new AuthenticatedUser()
             {
                 Name = "abc",
@@ -94,12 +97,17 @@ namespace MyChess.Tests.Handlers
             };
 
             var playerSettings = new UserSettings();
+            playerSettings.PlayAlwaysUp = true;
 
             // Act
             var actual = await _settingsHandler.UpdateSettingsAsync(user, playerSettings);
 
             // Assert
             Assert.Null(actual);
+            var table = _context.Tables[TableNames.UserSettings];
+            Assert.Equal(expectedRows, table.Count);
+            var row = table.First() as UserSettingEntity;
+            Assert.Equal(expectedPlayAlwaysUp, row.PlayAlwaysUp);
         }
     }
 }

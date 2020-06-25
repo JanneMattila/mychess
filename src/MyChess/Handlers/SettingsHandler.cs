@@ -17,13 +17,13 @@ namespace MyChess.Handlers
 
         public async Task<UserSettings> GetSettingsAsync(AuthenticatedUser authenticatedUser)
         {
-            var playerSettings = new UserSettings();
+            var userSettings = new UserSettings();
             var userID = await GetOrCreateUserAsync(authenticatedUser);
             var userSettingsEntity = await _context.GetAsync<UserSettingEntity>(TableNames.UserSettings, userID, userID);
             if (userSettingsEntity != null)
             {
                 _log.SettingsHandlerSettingsFound(userID);
-                playerSettings.PlayAlwaysUp = userSettingsEntity.PlayAlwaysUp;
+                userSettings.PlayAlwaysUp = userSettingsEntity.PlayAlwaysUp;
             }
             else
             {
@@ -32,7 +32,7 @@ namespace MyChess.Handlers
 
             await foreach (var userNotificationEntity in _context.GetAllAsync<UserNotificationEntity>(TableNames.UserNotifications, userID))
             {
-                playerSettings.Notifications.Add(new UserNotifications()
+                userSettings.Notifications.Add(new UserNotifications()
                 {
                     Name = userNotificationEntity.Name,
                     Enabled = userNotificationEntity.Enabled,
@@ -40,12 +40,12 @@ namespace MyChess.Handlers
                 });
             }
 
-            _log.SettingsHandlerNotificationsFound(playerSettings.Notifications.Count);
+            _log.SettingsHandlerNotificationsFound(userSettings.Notifications.Count);
 
-            return playerSettings;
+            return userSettings;
         }
 
-        public async Task<HandlerError?> UpdateSettingsAsync(AuthenticatedUser authenticatedUser, UserSettings playerSettings)
+        public async Task<HandlerError?> UpdateSettingsAsync(AuthenticatedUser authenticatedUser, UserSettings userSettings)
         {
             var userID = await GetOrCreateUserAsync(authenticatedUser);
 
@@ -54,10 +54,11 @@ namespace MyChess.Handlers
             await _context.UpsertAsync(TableNames.UserSettings, new UserSettingEntity
             {
                 PartitionKey = userID,
-                RowKey = userID
+                RowKey = userID,
+                PlayAlwaysUp = userSettings.PlayAlwaysUp
             });
 
-            foreach (var userNotifications in playerSettings.Notifications)
+            foreach (var userNotifications in userSettings.Notifications)
             {
                 await _context.UpsertAsync(TableNames.UserNotifications, new UserNotificationEntity
                 {
