@@ -5,7 +5,8 @@ export const getInitialState = () => {
     return {
         loginState: ProcessState.NotStarted,
         gamesState: ProcessState.NotStarted,
-        friendsState: ProcessState.NotStarted
+        friendsState: ProcessState.NotStarted,
+        settingsState: ProcessState.NotStarted
     }
 }
 
@@ -62,6 +63,23 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 errorLink: action.errorLink
             })
         }
+
+        case EventTypes.SETTINGS_LOADING: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                settingsState: action.settingsState,
+                error: action.error,
+                userSettings: action.userSettings
+            })
+        }
+
+        case EventTypes.SETTINGS_UPSERT: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                settingsUpsertState: action.settingsUpsertState,
+                error: action.error,
+                errorLink: action.errorLink
+            })
+        }
+
         case EventTypes.PLAY_SHOW_DIALOG: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 activeDialog: action.show ? action.dialog : DialogType.None,

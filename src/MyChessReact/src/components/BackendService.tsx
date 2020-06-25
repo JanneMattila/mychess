@@ -187,12 +187,12 @@ export function BackendService(props: BackendServiceProps) {
 
             try {
                 const response = await fetch(endpoint + "/api/users/me/settings", request);
-                const data = await response.json();
-                console.log(data);
-
                 if (response.ok) {
                     dispatch(settingsUpsertEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
                 } else {
+                    const data = await response.json();
+                    console.log(data);
+
                     const ex = data as ProblemDetail;
                     if (ex.title !== undefined && ex.instance !== undefined) {
                         console.log(ex);

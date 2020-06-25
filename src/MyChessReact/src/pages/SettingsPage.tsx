@@ -17,7 +17,7 @@ export function SettingsPage(props: SettingsProps) {
     const loginState = useTypedSelector(state => state.loginState);
     const me = useTypedSelector(state => state.me);
     const meID = Database.get<string>(DatabaseFields.ME_ID);
-    const settings = useTypedSelector(state => state.settings);
+    const userSettings = useTypedSelector(state => state.userSettings);
 
     const [executeGetMe, setExecuteGetMe] = useState(0);
     const [executeGetSettings, setExecuteGetSettings] = useState(0);
@@ -40,30 +40,34 @@ export function SettingsPage(props: SettingsProps) {
 
 
     useEffect(() => {
-        if (settings) {
+        if (userSettings) {
             let enabled = false;
-            if (settings.notifications.length === 1 &&
-                settings.notifications[0].enabled) {
+            if (userSettings.notifications.length === 1 &&
+                userSettings.notifications[0].enabled) {
                 enabled = true;
             }
 
-            setPlayAlwaysUp(settings.playAlwaysUp);
+            setPlayAlwaysUp(userSettings.playAlwaysUp);
             setNotifications(enabled);
         }
-    }, [settings]);
+    }, [userSettings]);
 
     const save = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-
-        if (settings) {
-            settings.notifications = [
+        if (userSettings) {
+            userSettings.playAlwaysUp = playAlwaysUp;
+            userSettings.notifications = [
                 {
                     "enabled": isNotificationsEnabled,
                     "name": "browser1",
                     "uri": ""
                 }
             ];
-            setExecuteSetSettings(settings);
+
+            console.log("save");
+            console.log(userSettings);
+
+            setExecuteSetSettings(userSettings);
         }
     }
 
@@ -84,11 +88,11 @@ export function SettingsPage(props: SettingsProps) {
     }
 
     const handlePlayAlwaysUpChange = async (checked: boolean) => {
-        setPlayAlwaysUp(!playAlwaysUp);
+        setPlayAlwaysUp(e => !e);
     }
 
     const handleNotificationChange = async (checked: boolean) => {
-        setNotifications(!isNotificationsEnabled);
+        setNotifications(e => !e);
 
         if (navigator.serviceWorker) {
             console.log(navigator.serviceWorker);

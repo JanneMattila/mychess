@@ -88,7 +88,7 @@ export interface RootState {
     readonly friendUpsertState?: ProcessState
 
     readonly settingsState?: ProcessState
-    readonly settings?: UserSettings
+    readonly userSettings?: UserSettings
 
     readonly settingsUpsertState?: ProcessState
 

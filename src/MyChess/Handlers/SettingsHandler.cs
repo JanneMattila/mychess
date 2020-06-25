@@ -64,6 +64,7 @@ namespace MyChess.Handlers
                 {
                     PartitionKey = userID,
                     RowKey = userNotifications.Name,
+                    Name = userNotifications.Name,
                     Enabled = userNotifications.Enabled,
                     Uri = userNotifications.Uri
                 });
