@@ -1,6 +1,7 @@
 import { Account } from "msal";
 import { MyChessGame } from "./models/MyChessGame";
 import { User } from "./models/User";
+import { UserSettings } from "./models/UserSettings";
 
 export enum ProcessState {
     NotStarted,
@@ -35,6 +36,10 @@ export enum EventTypes {
     FRIENDS_LOADING = "Friends/Load",
     FRIENDS_UPSERT = "Friends/Upsert",
 
+    // User settings related events
+    SETTINGS_LOADING = "Settings/Load",
+    SETTINGS_UPSERT = "Settings/Upsert",
+
     // Game playing related events
     PLAY_LOADING = "Play/Load",
     PLAY_SHOW_DIALOG = "Play/Dialog",
@@ -47,6 +52,8 @@ type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessS
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: User[] }
 type FriendUpsertAction = { type: EventTypes.FRIENDS_UPSERT, friendUpsertState: ProcessState, error?: string, errorLink?: string }
+type SettingsLoadingAction = { type: EventTypes.SETTINGS_LOADING, settingsState: ProcessState, error?: string, userSettings?: UserSettings }
+type SettingsUpsertAction = { type: EventTypes.SETTINGS_UPSERT, settingsUpsertState: ProcessState, error?: string, errorLink?: string }
 type PlayShowDialogAction = { type: EventTypes.PLAY_SHOW_DIALOG, dialog: DialogType, show: boolean }
 
 // Root action
@@ -58,6 +65,8 @@ export type RootAction =
     | MeLoadingAction
     | FriendsLoadingAction
     | FriendUpsertAction
+    | SettingsLoadingAction
+    | SettingsUpsertAction
     | PlayShowDialogAction
 
 export interface RootState {
@@ -77,6 +86,11 @@ export interface RootState {
     readonly friends?: User[]
 
     readonly friendUpsertState?: ProcessState
+
+    readonly settingsState?: ProcessState
+    readonly settings?: UserSettings
+
+    readonly settingsUpsertState?: ProcessState
 
     readonly activeDialog?: DialogType
 }
@@ -103,6 +117,15 @@ export function friendsLoadingEvent(friendsState: ProcessState, error?: string, 
 export function friendUpsertEvent(friendUpsertState: ProcessState, error?: string, errorLink?: string): FriendUpsertAction {
     return { type: EventTypes.FRIENDS_UPSERT, friendUpsertState, error, errorLink };
 }
+
+export function settingsLoadingEvent(settingsState: ProcessState, error?: string, userSettings?: UserSettings): SettingsLoadingAction {
+    return { type: EventTypes.SETTINGS_LOADING, settingsState, error, userSettings };
+}
+
+export function settingsUpsertEvent(settingsUpsertState: ProcessState, error?: string, errorLink?: string): SettingsUpsertAction {
+    return { type: EventTypes.SETTINGS_UPSERT, settingsUpsertState, error, errorLink };
+}
+
 export function showDialogEvent(dialog: DialogType, show: boolean): PlayShowDialogAction {
     return { type: EventTypes.PLAY_SHOW_DIALOG, dialog, show };
 }

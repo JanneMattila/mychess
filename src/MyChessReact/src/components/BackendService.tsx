@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
-import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent } from "../actions";
+import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent } from "../actions";
 import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { User } from "../models/User";
@@ -140,9 +140,42 @@ export function BackendService(props: BackendServiceProps) {
         }
     }, [props.upsertFriend, ai, dispatch, history, endpoint, accessToken]);
 
+
+    useEffect(() => {
+        const getSettings = async () => {
+            dispatch(settingsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
+            const request: RequestInit = {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
+
+            try {
+                const response = await fetch(endpoint + "/api/users/me/settings", request);
+                const data = await response.json();
+
+                dispatch(settingsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
+            } catch (error) {
+                console.log(error);
+                ai.trackException(error);
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
+                dispatch(settingsLoadingEvent(ProcessState.Error, errorMessage));
+            }
+        }
+
+        if (accessToken) {
+            if (props.getSettings !== 0) {
+                getSettings();
+            }
+        }
+    }, [props.getSettings, ai, dispatch, endpoint, accessToken]);
+
     useEffect(() => {
         const upsertSettings = async (playerSettings: UserSettings) => {
-            dispatch(friendUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
+            dispatch(settingsUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
             const request: RequestInit = {
                 method: "POST",
                 body: JSON.stringify(playerSettings),
@@ -158,20 +191,19 @@ export function BackendService(props: BackendServiceProps) {
                 console.log(data);
 
                 if (response.ok) {
-                    dispatch(friendUpsertEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
-                    history.push("/friends");
+                    dispatch(settingsUpsertEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
                 } else {
                     const ex = data as ProblemDetail;
                     if (ex.title !== undefined && ex.instance !== undefined) {
                         console.log(ex);
-                        dispatch(friendUpsertEvent(ProcessState.Error, ex.title, ex.instance));
+                        dispatch(settingsUpsertEvent(ProcessState.Error, ex.title, ex.instance));
                     }
                 }
             } catch (error) {
                 ai.trackException(error);
 
-                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to modify friend.";
-                dispatch(friendUpsertEvent(ProcessState.Error, errorMessage, ""));
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to update settings.";
+                dispatch(settingsUpsertEvent(ProcessState.Error, errorMessage, ""));
 
                 console.log(error);
                 console.log(errorMessage);
