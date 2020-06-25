@@ -6,7 +6,7 @@ namespace MyChess.Handlers
 {
     public interface ISettingsHandler
     {
-        Task<PlayerSettings> GetSettingsAsync(AuthenticatedUser authenticatedUser);
-        Task<HandlerError?> UpdateSettingsAsync(AuthenticatedUser authenticatedUser, PlayerSettings playerSettings);
+        Task<UserSettings> GetSettingsAsync(AuthenticatedUser authenticatedUser);
+        Task<HandlerError?> UpdateSettingsAsync(AuthenticatedUser authenticatedUser, UserSettings playerSettings);
     }
 }

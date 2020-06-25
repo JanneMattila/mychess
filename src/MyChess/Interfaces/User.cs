@@ -2,7 +2,7 @@
 
 namespace MyChess.Interfaces
 {
-    public class Player
+    public class User
     {
         [JsonPropertyName("id")]
         public string ID { get; set; } = string.Empty;

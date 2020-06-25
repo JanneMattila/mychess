@@ -83,7 +83,7 @@ namespace MyChess.Functions
         private async Task<IActionResult> PostAsync(AuthenticatedUser authenticatedUser, HttpRequest req, string id)
         {
             _log.FuncFriendsAddNewFriend();
-            var friendToAdd = await JsonSerializer.DeserializeAsync<Player>(req.Body);
+            var friendToAdd = await JsonSerializer.DeserializeAsync<User>(req.Body);
             var result = await _friendsHandler.AddNewFriend(authenticatedUser, friendToAdd);
             if (result.Friend != null)
             {

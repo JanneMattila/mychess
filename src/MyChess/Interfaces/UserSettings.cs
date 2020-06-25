@@ -3,12 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace MyChess.Interfaces
 {
-    public class PlayerSettings
+    public class UserSettings
     {
         [JsonPropertyName("playAlwaysUp")]
         public bool PlayAlwaysUp { get; set; }
 
         [JsonPropertyName("notifications")]
-        public List<PlayerNotifications> Notifications { get; set; } = new List<PlayerNotifications>();
+        public List<UserNotifications> Notifications { get; set; } = new List<UserNotifications>();
     }
 }

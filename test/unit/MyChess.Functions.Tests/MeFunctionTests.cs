@@ -70,7 +70,7 @@ namespace MyChess.Functions.Tests
             // Assert
             Assert.IsType(expected, actual);
             var body = actual as OkObjectResult;
-            var actualUser = body?.Value as Player;
+            var actualUser = body?.Value as User;
             Assert.Equal(expectedUserID, actualUser?.ID);
         }
     }

@@ -88,7 +88,7 @@ namespace MyChess.Tests.Handlers
                 ProviderIdentifier = "p"
             };
 
-            var friendToAdd = new Player();
+            var friendToAdd = new User();
 
             // Act
             var actual = await _friendsHandler.AddNewFriend(user, friendToAdd);
@@ -136,7 +136,7 @@ namespace MyChess.Tests.Handlers
                 UserPrimaryKey = "u2",
                 UserRowKey = "p2"
             });
-            var friendToAdd = new Player()
+            var friendToAdd = new User()
             {
                 ID = "user456",
                 Name = "My Best Friend"

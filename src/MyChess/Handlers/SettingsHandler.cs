@@ -15,9 +15,9 @@ namespace MyChess.Handlers
         }
 
 
-        public async Task<PlayerSettings> GetSettingsAsync(AuthenticatedUser authenticatedUser)
+        public async Task<UserSettings> GetSettingsAsync(AuthenticatedUser authenticatedUser)
         {
-            var playerSettings = new PlayerSettings();
+            var playerSettings = new UserSettings();
             var userID = await GetOrCreateUserAsync(authenticatedUser);
             var userSettingsEntity = await _context.GetAsync<UserSettingEntity>(TableNames.UserSettings, userID, userID);
             if (userSettingsEntity != null)
@@ -32,7 +32,7 @@ namespace MyChess.Handlers
 
             await foreach (var userNotificationEntity in _context.GetAllAsync<UserNotificationEntity>(TableNames.UserNotifications, userID))
             {
-                playerSettings.Notifications.Add(new PlayerNotifications()
+                playerSettings.Notifications.Add(new UserNotifications()
                 {
                     Name = userNotificationEntity.Name,
                     Enabled = userNotificationEntity.Enabled,
@@ -45,7 +45,7 @@ namespace MyChess.Handlers
             return playerSettings;
         }
 
-        public async Task<HandlerError?> UpdateSettingsAsync(AuthenticatedUser authenticatedUser, PlayerSettings playerSettings)
+        public async Task<HandlerError?> UpdateSettingsAsync(AuthenticatedUser authenticatedUser, UserSettings playerSettings)
         {
             var userID = await GetOrCreateUserAsync(authenticatedUser);
 

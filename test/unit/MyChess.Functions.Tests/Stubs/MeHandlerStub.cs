@@ -6,9 +6,9 @@ namespace MyChess.Functions.Tests.Stubs
 {
     public class MeHandlerStub : IMeHandler
     {
-        public Player User { get; set; } = new Player();
+        public User User { get; set; } = new User();
 
-        public async Task<Player> LoginAsync(AuthenticatedUser authenticatedUser)
+        public async Task<User> LoginAsync(AuthenticatedUser authenticatedUser)
         {
             return await Task.FromResult(User);
         }

@@ -16,7 +16,7 @@ namespace MyChess.Handlers
         {
         }
 
-        public async Task<(Player? Friend, HandlerError? Error)> AddNewFriend(AuthenticatedUser authenticatedUser, Player player)
+        public async Task<(User? Friend, HandlerError? Error)> AddNewFriend(AuthenticatedUser authenticatedUser, User player)
         {
             var friendID = player.ID;
             var friend = await GetUserByUserIDAsync(friendID);
@@ -43,14 +43,14 @@ namespace MyChess.Handlers
             return (player, null);
         }
 
-        public async Task<Player?> GetFriendAsync(AuthenticatedUser authenticatedUser, string friendID)
+        public async Task<User?> GetFriendAsync(AuthenticatedUser authenticatedUser, string friendID)
         {
             var userID = await GetOrCreateUserAsync(authenticatedUser);
             var userFriendEntity = await _context.GetAsync<UserFriendEntity>(TableNames.UserFriends, userID, friendID);
             if (userFriendEntity != null)
             {
                 _log.FriendHandlerFriendFound(friendID);
-                return new Player()
+                return new User()
                 {
                     ID = userFriendEntity.RowKey,
                     Name = userFriendEntity.Name
@@ -63,14 +63,14 @@ namespace MyChess.Handlers
             }
         }
 
-        public async Task<List<Player>> GetFriendsAsync(AuthenticatedUser authenticatedUser)
+        public async Task<List<User>> GetFriendsAsync(AuthenticatedUser authenticatedUser)
         {
             var userID = await GetOrCreateUserAsync(authenticatedUser);
-            var friends = new List<Player>();
+            var friends = new List<User>();
 
             await foreach (var userFriendEntity in _context.GetAllAsync<UserFriendEntity>(TableNames.UserFriends, userID))
             {
-                friends.Add(new Player()
+                friends.Add(new User()
                 {
                     ID = userFriendEntity.RowKey,
                     Name = userFriendEntity.Name

@@ -2,7 +2,7 @@
 
 namespace MyChess.Interfaces
 {
-    public class PlayerNotifications
+    public class UserNotifications
     {
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;

@@ -5,6 +5,6 @@ namespace MyChess.Handlers
 {
     public interface IMeHandler
     {
-        Task<Player> LoginAsync(AuthenticatedUser authenticatedUser);
+        Task<User> LoginAsync(AuthenticatedUser authenticatedUser);
     }
 }

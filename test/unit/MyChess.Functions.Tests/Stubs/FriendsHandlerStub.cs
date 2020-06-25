@@ -8,24 +8,24 @@ namespace MyChess.Functions.Tests.Stubs
 {
     public class FriendsHandlerStub : IFriendsHandler
     {
-        public Player? SingleFriend { get; set; }
+        public User? SingleFriend { get; set; }
 
-        public List<Player> Friends { get; set; } = new List<Player>();
+        public List<User> Friends { get; set; } = new List<User>();
 
         public HandlerError? Error { get; set; }
 
-        public async Task<(Player? Friend, HandlerError? Error)> AddNewFriend(AuthenticatedUser authenticatedUser, Player player)
+        public async Task<(User? Friend, HandlerError? Error)> AddNewFriend(AuthenticatedUser authenticatedUser, User player)
         {
             await Task.CompletedTask;
             return (SingleFriend, Error);
         }
 
-        public async Task<Player?> GetFriendAsync(AuthenticatedUser authenticatedUser, string friendID)
+        public async Task<User?> GetFriendAsync(AuthenticatedUser authenticatedUser, string friendID)
         {
             return await Task.FromResult(SingleFriend);
         }
 
-        public async Task<List<Player>> GetFriendsAsync(AuthenticatedUser authenticatedUser)
+        public async Task<List<User>> GetFriendsAsync(AuthenticatedUser authenticatedUser)
         {
             return await Task.FromResult(Friends);
         }

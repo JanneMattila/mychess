@@ -58,8 +58,8 @@ namespace MyChess.Functions.Tests
             var expected = typeof(OkObjectResult);
             var expectedFriends = 2;
             
-            _friendsHandlerStub.Friends.Add(new Player());
-            _friendsHandlerStub.Friends.Add(new Player());
+            _friendsHandlerStub.Friends.Add(new User());
+            _friendsHandlerStub.Friends.Add(new User());
             
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
@@ -73,7 +73,7 @@ namespace MyChess.Functions.Tests
             // Assert
             Assert.IsType(expected, actual);
             var body = actual as OkObjectResult;
-            var list = body?.Value as List<Player>;
+            var list = body?.Value as List<User>;
             Assert.Equal(expectedFriends, list?.Count);
         }
 
@@ -84,7 +84,7 @@ namespace MyChess.Functions.Tests
             var expected = typeof(OkObjectResult);
             var expectedPlayerID = "abc";
 
-            _friendsHandlerStub.SingleFriend = new Player()
+            _friendsHandlerStub.SingleFriend = new User()
             {
                 ID = "abc"
             };
@@ -101,7 +101,7 @@ namespace MyChess.Functions.Tests
             // Assert
             Assert.IsType(expected, actual);
             var body = actual as OkObjectResult;
-            var actualPlayer = body?.Value as Player;
+            var actualPlayer = body?.Value as User;
             Assert.Equal(expectedPlayerID, actualPlayer?.ID);
         }
 
@@ -111,13 +111,13 @@ namespace MyChess.Functions.Tests
             // Arrange
             var expected = typeof(CreatedResult);
             var expectedPlayerID = "abc";
-            var friend = new Player()
+            var friend = new User()
             {
                 ID = "abc",
                 Name = "John Doe"
             };
 
-            _friendsHandlerStub.SingleFriend = new Player()
+            _friendsHandlerStub.SingleFriend = new User()
             {
                 ID = "abc"
             };
@@ -134,7 +134,7 @@ namespace MyChess.Functions.Tests
             // Assert
             Assert.IsType(expected, actual);
             var body = actual as CreatedResult;
-            var actualPlayer = body?.Value as Player;
+            var actualPlayer = body?.Value as User;
             Assert.Equal(expectedPlayerID, actualPlayer?.ID);
         }
 
@@ -144,7 +144,7 @@ namespace MyChess.Functions.Tests
             // Arrange
             var expected = typeof(ObjectResult);
             var expectedError = "1234";
-            var friend = new Player()
+            var friend = new User()
             {
                 ID = "abc",
                 Name = "John Doe"

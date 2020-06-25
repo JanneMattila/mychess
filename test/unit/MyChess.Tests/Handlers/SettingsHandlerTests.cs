@@ -93,7 +93,7 @@ namespace MyChess.Tests.Handlers
                 ProviderIdentifier = "p"
             };
 
-            var playerSettings = new PlayerSettings();
+            var playerSettings = new UserSettings();
 
             // Act
             var actual = await _settingsHandler.UpdateSettingsAsync(user, playerSettings);

@@ -7,8 +7,8 @@ namespace MyChess.Handlers
 {
     public interface IFriendsHandler
     {
-        Task<(Player? Friend, HandlerError? Error)> AddNewFriend(AuthenticatedUser authenticatedUser, Player player);
-        Task<Player?> GetFriendAsync(AuthenticatedUser authenticatedUser, string friendID);
-        Task<List<Player>> GetFriendsAsync(AuthenticatedUser authenticatedUser);
+        Task<(User? Friend, HandlerError? Error)> AddNewFriend(AuthenticatedUser authenticatedUser, User player);
+        Task<User?> GetFriendAsync(AuthenticatedUser authenticatedUser, string friendID);
+        Task<List<User>> GetFriendsAsync(AuthenticatedUser authenticatedUser);
     }
 }

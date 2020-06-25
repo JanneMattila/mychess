@@ -5,9 +5,9 @@ namespace MyChess.Interfaces
     public class MyChessGamePlayers
     {
         [JsonPropertyName("white")]
-        public Player White { get; set; } = new Player();
+        public User White { get; set; } = new User();
 
         [JsonPropertyName("black")]
-        public Player Black { get; set; } = new Player();
+        public User Black { get; set; } = new User();
     }
 }
