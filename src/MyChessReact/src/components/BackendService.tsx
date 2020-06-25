@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
-import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent } from "../actions";
+import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, meLoadingEvent } from "../actions";
 import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { User } from "../models/User";
@@ -19,6 +19,8 @@ type BackendServiceProps = {
 
     getSettings?: number;
     upsertSettings?: UserSettings;
+
+    getMe?: number;
 };
 
 export function BackendService(props: BackendServiceProps) {
@@ -56,7 +58,7 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (accessToken) {
+        if (accessToken && props.getFriends) {
             if (props.getFriends !== 0) {
                 getFriends();
             }
@@ -88,7 +90,7 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (accessToken) {
+        if (accessToken && props.getGames) {
             if (props.getGames !== 0) {
                 getGames();
             }
@@ -133,10 +135,8 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (accessToken) {
-            if (props.upsertFriend) {
-                upsertFriend(props.upsertFriend);
-            }
+        if (accessToken && props.upsertFriend) {
+            upsertFriend(props.upsertFriend);
         }
     }, [props.upsertFriend, ai, dispatch, history, endpoint, accessToken]);
 
@@ -166,7 +166,7 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (accessToken) {
+        if (accessToken && props.getSettings) {
             if (props.getSettings !== 0) {
                 getSettings();
             }
@@ -210,12 +210,46 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (accessToken) {
-            if (props.upsertSettings) {
-                upsertSettings(props.upsertSettings);
-            }
+        if (accessToken && props.upsertSettings) {
+            upsertSettings(props.upsertSettings);
         }
     }, [props.upsertSettings, ai, dispatch, history, endpoint, accessToken]);
+
+    useEffect(() => {
+        const getMe = async () => {
+            dispatch(meLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
+            const request: RequestInit = {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
+
+            try {
+                const response = await fetch(props.endpoint + "/api/users/me", request);
+                const data = await response.json() as User;
+                console.log(data);
+
+                Database.set(DatabaseFields.ME_ID, data.id);
+
+                dispatch(meLoadingEvent(ProcessState.Success, "" /* Clear error message */, data.id));
+            } catch (error) {
+                ai.trackException(error);
+                console.log(error);
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve settings.";
+                console.log(errorMessage);
+                dispatch(meLoadingEvent(ProcessState.Error, errorMessage));
+            }
+        }
+
+        if (accessToken && props.getMe) {
+            if (props.getMe !== 0) {
+                getMe();
+            }
+        }
+    }, [props.getMe, ai, dispatch, history, endpoint, accessToken]);
 
     return (
         <>

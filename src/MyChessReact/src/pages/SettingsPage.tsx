@@ -2,12 +2,12 @@ import React, { useEffect, MouseEvent, useState } from "react";
 import { Link } from "react-router-dom";
 import Switch from "react-switch";
 import "./SettingsPage.css";
-import { ProcessState, meLoadingEvent } from "../actions";
+import { ProcessState } from "../actions";
 import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "../components/TelemetryService";
-import { User } from "../models/User";
-import { useDispatch } from "react-redux";
 import { Database, DatabaseFields } from "../data/Database";
+import { BackendService } from "../components/BackendService";
+import { UserSettings } from "../models/UserSettings";
 
 type SettingsProps = {
     endpoint: string;
@@ -15,55 +15,56 @@ type SettingsProps = {
 
 export function SettingsPage(props: SettingsProps) {
     const loginState = useTypedSelector(state => state.loginState);
-    const accessToken = useTypedSelector(state => state.accessToken);
-    const me = Database.get<string>(DatabaseFields.ME_ID);
+    const me = useTypedSelector(state => state.me);
+    const meID = Database.get<string>(DatabaseFields.ME_ID);
+    const settings = useTypedSelector(state => state.settings);
+
+    const [executeGetMe, setExecuteGetMe] = useState(0);
+    const [executeGetSettings, setExecuteGetSettings] = useState(0);
+    const [executeSetSettings, setExecuteSetSettings] = useState<UserSettings | undefined>(undefined);
 
     const [playerIdentifier, setPlayerIdentifier] = useState("");
+    const [playAlwaysUp, setPlayAlwaysUp] = useState(false);
     const [isNotificationsEnabled, setNotifications] = useState(false);
     const ai = getAppInsights();
 
-    const dispatch = useDispatch();
+    useEffect(() => {
+        if (meID) {
+            setPlayerIdentifier(meID);
+            setExecuteGetSettings(e => e + 1);
+        }
+        else {
+            setExecuteGetMe(e => e + 1);
+        }
+    }, [me, meID]);
+
 
     useEffect(() => {
-        const populateUserInformation = async (accessToken: string) => {
-            dispatch(meLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
-            const request: RequestInit = {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                    "Authorization": "Bearer " + accessToken
-                }
-            };
-
-            try {
-                const response = await fetch(props.endpoint + "/api/users/me", request);
-                const data = await response.json() as User;
-                console.log(data);
-                setPlayerIdentifier(data.id);
-
-                Database.set(DatabaseFields.ME_ID, data.id);
-
-                dispatch(meLoadingEvent(ProcessState.Success, "" /* Clear error message */, data.id));
-            } catch (error) {
-                ai.trackException(error);
-                console.log(error);
-
-                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve settings.";
-                console.log(errorMessage);
-                dispatch(meLoadingEvent(ProcessState.Error, errorMessage));
+        if (settings) {
+            let enabled = false;
+            if (settings.notifications.length === 1 &&
+                settings.notifications[0].enabled) {
+                enabled = true;
             }
-        }
 
-        if (accessToken !== undefined) {
-            if (me) {
-                setPlayerIdentifier(me);
-            }
-            populateUserInformation(accessToken);
+            setPlayAlwaysUp(settings.playAlwaysUp);
+            setNotifications(enabled);
         }
-    }, [accessToken, ai, props.endpoint, dispatch, me]);
+    }, [settings]);
 
-    const confirm = (event: MouseEvent<HTMLButtonElement>) => {
+    const save = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
+
+        if (settings) {
+            settings.notifications = [
+                {
+                    "enabled": isNotificationsEnabled,
+                    "name": "browser1",
+                    "uri": ""
+                }
+            ];
+            setExecuteSetSettings(settings);
+        }
     }
 
     const cancel = (event: MouseEvent<HTMLButtonElement>) => {
@@ -80,6 +81,10 @@ export function SettingsPage(props: SettingsProps) {
         event.preventDefault();
 
         navigator.clipboard.writeText(window.origin + "/friends/add/" + playerIdentifier);
+    }
+
+    const handlePlayAlwaysUpChange = async (checked: boolean) => {
+        setPlayAlwaysUp(!playAlwaysUp);
     }
 
     const handleNotificationChange = async (checked: boolean) => {
@@ -111,12 +116,18 @@ export function SettingsPage(props: SettingsProps) {
 
                     <div className="subtitle">Settings</div>
                     <label>
+                        Play always up<br />
+                        <Switch onChange={handlePlayAlwaysUpChange} checked={playAlwaysUp} />
+                    </label>
+                    <br />
+                    <br />
+                    <label>
                         Notifications<br />
                         <Switch onChange={handleNotificationChange} checked={isNotificationsEnabled} />
                     </label>
 
                     <div className="title">
-                        <button onClick={confirm}><span role="img" aria-label="OK">✅</span> Save</button>
+                        <button onClick={save}><span role="img" aria-label="OK">✅</span> Save</button>
                         <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                     </div>
 
@@ -124,6 +135,7 @@ export function SettingsPage(props: SettingsProps) {
                         <span role="img" aria-label="Manage your friends">👥</span> Manage your friends
                     </Link>
                 </div>
+                <BackendService endpoint={props.endpoint} getMe={executeGetMe} getSettings={executeGetSettings} upsertSettings={executeSetSettings} />
             </div>
         );
     }

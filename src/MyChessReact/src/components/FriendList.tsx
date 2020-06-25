@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTypedSelector } from "../reducers";
-import { ProcessState, friendsLoadingEvent } from "../actions";
+import { ProcessState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { Link, useHistory } from "react-router-dom";
 import "./FriendList.css";
