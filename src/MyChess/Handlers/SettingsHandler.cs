@@ -23,6 +23,7 @@ namespace MyChess.Handlers
             if (userSettingsEntity != null)
             {
                 _log.SettingsHandlerSettingsFound(userID);
+                playerSettings.PlayAlwaysUp = userSettingsEntity.PlayAlwaysUp;
             }
             else
             {

@@ -7,5 +7,7 @@ namespace MyChess.Data
         public UserSettingEntity()
         {
         }
+
+        public bool PlayAlwaysUp { get; set; } = false;
     }
 }
