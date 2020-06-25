@@ -28,27 +28,50 @@ namespace MyChess.Functions
             _securityValidatorOptions = securityValidatorOptions.Value;
         }
 
-        private async Task InitializeAsync()
+        public async Task<bool> InitializeAsync()
         {
-            var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-                $"https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration",
-                new OpenIdConnectConfigurationRetriever());
-
-            var configuration = await configurationManager.GetConfigurationAsync();
-            _tokenValidationParameters = new TokenValidationParameters
+            if (_tokenValidationParameters == null)
             {
-                IssuerSigningKeys = configuration.SigningKeys,
-                ValidAudiences = new[]
+                await _initializationSemaphore.WaitAsync();
+                if (_tokenValidationParameters == null)
                 {
-                    _securityValidatorOptions.Audience,
-                    _securityValidatorOptions.ClientId
-                },
-                ValidateIssuer = true,
-                IssuerValidator = (issuer, securityToken, validationParameters) =>
-                {
-                    return IssuerValidationLogic(issuer) ? issuer : null;
+                    try
+                    {
+                        _log.FuncSecInitializing();
+                        var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                            $"https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration",
+                            new OpenIdConnectConfigurationRetriever());
+
+                        var configuration = await configurationManager.GetConfigurationAsync();
+                        _tokenValidationParameters = new TokenValidationParameters
+                        {
+                            IssuerSigningKeys = configuration.SigningKeys,
+                            ValidAudiences = new[]
+                                {
+                                    _securityValidatorOptions.Audience,
+                                    _securityValidatorOptions.ClientId
+                                },
+                            ValidateIssuer = true,
+                            IssuerValidator = (issuer, securityToken, validationParameters) =>
+                            {
+                                return IssuerValidationLogic(issuer) ? issuer : null;
+                            }
+                        };
+                        _log.FuncSecInitialized();
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        _log.FuncSecInitializingFailed(ex);
+                        return false;
+                    }
+                    finally
+                    {
+                        _initializationSemaphore.Release();
+                    }
                 }
-            };
+            }
+            return true;
         }
 
         private bool IssuerValidationLogic(string issuer)
@@ -94,28 +117,10 @@ namespace MyChess.Functions
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
-
-            if (_tokenValidationParameters == null)
+            var success = await InitializeAsync();
+            if (!success)
             {
-                await _initializationSemaphore.WaitAsync();
-                if (_tokenValidationParameters == null)
-                {
-                    try
-                    {
-                        _log.FuncSecInitializing();
-                        await InitializeAsync();
-                        _log.FuncSecInitialized();
-                    }
-                    catch (Exception ex)
-                    {
-                        _log.FuncSecInitializingFailed(ex);
-                        return null;
-                    }
-                    finally
-                    {
-                        _initializationSemaphore.Release();
-                    }
-                }
+                return null;
             }
 
             try
