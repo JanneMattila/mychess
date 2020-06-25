@@ -6,7 +6,7 @@ import { getAppInsights } from "./TelemetryService";
 import { Link, useHistory } from "react-router-dom";
 import "./GameList.css";
 import { Database, DatabaseFields } from "../data/Database";
-import { Player } from "../models/Player";
+import { User } from "../models/User";
 import { BackendService } from "./BackendService";
 
 type GameListProps = {
@@ -24,7 +24,7 @@ export function GameList(props: GameListProps) {
     const { push } = useHistory();
     const ai = getAppInsights();
 
-    const friends = Database.get<Player[]>(DatabaseFields.FRIEND_LIST);
+    const friends = Database.get<User[]>(DatabaseFields.FRIEND_LIST);
     const meID = Database.get<string>(DatabaseFields.ME_ID);
 
     const getOpponent = (game: MyChessGame) => {

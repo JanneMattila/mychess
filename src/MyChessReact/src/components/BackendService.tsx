@@ -4,21 +4,21 @@ import { getAppInsights } from "./TelemetryService";
 import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent } from "../actions";
 import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
-import { Player } from "../models/Player";
+import { User } from "../models/User";
 import { useHistory } from "react-router-dom";
 import { useTypedSelector } from "../reducers";
-import { PlayerSettings } from "../models/PlayerSettings";
+import { UserSettings } from "../models/UserSettings";
 
 type BackendServiceProps = {
     endpoint: string;
 
     getFriends?: number;
-    upsertFriend?: Player;
+    upsertFriend?: User;
 
     getGames?: number;
 
     getSettings?: number;
-    upsertSettings?: PlayerSettings;
+    upsertSettings?: UserSettings;
 };
 
 export function BackendService(props: BackendServiceProps) {
@@ -96,7 +96,7 @@ export function BackendService(props: BackendServiceProps) {
     }, [props.getGames, ai, dispatch, endpoint, accessToken]);
 
     useEffect(() => {
-        const upsertFriend = async (player: Player) => {
+        const upsertFriend = async (player: User) => {
             dispatch(friendUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
             const request: RequestInit = {
                 method: "POST",
@@ -141,7 +141,7 @@ export function BackendService(props: BackendServiceProps) {
     }, [props.upsertFriend, ai, dispatch, history, endpoint, accessToken]);
 
     useEffect(() => {
-        const upsertSettings = async (playerSettings: PlayerSettings) => {
+        const upsertSettings = async (playerSettings: UserSettings) => {
             dispatch(friendUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
             const request: RequestInit = {
                 method: "POST",

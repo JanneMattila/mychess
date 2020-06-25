@@ -5,7 +5,7 @@ import "./SettingsPage.css";
 import { ProcessState, meLoadingEvent } from "../actions";
 import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "../components/TelemetryService";
-import { Player } from "../models/Player";
+import { User } from "../models/User";
 import { useDispatch } from "react-redux";
 import { Database, DatabaseFields } from "../data/Database";
 
@@ -37,7 +37,7 @@ export function SettingsPage(props: SettingsProps) {
 
             try {
                 const response = await fetch(props.endpoint + "/api/users/me", request);
-                const data = await response.json() as Player;
+                const data = await response.json() as User;
                 console.log(data);
                 setPlayerIdentifier(data.id);
 

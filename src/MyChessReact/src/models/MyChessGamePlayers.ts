@@ -1,11 +1,11 @@
-import { Player } from "./Player";
+import { User } from "./User";
 
 export class MyChessGamePlayers {
-    white: Player;
-    black: Player;
+    white: User;
+    black: User;
 
     constructor() {
-        this.white = new Player();
-        this.black = new Player();
+        this.white = new User();
+        this.black = new User();
     }
 }

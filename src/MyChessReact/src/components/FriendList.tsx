@@ -4,7 +4,7 @@ import { ProcessState, friendsLoadingEvent } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { Link, useHistory } from "react-router-dom";
 import "./FriendList.css";
-import { Player } from "../models/Player";
+import { User } from "../models/User";
 import { BackendService } from "./BackendService";
 
 type FriendListProps = {
@@ -23,7 +23,7 @@ export function FriendList(props: FriendListProps) {
 
     const ai = getAppInsights();
 
-    const renderFriends = (friends?: Player[]) => {
+    const renderFriends = (friends?: User[]) => {
         return (
             <div>
                 <div className="row">

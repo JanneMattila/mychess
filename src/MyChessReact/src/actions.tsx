@@ -1,6 +1,6 @@
 import { Account } from "msal";
 import { MyChessGame } from "./models/MyChessGame";
-import { Player } from "./models/Player";
+import { User } from "./models/User";
 
 export enum ProcessState {
     NotStarted,
@@ -45,7 +45,7 @@ type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
-type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: Player[] }
+type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: User[] }
 type FriendUpsertAction = { type: EventTypes.FRIENDS_UPSERT, friendUpsertState: ProcessState, error?: string, errorLink?: string }
 type PlayShowDialogAction = { type: EventTypes.PLAY_SHOW_DIALOG, dialog: DialogType, show: boolean }
 
@@ -74,7 +74,7 @@ export interface RootState {
     readonly meState?: ProcessState
 
     readonly friendsState?: ProcessState
-    readonly friends?: Player[]
+    readonly friends?: User[]
 
     readonly friendUpsertState?: ProcessState
 
@@ -96,7 +96,7 @@ export function meLoadingEvent(meState: ProcessState, error?: string, me?: strin
     return { type: EventTypes.ME_LOADING, meState, error, me };
 }
 
-export function friendsLoadingEvent(friendsState: ProcessState, error?: string, friends?: Player[]): FriendsLoadingAction {
+export function friendsLoadingEvent(friendsState: ProcessState, error?: string, friends?: User[]): FriendsLoadingAction {
     return { type: EventTypes.FRIENDS_LOADING, friendsState, error, friends };
 }
 

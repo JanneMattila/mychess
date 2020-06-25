@@ -4,7 +4,7 @@ import { ProcessState } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { useHistory } from "react-router-dom";
 import "./FriendList.css";
-import { Player } from "../models/Player";
+import { User } from "../models/User";
 import { Database, DatabaseFields } from "../data/Database";
 import { BackendService } from "./BackendService";
 
@@ -24,7 +24,7 @@ export function ModifyFriend(props: ModifyFriendProps) {
 
     const [friendName, setFriendName] = useState("");
     const [friendID, setFriendID] = useState("");
-    const [player, setPlayer] = useState<Player | undefined>(undefined);
+    const [player, setPlayer] = useState<User | undefined>(undefined);
 
     const ai = getAppInsights();
 
@@ -32,7 +32,7 @@ export function ModifyFriend(props: ModifyFriendProps) {
         if (props.id) {
             setFriendID(props.id);
 
-            const friends = Database.get<Array<Player>>(DatabaseFields.FRIEND_LIST);
+            const friends = Database.get<Array<User>>(DatabaseFields.FRIEND_LIST);
             if (friends) {
                 const existingFriend = friends.find(f => f.id === props.id);
                 if (existingFriend) {
