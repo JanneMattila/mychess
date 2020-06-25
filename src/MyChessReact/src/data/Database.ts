@@ -7,6 +7,7 @@ export enum DatabaseFields {
 
     // ME related fields
     ME_ID = "Me/ID",
+    ME_SETTINGS = "Me/Settings",
 
     // Friend related fields
     FRIEND_LIST = "Friends/List"

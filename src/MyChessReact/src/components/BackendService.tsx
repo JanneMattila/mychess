@@ -156,6 +156,8 @@ export function BackendService(props: BackendServiceProps) {
                 const response = await fetch(endpoint + "/api/users/me/settings", request);
                 const data = await response.json();
 
+                Database.set(DatabaseFields.ME_SETTINGS, data);
+
                 dispatch(settingsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
             } catch (error) {
                 console.log(error);
