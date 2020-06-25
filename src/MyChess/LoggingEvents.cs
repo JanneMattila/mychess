@@ -62,6 +62,7 @@
         public const int SettingsHandlerSettingsFound = 2300;
         public const int SettingsHandlerSettingsNotFound = 2301;
         public const int SettingsHandlerNotificationsFound = 2302;
+        public const int SettingsHandlerUpdateSettings = 2303;
 
         public static string CreateLinkToProblemDescription(int eventID)
         {

@@ -49,6 +49,8 @@ namespace MyChess.Handlers
         {
             var userID = await GetOrCreateUserAsync(authenticatedUser);
 
+            _log.SettingsHandlerUpdateSettings(userID);
+
             await _context.UpsertAsync(TableNames.UserSettings, new UserSettingEntity
             {
                 PartitionKey = userID,
