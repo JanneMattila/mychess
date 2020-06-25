@@ -38,6 +38,12 @@
         public const int FuncMeProcessingMethod = 1402;
         public const int FuncMeFetchMe = 1403;
 
+        public const int FuncSettingsStarted = 1500;
+        public const int FuncSettingsUserDoesNotHavePermission = 1501;
+        public const int FuncSettingsProcessingMethod = 1502;
+        public const int FuncSettingsFetchSettings = 1503;
+        public const int FuncSettingsUpdateSettings = 1504;
+
         public const int BaseHandlerCreateNewUser = 2000;
         public const int BaseHandlerNewUserCreated = 2001;
         public const int BaseHandlerExistingUserFound = 2002;

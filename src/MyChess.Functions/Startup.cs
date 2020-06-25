@@ -39,6 +39,7 @@ namespace MyChess.Functions
             builder.Services.AddSingleton<ISecurityValidator, SecurityValidator>();
             builder.Services.AddSingleton<IMyChessDataContext, MyChessDataContext>();
             builder.Services.AddSingleton<IMeHandler, MeHandler>();
+            builder.Services.AddSingleton<ISettingsHandler, SettingsHandler>();
             builder.Services.AddSingleton<IGamesHandler, GamesHandler>();
             builder.Services.AddSingleton<IFriendsHandler, FriendsHandler>();
         }
