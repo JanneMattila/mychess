@@ -34,7 +34,7 @@ function App() {
             <Route exact path="/privacy" component={PrivacyPage} />
             <Route exact path="/play/local" component={() => <PlayPage endpoint={configuration.endpoint} />} />
             <Route exact path="/play/:id" component={() => <PlayPage endpoint={configuration.endpoint} />} />
-            <Route path="/settings" component={() => <SettingsPage endpoint={configuration.endpoint} />} />
+            <Route path="/settings" component={() => <SettingsPage endpoint={configuration.endpoint} webPushPublicKey={configuration.webPushPublicKey} />} />
             <Route exact path="/friends/add" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
             <Route path="/friends/add/:id" component={() => <ModifyFriendPage title="Add friend" endpoint={configuration.endpoint} />} />
             <Route path="/friends/:id" component={() => <ModifyFriendPage title="Modify friend" endpoint={configuration.endpoint} />} />

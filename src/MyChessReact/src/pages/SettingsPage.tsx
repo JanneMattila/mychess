@@ -11,6 +11,7 @@ import { UserSettings } from "../models/UserSettings";
 
 type SettingsProps = {
     endpoint: string;
+    webPushPublicKey: string
 };
 
 export function SettingsPage(props: SettingsProps) {
@@ -26,6 +27,8 @@ export function SettingsPage(props: SettingsProps) {
     const [playerIdentifier, setPlayerIdentifier] = useState("");
     const [playAlwaysUp, setPlayAlwaysUp] = useState(false);
     const [isNotificationsEnabled, setNotifications] = useState(false);
+    const [notificationUri, setNotificationUri] = useState("");
+
     const ai = getAppInsights();
 
     useEffect(() => {
@@ -44,6 +47,7 @@ export function SettingsPage(props: SettingsProps) {
             let enabled = false;
             if (userSettings.notifications.length === 1 &&
                 userSettings.notifications[0].enabled) {
+                setNotificationUri(userSettings.notifications[0].uri);
                 enabled = true;
             }
 
@@ -60,7 +64,7 @@ export function SettingsPage(props: SettingsProps) {
                 {
                     "enabled": isNotificationsEnabled,
                     "name": "browser1",
-                    "uri": ""
+                    "uri": notificationUri
                 }
             ];
 
@@ -91,16 +95,54 @@ export function SettingsPage(props: SettingsProps) {
         setPlayAlwaysUp(e => !e);
     }
 
-    const handleNotificationChange = async (checked: boolean) => {
-        setNotifications(e => !e);
+    /*
+     * Conversion logic from internet but original source not found.
+     * Same code can be found e.g.
+     * https://gist.github.com/Klerith/80abd742d726dd587f4bd5d6a0ab26b6
+     */
+    const urlBase64ToUint8Array = (base64String: string) => {
+        var padding = '='.repeat((4 - base64String.length % 4) % 4);
+        var base64 = (base64String + padding)
+            .replace(/\-/g, '+')
+            .replace(/_/g, '/');
 
-        if (navigator.serviceWorker) {
+        var rawData = window.atob(base64);
+        var outputArray = new Uint8Array(rawData.length);
+
+        for (var i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    const handleNotificationChange = async (checked: boolean) => {
+        setNotifications(checked);
+
+        if (checked && navigator.serviceWorker) {
             console.log(navigator.serviceWorker);
             const registration = await navigator.serviceWorker.getRegistration();
             if (registration) {
-                console.log(registration.pushManager.permissionState);
+                const permission = await Notification.requestPermission();
+                console.log(permission);
+
+                if (permission === "granted") {
+                    var options: PushSubscriptionOptions = {
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(props.webPushPublicKey)
+                    };
+                    console.log(options);
+
+                    const result = await registration.pushManager.subscribe(options);
+                    console.log(result);
+                    setNotificationUri(result.endpoint);
+                }
             }
         }
+    }
+
+
+    const installAsApp = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
     }
 
     if (loginState === ProcessState.Success) {
@@ -133,6 +175,10 @@ export function SettingsPage(props: SettingsProps) {
                     <div className="title">
                         <button onClick={save}><span role="img" aria-label="OK">✅</span> Save</button>
                         <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+                    </div>
+
+                    <div className="title">
+                        <button onClick={installAsApp}><span role="img" aria-label="OK">📦</span> Install as App</button>
                     </div>
 
                     <Link to="/friends" className="Settings-link">

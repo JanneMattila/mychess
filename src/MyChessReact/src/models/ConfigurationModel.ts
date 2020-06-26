@@ -3,4 +3,5 @@ export interface ConfigurationModel {
     clientId: string;
     applicationIdURI: string;
     instrumentationKey: string;
+    webPushPublicKey: string
 }
