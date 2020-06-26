@@ -28,16 +28,34 @@ export function SettingsPage(props: SettingsProps) {
     const [playAlwaysUp, setPlayAlwaysUp] = useState(false);
     const [isNotificationsEnabled, setNotifications] = useState(false);
     const [notificationUri, setNotificationUri] = useState("");
+    const [deferredPrompt, setDeferredPrompt] = useState<any>(undefined);
 
     const ai = getAppInsights();
 
     useEffect(() => {
+
+        const setPrompt = (e: any) => {
+            setDeferredPrompt(e);
+
+            const element = document.getElementById("installAsApp");
+            if (element) {
+                element.style.visibility = "";
+            }
+        }
+
         if (meID) {
             setPlayerIdentifier(meID);
             setExecuteGetSettings(e => e + 1);
         }
         else {
             setExecuteGetMe(e => e + 1);
+        }
+
+        console.log("add event beforeinstallprompt");
+        window.addEventListener('beforeinstallprompt', setPrompt);
+        return () => {
+            console.log("remove event beforeinstallprompt");
+            window.removeEventListener('beforeinstallprompt', setPrompt);
         }
     }, [me, meID]);
 
@@ -103,7 +121,7 @@ export function SettingsPage(props: SettingsProps) {
     const urlBase64ToUint8Array = (base64String: string) => {
         var padding = '='.repeat((4 - base64String.length % 4) % 4);
         var base64 = (base64String + padding)
-            .replace(/\-/g, '+')
+            .replace(/-/g, '+')
             .replace(/_/g, '/');
 
         var rawData = window.atob(base64);
@@ -143,6 +161,12 @@ export function SettingsPage(props: SettingsProps) {
 
     const installAsApp = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
+
+        deferredPrompt.prompt();
+    }
+
+    const hidden = {
+        display: "none",
     }
 
     if (loginState === ProcessState.Success) {
@@ -177,8 +201,8 @@ export function SettingsPage(props: SettingsProps) {
                         <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
                     </div>
 
-                    <div className="title">
-                        <button onClick={installAsApp}><span role="img" aria-label="OK">📦</span> Install as App</button>
+                    <div id="installAsApp" className="title" style={hidden}>
+                        <button onClick={installAsApp}><span role="img" aria-label="Install as App">📦</span> Install as App</button>
                     </div>
 
                     <Link to="/friends" className="Settings-link">
