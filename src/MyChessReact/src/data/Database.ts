@@ -4,6 +4,7 @@ export enum DatabaseFields {
 
     // Game related fields
     GAMES_LIST = "Games/List",
+    GAMES_LOCAL_GAME_STATE = "Games/LocalGameState",
 
     // ME related fields
     ME_ID = "Me/ID",

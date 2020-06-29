@@ -8,6 +8,7 @@ import { ChessPlayer } from "./ChessPlayer";
 import { setTimeout } from "timers";
 import { QueryStringParser } from "../helpers/QueryStringParser";
 import { MyChessGameMove } from "../models/MyChessGameMove";
+import { Database, DatabaseFields } from "../data/Database";
 
 export class ChessBoardView {
     private board: ChessBoard = new ChessBoard();
@@ -185,6 +186,22 @@ export class ChessBoardView {
             this.isLocalGame = true;
 
             this.game = new MyChessGame();
+
+            const json = Database.get<string>(DatabaseFields.GAMES_LOCAL_GAME_STATE);
+            if (json) {
+                // Try to load game state from previously stored state
+                try {
+                    this.game = JSON.parse(json) as MyChessGame;
+                    console.log(this.game);
+
+                    // let animatedMoves = Math.min(3, this.game.moves.length);
+                    // let moves = this.game.moves.length - animatedMoves;
+                    this.currentMoveNumber = this.makeNumberOfMoves(this.game, this.game.moves.length);
+                } catch (error) {
+                    console.log(error);
+                    this.game = new MyChessGame();
+                }
+            }
         }
         else {
             this.isLocalGame = false;
@@ -537,6 +554,8 @@ export class ChessBoardView {
 
             this.game.moves.push(move);
             this.currentMoveNumber++;
+
+            Database.set(DatabaseFields.GAMES_LOCAL_GAME_STATE, JSON.stringify(this.game));
         }
         else {
             this.showCommentDialog(false);
