@@ -45,7 +45,8 @@ function App() {
             buttonText="Accept"
             cookieName="mychess-cookie-consent"
             style={{ background: "darkgrey", color: "black", display: "" }}
-            buttonStyle={{ color: "#4e503b" }}>
+            buttonStyle={{ color: "#4e503b" }}
+            sameSite="strict">
             This website uses cookies to enhance the user experience.
           </CookieConsent>
         </div>
