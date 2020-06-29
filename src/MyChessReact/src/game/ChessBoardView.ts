@@ -69,24 +69,24 @@ export class ChessBoardView {
     private touchendHandler(event: TouchEvent) {
         if (this.touch !== undefined &&
             event.changedTouches.length === 1) {
-            const delta = 40;
-            let touchEnd = event.changedTouches[0];
-            if (Math.abs(touchEnd.clientY - this.touch.clientY) > delta) {
-                if (touchEnd.clientY < this.touch.clientY - delta) {
-                    this.firstMove();
-                }
-                else {
-                    this.lastMove();
-                }
-            }
-            else if (Math.abs(touchEnd.clientX - this.touch.clientX) > delta) {
-                if (touchEnd.clientX < this.touch.clientX - delta) {
-                    this.previousMove();
-                }
-                else {
-                    this.nextMove();
-                }
-            }
+            // const delta = 40;
+            // let touchEnd = event.changedTouches[0];
+            // if (Math.abs(touchEnd.clientY - this.touch.clientY) > delta) {
+            //     if (touchEnd.clientY < this.touch.clientY - delta) {
+            //         this.firstMove();
+            //     }
+            //     else {
+            //         this.lastMove();
+            //     }
+            // }
+            // else if (Math.abs(touchEnd.clientX - this.touch.clientX) > delta) {
+            //     if (touchEnd.clientX < this.touch.clientX - delta) {
+            //         this.previousMove();
+            //     }
+            //     else {
+            //         this.nextMove();
+            //     }
+            // }
         }
     }
 
@@ -557,10 +557,8 @@ export class ChessBoardView {
 
             Database.set(DatabaseFields.GAMES_LOCAL_GAME_STATE, JSON.stringify(this.game));
         }
-        else {
-            this.showCommentDialog(false);
-            this.showGameNameDialog(this.isNewGame);
-        }
+        this.showCommentDialog(!this.isLocalGame);
+        this.showGameNameDialog(!this.isLocalGame && this.isNewGame);
     }
 
     public confirmComment = (): void => {
