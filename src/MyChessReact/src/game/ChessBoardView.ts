@@ -183,6 +183,8 @@ export class ChessBoardView {
         if (path.indexOf("/local") !== -1) {
             console.log("local game");
             this.isLocalGame = true;
+
+            this.game = new MyChessGame();
         }
         else {
             this.isLocalGame = false;
@@ -296,22 +298,29 @@ export class ChessBoardView {
         this.initialize();
         this.game = game;
 
-        let count = Math.max(Math.min(game.moves.length, movesCount), 1);
+        let count = Math.min(game.moves.length, movesCount);
         console.log("going to make " + count + " moves");
-        for (let i = 0; i < count; i++) {
-            let move = game.moves[i];
-            let promotion = move.promotion !== null ? move.promotion : "";
-            this.makeMove(move.move, promotion);
+
+        if (count > 0) {
+            for (let i = 0; i < count; i++) {
+                let move = game.moves[i];
+                let promotion = move.promotion !== null ? move.promotion : "";
+                this.makeMove(move.move, promotion);
+            }
+            this.setBoardStatus(count, game.moves.length);
+
+            let move = game.moves[count - 1];
+
+            const start = Date.parse(move.start);
+            const end = Date.parse(move.end);
+
+            this.setThinkTime(count, end - start);
+            this.setComment(move.comment);
         }
-        this.setBoardStatus(count, game.moves.length);
-
-        let move = game.moves[count - 1];
-
-        const start = Date.parse(move.start);
-        const end = Date.parse(move.end);
-
-        this.setThinkTime(count, end - start);
-        this.setComment(move.comment);
+        else {
+            this.setThinkTime(0, -1);
+            this.setComment("");
+        }
         this.drawBoard();
 
         return count;
@@ -510,8 +519,29 @@ export class ChessBoardView {
         console.log("move confirmed");
         this.showConfirmationDialog(false);
         this.showPromotionDialog(false);
-        this.showCommentDialog(!this.isLocalGame);
-        this.showGameNameDialog(!this.isLocalGame && this.isNewGame);
+
+        if (this.isLocalGame) {
+            const lastMove = this.getLastMoveAsString();
+            const lastPromotion = this.getLastMovePromotionAsString();
+            if (!lastMove) {
+                console.log("no last move available");
+                return;
+            }
+
+            const move = new MyChessGameMove()
+            move.move = lastMove;
+            move.promotion = lastPromotion;
+            move.comment = "";
+            move.start = this.start;
+            move.end = new Date().toISOString();
+
+            this.game.moves.push(move);
+            this.currentMoveNumber++;
+        }
+        else {
+            this.showCommentDialog(false);
+            this.showGameNameDialog(this.isNewGame);
+        }
     }
 
     public confirmComment = (): void => {
@@ -676,6 +706,11 @@ export class ChessBoardView {
 
     public setThinkTime(moveIndex: number, thinkTime: number) {
         let thinkTimeElement = document.getElementById("ThinkTime") as HTMLDivElement;
+
+        if (thinkTime === -1) {
+            thinkTimeElement.innerText = "";
+            return;
+        }
 
         let minutes = 0;
         let seconds = thinkTime / 1000;
