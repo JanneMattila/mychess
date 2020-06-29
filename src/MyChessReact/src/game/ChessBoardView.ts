@@ -46,6 +46,10 @@ export class ChessBoardView {
         this.board.initialize();
         this.previousAvailableMoves = [];
 
+        this.setBoardStatus(0, 0);
+        this.setComment("");
+        this.setThinkTime(0, -1);
+
         // Update game board to the screen
         this.drawBoard();
 
@@ -181,6 +185,8 @@ export class ChessBoardView {
 
         this.initialize();
 
+        this.start = new Date().toISOString();
+
         if (path.indexOf("/local") !== -1) {
             console.log("local game");
             this.isLocalGame = true;
@@ -194,8 +200,6 @@ export class ChessBoardView {
                     this.game = JSON.parse(json) as MyChessGame;
                     console.log(this.game);
 
-                    // let animatedMoves = Math.min(3, this.game.moves.length);
-                    // let moves = this.game.moves.length - animatedMoves;
                     this.currentMoveNumber = this.makeNumberOfMoves(this.game, this.game.moves.length);
                 } catch (error) {
                     console.log(error);
@@ -208,8 +212,6 @@ export class ChessBoardView {
             if (me) {
                 this.me = me;
             }
-
-            this.start = new Date().toISOString();
 
             if (path.indexOf("/new") !== -1) {
                 console.log("new game");
@@ -556,6 +558,7 @@ export class ChessBoardView {
             this.currentMoveNumber++;
 
             Database.set(DatabaseFields.GAMES_LOCAL_GAME_STATE, JSON.stringify(this.game));
+            this.start = new Date().toISOString();
         }
         this.showCommentDialog(!this.isLocalGame);
         this.showGameNameDialog(!this.isLocalGame && this.isNewGame);
