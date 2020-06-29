@@ -19,11 +19,9 @@ let userAgentApplication: UserAgentApplication;
 export function Auth(props: AuthProps) {
     const location = useLocation();
     const history = useHistory();
-    const selectorLoginState = (state: RootState) => state.loginState;
-    const selectorAccount = (state: RootState) => state.account;
 
-    const loginState = useTypedSelector(selectorLoginState);
-    const account = useTypedSelector(selectorAccount);
+    const loginState = useTypedSelector(state => state.loginState);
+    const account = useTypedSelector(state => state.account);
 
     const dispatch = useDispatch();
     const ai = getAppInsights();
