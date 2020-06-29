@@ -133,8 +133,6 @@ export function SettingsPage(props: SettingsProps) {
     }
 
     const handleNotificationChange = async (checked: boolean) => {
-        setNotifications(checked);
-
         if (checked && navigator.serviceWorker) {
             console.log(navigator.serviceWorker);
             const registration = await navigator.serviceWorker.getRegistration();
@@ -165,9 +163,12 @@ export function SettingsPage(props: SettingsProps) {
                         p256dh: p256dh,
                         auth: auth
                     });
+                    setNotifications(checked);
+                    return;
                 }
             }
         }
+        setNotifications(false);
     }
 
     const installAsApp = (event: MouseEvent<HTMLButtonElement>) => {
