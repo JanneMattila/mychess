@@ -13,7 +13,6 @@ export function PlayPage(props: PlayProps) {
     const meID = Database.get<string>(DatabaseFields.ME_ID);
 
     const board = new ChessBoardView();
-    let isOpen = false;
     let isEllipse = false;
 
     useEffect(() => {
@@ -22,11 +21,7 @@ export function PlayPage(props: PlayProps) {
         return () => {
             board.removeEventHandlers();
         }
-    }, [props.endpoint, accessToken, meID, window.location.href]);
-
-    const closeModal = () => {
-        isOpen = false;
-    }
+    }, [props.endpoint, accessToken, meID, board]);
 
     const confirmMove = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();

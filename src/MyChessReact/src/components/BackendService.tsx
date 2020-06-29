@@ -229,7 +229,7 @@ export function BackendService(props: BackendServiceProps) {
             };
 
             try {
-                const response = await fetch(props.endpoint + "/api/users/me", request);
+                const response = await fetch(endpoint + "/api/users/me", request);
                 const data = await response.json() as User;
                 console.log(data);
 
