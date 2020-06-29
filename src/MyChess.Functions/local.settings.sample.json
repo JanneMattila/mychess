@@ -8,7 +8,11 @@
     "AzureSignalRConnectionString": "<!-- Azure SignalR Connection string -->",
 
     "AzureAD:Audience": "",
-    "AzureAD:ClientId": ""
+    "AzureAD:ClientId": "",
+
+    "WebPush:PublicServerUri": "http://localhost:3000",
+    "WebPush:PublicKey": "",
+    "WebPush:PrivateKey": ""
   },
   "Host": {
     "CORS": "http://localhost:3000",

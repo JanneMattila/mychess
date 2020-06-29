@@ -170,7 +170,6 @@ namespace MyChess.Handlers
             }
 
             // TODO: If game is over then move to archive.
-            // TODO: Add notifications from move.
 
             var data = _compactor.Compact(game);
 
@@ -201,6 +200,8 @@ namespace MyChess.Handlers
                 RowKey = game.ID,
                 Data = data
             });
+
+            await _notificationHandler.SendNotificationAsync(opponentID, game.ID, move.Comment);
 
             return null;
         }

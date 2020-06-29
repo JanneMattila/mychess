@@ -70,6 +70,10 @@
         public const int SettingsHandlerNotificationsFound = 2302;
         public const int SettingsHandlerUpdateSettings = 2303;
 
+        public const int NotificationsHandlerSendingNotifications = 2400;
+        public const int NotificationsHandlerSendStatistics = 2401;
+        public const int NotificationsHandlerSendFailed = 2402;
+
         public static string CreateLinkToProblemDescription(int eventID)
         {
             return $"https://bit.ly/MyChessProblems#{eventID}";
