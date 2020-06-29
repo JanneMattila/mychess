@@ -9,7 +9,7 @@ export function HomePage() {
     return (
         <div>
             <GameList title="Games waiting for you" endpoint={configuration.endpoint} />
-            <div className="App-footer-container">
+            <footer className="App-footer-container">
                 <Link to="/privacy" className="App-footer-link">
                     Privacy
                 </Link>
@@ -17,7 +17,7 @@ export function HomePage() {
                 <Link to="/play/local" className="App-footer-link">
                     Play locally
                 </Link>
-            </div>
+            </footer>
         </div>
     );
 }
