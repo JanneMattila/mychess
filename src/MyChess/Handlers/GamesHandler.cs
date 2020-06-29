@@ -45,6 +45,9 @@ namespace MyChess.Handlers
             game.Players.White.ID = userID;
             var data = _compactor.Compact(game);
 
+            // TODO: Validate game data
+            var comment = game.Moves[0].Comment;
+
             await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity
             {
                 PartitionKey = opponentID,
@@ -57,6 +60,8 @@ namespace MyChess.Handlers
                 RowKey = game.ID,
                 Data = data
             });
+
+            await _notificationHandler.SendNotificationAsync(opponentID, game.ID, comment);
 
             return (game, null);
         }

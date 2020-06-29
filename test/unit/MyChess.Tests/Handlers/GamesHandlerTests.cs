@@ -140,6 +140,7 @@ namespace MyChess.Tests.Handlers
             });
             var gameToCreate = new MyChessGame();
             gameToCreate.Players.Black.ID = "user456";
+            gameToCreate.Moves.Add(new MyChessGameMove());
 
             // Act
             var actual = await _gamesHandler.CreateGameAsync(user, gameToCreate);
