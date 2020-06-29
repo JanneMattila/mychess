@@ -1,11 +1,16 @@
 export class UserNotifications {
     name: string;
     enabled: boolean;
-    uri: string;
+
+    endpoint: string;
+    p256dh: string;
+    auth: string;
 
     constructor() {
         this.name = "";
         this.enabled = false;
-        this.uri = "";
+        this.endpoint = "";
+        this.p256dh = "";
+        this.auth = "";
     }
 }

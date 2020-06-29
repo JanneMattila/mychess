@@ -10,7 +10,13 @@ namespace MyChess.Interfaces
         [JsonPropertyName("enabled")]
         public bool Enabled { get; set; }
 
-        [JsonPropertyName("uri")]
-        public string Uri { get; set; } = string.Empty;
+        [JsonPropertyName("endpoint")]
+        public string Endpoint { get; set; } = string.Empty;
+
+        [JsonPropertyName("p256dh")]
+        public string P256dh { get; set; } = string.Empty;
+
+        [JsonPropertyName("auth")]
+        public string Auth { get; set; } = string.Empty;
     }
 }

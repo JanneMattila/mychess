@@ -11,7 +11,9 @@ namespace MyChess.Data
 
         public string Name { get; set; } = string.Empty;
 
-        public string Uri { get; set; } = string.Empty;
+        public string Endpoint { get; set; } = string.Empty;
+        public string P256dh { get; set; } = string.Empty;
+        public string Auth { get; set; } = string.Empty;
 
         public bool Enabled { get; set; } = false;
     }

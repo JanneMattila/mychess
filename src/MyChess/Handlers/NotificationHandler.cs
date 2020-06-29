@@ -50,9 +50,9 @@ namespace MyChess.Handlers
             {
                 if (notificationEntity.Enabled)
                 {
-                    var endpoint = notificationEntity.Uri;
-                    var p256dh = string.Empty;
-                    var auth = string.Empty;
+                    var endpoint = notificationEntity.Endpoint;
+                    var p256dh = notificationEntity.P256dh;
+                    var auth = notificationEntity.Auth;
 
                     var subscription = new PushSubscription(endpoint, p256dh, auth);
 

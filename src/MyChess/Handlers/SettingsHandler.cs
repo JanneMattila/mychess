@@ -36,7 +36,9 @@ namespace MyChess.Handlers
                 {
                     Name = userNotificationEntity.Name,
                     Enabled = userNotificationEntity.Enabled,
-                    Uri = userNotificationEntity.Uri,
+                    Endpoint = userNotificationEntity.Endpoint,
+                    P256dh = userNotificationEntity.P256dh,
+                    Auth = userNotificationEntity.Auth,
                 });
             }
 
@@ -66,7 +68,9 @@ namespace MyChess.Handlers
                     RowKey = userNotifications.Name,
                     Name = userNotifications.Name,
                     Enabled = userNotifications.Enabled,
-                    Uri = userNotifications.Uri
+                    Endpoint = userNotifications.Endpoint,
+                    P256dh = userNotifications.P256dh,
+                    Auth = userNotifications.Auth,
                 });
             }
 

@@ -8,6 +8,7 @@ import { getAppInsights } from "../components/TelemetryService";
 import { Database, DatabaseFields } from "../data/Database";
 import { BackendService } from "../components/BackendService";
 import { UserSettings } from "../models/UserSettings";
+import { UserNotifications } from "../models/UserNotifications";
 
 type SettingsProps = {
     endpoint: string;
@@ -27,7 +28,7 @@ export function SettingsPage(props: SettingsProps) {
     const [playerIdentifier, setPlayerIdentifier] = useState("");
     const [playAlwaysUp, setPlayAlwaysUp] = useState(false);
     const [isNotificationsEnabled, setNotifications] = useState(false);
-    const [notificationUri, setNotificationUri] = useState("");
+    const [notificationSettings, setNotificationSettings] = useState<UserNotifications | undefined>(undefined);
     const [deferredPrompt, setDeferredPrompt] = useState<any>(undefined);
 
     const ai = getAppInsights();
@@ -65,7 +66,7 @@ export function SettingsPage(props: SettingsProps) {
             let enabled = false;
             if (userSettings.notifications.length === 1 &&
                 userSettings.notifications[0].enabled) {
-                setNotificationUri(userSettings.notifications[0].uri);
+                setNotificationSettings(userSettings.notifications[0]);
                 enabled = true;
             }
 
@@ -78,13 +79,11 @@ export function SettingsPage(props: SettingsProps) {
         event.preventDefault();
         if (userSettings) {
             userSettings.playAlwaysUp = playAlwaysUp;
-            userSettings.notifications = [
-                {
-                    "enabled": isNotificationsEnabled,
-                    "name": "browser1",
-                    "uri": notificationUri
-                }
-            ];
+            if (notificationSettings) {
+                userSettings.notifications = [
+                    notificationSettings
+                ];
+            }
 
             console.log("save");
             console.log(userSettings);
@@ -152,12 +151,24 @@ export function SettingsPage(props: SettingsProps) {
 
                     const result = await registration.pushManager.subscribe(options);
                     console.log(result);
-                    setNotificationUri(result.endpoint);
+                    const json = result.toJSON();
+                    const p256dh = json?.keys?.p256dh;
+                    const auth = json?.keys?.auth;
+                    if (!p256dh || !auth) {
+                        throw new Error("Could not get push subscription keys");
+                    }
+
+                    setNotificationSettings({
+                        enabled: checked,
+                        name: "browser1",
+                        endpoint: result.endpoint,
+                        p256dh: p256dh,
+                        auth: auth
+                    });
                 }
             }
         }
     }
-
 
     const installAsApp = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
