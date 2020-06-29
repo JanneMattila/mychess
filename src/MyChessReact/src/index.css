@@ -5,4 +5,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #353535;
+
+  /* Prevent pull to refresh */
+  touch-action: manipulation;
+  overscroll-behavior-y: contain;
 }
