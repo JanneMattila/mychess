@@ -73,6 +73,15 @@ export function PlayPage(props: PlayProps) {
         board.lastMove();
     }
 
+    const resignGame = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+
+        if (window.confirm("Do you really want to resign the current game?")) {
+            board.resignGame();
+            toggleEllipse(event);
+        }
+    }
+
     const hidden = {
         display: "none",
     }
@@ -135,7 +144,7 @@ export function PlayPage(props: PlayProps) {
                 <hr />
                 <br />
 
-                <button onClick={cancel}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
+                <button onClick={resignGame}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
             </div>
         </div >
     );

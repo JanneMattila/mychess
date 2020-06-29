@@ -606,6 +606,21 @@ export class ChessBoardView {
         this.showCommentDialog(false);
     }
 
+    public resignGame = (): void => {
+        console.log("game resigned");
+
+        if (this.isLocalGame) {
+            Database.delete(DatabaseFields.GAMES_LOCAL_GAME_STATE);
+            this.game = new MyChessGame();
+            this.board = new ChessBoard();
+            this.board.initialize();
+            this.previousAvailableMoves = [];
+            this.currentMoveNumber = 0;
+
+            this.drawBoard();
+        }
+    }
+
     public cancel = (): void => {
         console.log("cancel");
         this.showConfirmationDialog(false);
