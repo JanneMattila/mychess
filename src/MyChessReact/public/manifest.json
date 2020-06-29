@@ -19,7 +19,7 @@
     }
   ],
   "start_url": ".",
-  "display": "standalone",
+  "display": "minimal-ui",
   "theme_color": "#FFFFFF",
   "background_color": "#FFFFFF",
   "orientation": "portrait"
