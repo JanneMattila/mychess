@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
-import { loginEvent, RootState, ProcessState } from "../actions";
+import { loginEvent, ProcessState } from "../actions";
 import { UserAgentApplication, Configuration } from "msal";
 import { Link, useHistory, useLocation } from "react-router-dom";
 import { getAppInsights } from "./TelemetryService";
@@ -33,6 +33,22 @@ export function Auth(props: AuthProps) {
         ]
     };
 
+    const config: Configuration = {
+        auth: {
+            clientId: props.clientId,
+            authority: "https://login.microsoftonline.com/common",
+            navigateToLoginRequestUrl: false,
+            redirectUri: window.location.origin,
+            postLogoutRedirectUri: window.location.origin
+        },
+        cache: {
+            cacheLocation: "localStorage"
+        },
+        system: {
+            navigateFrameWait: 0
+        }
+    };
+
     const preAuthEvent = () => {
         if (location.pathname !== "/") {
             Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
@@ -55,24 +71,17 @@ export function Auth(props: AuthProps) {
         }
     }
 
+    const acquireTokenSilent = () => {
+        userAgentApplication.acquireTokenSilent(accessTokenRequest).then(function (accessTokenResponse) {
+            // Acquire token silent success
+            authEvent(accessTokenResponse.accessToken);
+        }).catch(function (error) {
+            // Acquire token silent failure, wait for user sign in
+        });
+    }
+
     useEffect(() => {
         if (!userAgentApplication) {
-            const config: Configuration = {
-                auth: {
-                    clientId: props.clientId,
-                    authority: "https://login.microsoftonline.com/common",
-                    navigateToLoginRequestUrl: false,
-                    redirectUri: window.location.origin,
-                    postLogoutRedirectUri: window.location.origin
-                },
-                cache: {
-                    cacheLocation: "localStorage"
-                },
-                system: {
-                    navigateFrameWait: 0
-                }
-            };
-
             userAgentApplication = new UserAgentApplication(config);
             userAgentApplication.handleRedirectCallback((error, response) => {
                 if (error) {
@@ -87,12 +96,10 @@ export function Auth(props: AuthProps) {
                 }
             });
 
-            userAgentApplication.acquireTokenSilent(accessTokenRequest).then(function (accessTokenResponse) {
-                // Acquire token silent success
-                authEvent(accessTokenResponse.accessToken);
-            }).catch(function (error) {
-                // Acquire token silent failure, wait for user sign in
-            });
+            acquireTokenSilent();
+            setInterval(() => {
+                acquireTokenSilent();
+            }, 1000 * 60 * 45);
         }
     });
 
