@@ -58,6 +58,26 @@ export function PlayPage(props: PlayProps) {
         }
     }
 
+    const firstMove = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        board.firstMove();
+    }
+
+    const previousMove = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        board.previousMove();
+    }
+
+    const nextMove = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        board.nextMove();
+    }
+
+    const lastMove = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        board.lastMove();
+    }
+
     const hidden = {
         display: "none",
     }
@@ -109,8 +129,18 @@ export function PlayPage(props: PlayProps) {
                 <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
             </div>
             <div id="ellipseContent" style={hidden}>
-                <button onClick={cancel}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
+                <button onClick={firstMove}><span role="img" aria-label="Move to first move">&nbsp; &#9664; &#9664; &nbsp;</span></button>
+                <button onClick={previousMove}><span role="img" aria-label="Move to previous move">&nbsp; &#9664; &nbsp;</span></button>
+                <button onClick={nextMove}><span role="img" aria-label="Move to next move">&nbsp; &#9654; &nbsp;</span></button>
+                <button onClick={lastMove}><span role="img" aria-label="Move to last move">&nbsp; &#9654; &#9654; &nbsp;</span></button>
+
                 <div id="ThinkTime"></div>
+
+                <br />
+                <hr />
+                <br />
+
+                <button onClick={cancel}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
             </div>
         </div >
     );
