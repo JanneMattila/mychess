@@ -37,6 +37,7 @@ export function SettingsPage(props: SettingsProps) {
 
         const setPrompt = (e: any) => {
             console.log("Show install prompt");
+            ai.trackEvent({ name: "ShowInstallPrompt" });
             setDeferredPrompt(e);
 
             const element = document.getElementById("installAsApp");
@@ -78,6 +79,9 @@ export function SettingsPage(props: SettingsProps) {
 
     const save = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
+
+        ai.trackEvent({ name: "SaveSettings" });
+
         if (userSettings) {
             userSettings.playAlwaysUp = playAlwaysUp;
             userSettings.notifications = [];
@@ -101,11 +105,15 @@ export function SettingsPage(props: SettingsProps) {
     const copy = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
 
+        ai.trackEvent({ name: "CopyInvitationCode" });
+
         navigator.clipboard.writeText(playerIdentifier);
     }
 
     const share = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
+
+        ai.trackEvent({ name: "ShareInvitationLink" });
 
         navigator.clipboard.writeText(window.origin + "/friends/add/" + playerIdentifier);
     }
@@ -138,6 +146,9 @@ export function SettingsPage(props: SettingsProps) {
         setNotifications(e => !e);
 
         if (!isNotificationsEnabled && navigator.serviceWorker) {
+
+            ai.trackEvent({ name: "TryingToEnableNotifications" });
+
             console.log("Enabling notifications");
             console.log(navigator.serviceWorker);
             const registration = await navigator.serviceWorker.getRegistration();
@@ -168,12 +179,15 @@ export function SettingsPage(props: SettingsProps) {
                         p256dh: p256dh,
                         auth: auth
                     });
+
+                    ai.trackEvent({ name: "NotificationEnabled" });
                     return;
                 }
             }
         }
 
         console.log("Disabling notifications");
+        ai.trackEvent({ name: "NotificationDisabled" });
         setNotificationSettings(undefined);
     }
 
