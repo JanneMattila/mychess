@@ -19,6 +19,7 @@ self.addEventListener('push', (event) => {
         event.waitUntil(self.registration.showNotification("My Chess", {
             body: "Open My Chess to play!",
             vibrate: [250, 100, 250, 100, 250],
+            badge: '/logo_192x192.png',
             icon: '/logo_192x192.png',
             data: "/"
         }));
@@ -31,6 +32,7 @@ self.addEventListener('push', (event) => {
         event.waitUntil(self.registration.showNotification("My Chess", {
             body: data.text,
             vibrate: [250, 100, 250, 100, 250],
+            badge: '/logo_192x192.png',
             icon: '/logo_192x192.png',
             data: data.uri
         }));
