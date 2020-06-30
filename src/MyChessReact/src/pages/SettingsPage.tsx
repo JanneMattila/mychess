@@ -79,7 +79,8 @@ export function SettingsPage(props: SettingsProps) {
         event.preventDefault();
         if (userSettings) {
             userSettings.playAlwaysUp = playAlwaysUp;
-            if (notificationSettings) {
+            userSettings.notifications = [];
+            if (notificationSettings && isNotificationsEnabled) {
                 userSettings.notifications = [
                     notificationSettings
                 ];
@@ -133,7 +134,10 @@ export function SettingsPage(props: SettingsProps) {
     }
 
     const handleNotificationChange = async (checked: boolean) => {
-        if (checked && navigator.serviceWorker) {
+        setNotifications(e => !e);
+
+        if (!isNotificationsEnabled && navigator.serviceWorker) {
+            console.log("Enabling notifications");
             console.log(navigator.serviceWorker);
             const registration = await navigator.serviceWorker.getRegistration();
             if (registration) {
@@ -163,12 +167,13 @@ export function SettingsPage(props: SettingsProps) {
                         p256dh: p256dh,
                         auth: auth
                     });
-                    setNotifications(checked);
                     return;
                 }
             }
         }
-        setNotifications(false);
+
+        console.log("Disabling notifications");
+        setNotificationSettings(undefined);
     }
 
     const installAsApp = (event: MouseEvent<HTMLButtonElement>) => {
