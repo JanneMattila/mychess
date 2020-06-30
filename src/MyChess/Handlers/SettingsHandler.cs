@@ -60,6 +60,12 @@ namespace MyChess.Handlers
                 PlayAlwaysUp = userSettings.PlayAlwaysUp
             });
 
+            // Remove any existing user notifications
+            await foreach (var notificationEntity in _context.GetAllAsync<UserNotificationEntity>(TableNames.UserNotifications, userID))
+            {
+                await _context.DeleteAsync(TableNames.UserNotifications, notificationEntity);
+            }
+
             foreach (var userNotifications in userSettings.Notifications)
             {
                 await _context.UpsertAsync(TableNames.UserNotifications, new UserNotificationEntity

@@ -47,7 +47,7 @@ export function register(config?: Config) {
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
+      const swUrl = `${process.env.PUBLIC_URL}/service-worker-custom.js`;
 
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
@@ -65,37 +65,6 @@ export function register(config?: Config) {
         // Is not localhost. Just register service worker
         registerValidSW(swUrl, config);
       }
-    });
-
-    /* eslint-disable-next-line no-restricted-globals */
-    self.addEventListener('push', function (event: any) {
-
-      console.log("serviceWorker - push");
-
-      /* eslint-disable-next-line no-restricted-globals */
-      if (!(self.Notification && self.Notification.permission === 'granted')) {
-        return;
-      }
-
-      console.log("serviceWorker - before data");
-      const data = event.data.json();
-      console.log("serviceWorker - after data");
-      console.log(data);
-
-      /* eslint-disable-next-line no-restricted-globals */
-      const notification = new self.Notification("My Chess", {
-        body: data.text,
-        vibrate: [250, 100, 250, 100, 250],
-        icon: 'images/logo_192x192.png',
-        badge: 'images/logo_192x192.png',
-        data: data.uri
-      });
-
-      notification.addEventListener('click', function () {
-        if (clients.openWindow) {
-          clients.openWindow(data.uri);
-        }
-      });
     });
   }
 }

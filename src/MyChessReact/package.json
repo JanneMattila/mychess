@@ -6,6 +6,7 @@
     "@microsoft/applicationinsights-react-js": "^3.0.0",
     "@microsoft/applicationinsights-web": "^2.5.4",
     "@types/react-modal": "^3.10.5",
+    "@types/workbox-build": "^5.0.0",
     "msal": "^1.2.2",
     "react": "^16.13.1",
     "react-cookie-consent": "^5.0.1",
@@ -22,7 +23,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && node ./src/service-worker-build.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
