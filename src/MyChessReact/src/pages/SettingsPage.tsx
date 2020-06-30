@@ -36,11 +36,12 @@ export function SettingsPage(props: SettingsProps) {
     useEffect(() => {
 
         const setPrompt = (e: any) => {
+            console.log("Show install prompt");
             setDeferredPrompt(e);
 
             const element = document.getElementById("installAsApp");
             if (element) {
-                element.style.visibility = "";
+                element.style.display = "";
             }
         }
 
