@@ -1,4 +1,5 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/5.1.3/workbox-sw.js");
+workbox.setConfig({ debug: false });
 
 self.addEventListener('push', (event) => {
     console.log("serviceWorker - push");
@@ -13,17 +14,27 @@ self.addEventListener('push', (event) => {
         return;
     }
 
-    const data = event.data.json();
-    console.log("serviceWorker - notification data:");
-    console.log(data);
+    if (!event.data) {
+        console.log("serviceWorker - local notification data:");
+        event.waitUntil(self.registration.showNotification("My Chess", {
+            body: "Open My Chess to play!",
+            vibrate: [250, 100, 250, 100, 250],
+            icon: '/logo_192x192.png',
+            data: "/"
+        }));
+    }
+    else {
+        const data = event.data.json();
+        console.log("serviceWorker - notification data:");
+        console.log(data);
 
-    event.waitUntil(self.registration.showNotification("My Chess", {
-        body: data.text,
-        vibrate: [250, 100, 250, 100, 250],
-        icon: '../images/logo_192x192.png',
-        badge: '../images/logo_192x192.png',
-        data: data.uri
-    }));
+        event.waitUntil(self.registration.showNotification("My Chess", {
+            body: data.text,
+            vibrate: [250, 100, 250, 100, 250],
+            icon: '/logo_192x192.png',
+            data: data.uri
+        }));
+    }
 });
 
 self.addEventListener('notificationclick', (event) => {
@@ -34,7 +45,7 @@ self.addEventListener('notificationclick', (event) => {
 
     event.notification.close();
     event.waitUntil(clients.matchAll({
-        type: "window"
+        type: "window", includeUncontrolled: true
     }).then(function (clientList) {
         if (clientList.length > 0) {
             let client = clientList[0];
