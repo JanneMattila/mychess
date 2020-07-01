@@ -65,7 +65,10 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("GET");
+            var req = HttpRequestHelper.Create("GET", query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
+            {
+                {  "state", "WaitingForYou" }
+            });
 
             // Act
             var actual = await _gamesFunction.Run(req, null);
@@ -93,7 +96,10 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("GET");
+            var req = HttpRequestHelper.Create("GET", query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
+            {
+                {  "state", "Archive" }
+            });
 
             // Act
             var actual = await _gamesFunction.Run(req, "abc");
@@ -135,7 +141,7 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("POST", body: game);
+            var req = HttpRequestHelper.Create("POST", body: game, query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
 
             // Act
             var actual = await _gamesFunction.Run(req, "abc");
@@ -178,7 +184,7 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("POST", body: game);
+            var req = HttpRequestHelper.Create("POST", body: game, query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
 
             // Act
             var actual = await _gamesFunction.Run(req, "abc");
