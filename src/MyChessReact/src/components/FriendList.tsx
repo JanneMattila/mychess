@@ -69,16 +69,14 @@ export function FriendList(props: FriendListProps) {
                         </div>;
                 }
                 else {
-                    contents = renderFriends(friends);
-                }
-
-                contents =
-                    <div>
-                        {contents}
+                    contents = <div>
+                        {renderFriends(friends)}
                         <div className="subtitle">
                             Or <button onClick={addNewFriend}>add new</button> friend
                         </div>
                     </div>;
+                }
+
                 break;
             case ProcessState.Error:
                 contents = <div className="subtitle">Oh no! Couldn't retrieve friends. Click to <button onClick={refresh}>refresh</button></div>;
