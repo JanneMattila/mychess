@@ -96,7 +96,6 @@ export function SettingsPage(props: SettingsProps) {
             console.log(userSettings);
 
             setExecuteSetSettings(userSettings);
-            history.push("/");
         }
     }
 
@@ -191,6 +190,7 @@ export function SettingsPage(props: SettingsProps) {
 
         console.log("Disabling notifications");
         ai.trackEvent({ name: "NotificationDisabled" });
+        setNotifications(false);
         setNotificationSettings(undefined);
     }
 

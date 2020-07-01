@@ -197,6 +197,7 @@ export function BackendService(props: BackendServiceProps) {
                 const response = await fetch(endpoint + "/api/users/me/settings", request);
                 if (response.ok) {
                     dispatch(settingsUpsertEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
+                    history.push("/");
                 } else {
                     const data = await response.json();
                     console.log(data);
