@@ -66,28 +66,62 @@ namespace MyChess.Handlers
             return (game, null);
         }
 
-        public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID)
+        public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID, string state)
         {
             var userID = await GetOrCreateUserAsync(authenticatedUser);
-            var gameEntity = await _context.GetAsync<GameEntity>(TableNames.GamesWaitingForYou, userID, gameID);
-            if (gameEntity != null)
+            var tableNames = GetTableNames(state);
+            foreach (var tableName in tableNames)
             {
-                _log.GameHandlerGameFound(gameID);
-                return _compactor.Decompress(gameEntity.Data);
+                var gameEntity = await _context.GetAsync<GameEntity>(tableName, userID, gameID);
+                if (gameEntity != null)
+                {
+                    _log.GameHandlerGameFound(gameID);
+                    return _compactor.Decompress(gameEntity.Data);
+                }
+                _log.GameHandlerGameNotFoundFromTable(gameID, tableName);
+            }
+
+            _log.GameHandlerGameNotFound(gameID);
+            return null;
+        }
+
+        private List<string> GetTableNames(string state)
+        {
+            var tables = new List<string>();
+            if (string.IsNullOrEmpty(state) || state == GameFilterType.WaitingForYou)
+            {
+                tables.Add(TableNames.GamesWaitingForYou);
+                tables.Add(TableNames.GamesWaitingForOpponent);
+                tables.Add(TableNames.GamesArchive);
+            }
+            else if (state == GameFilterType.WaitingForOpponent)
+            {
+                tables.Add(TableNames.GamesWaitingForOpponent);
+                tables.Add(TableNames.GamesWaitingForYou);
+                tables.Add(TableNames.GamesArchive);
             }
             else
             {
-                _log.GameHandlerGameNotFound(gameID);
-                return null;
+                tables.Add(TableNames.GamesArchive);
+                tables.Add(TableNames.GamesWaitingForOpponent);
+                tables.Add(TableNames.GamesWaitingForYou);
             }
+            return tables;
         }
 
-        public async Task<List<MyChessGame>> GetGamesAsync(AuthenticatedUser authenticatedUser)
+        public async Task<List<MyChessGame>> GetGamesAsync(AuthenticatedUser authenticatedUser, string state)
         {
             var userID = await GetOrCreateUserAsync(authenticatedUser);
             var games = new List<MyChessGame>();
+            var table = state switch
+            {
+                GameFilterType.WaitingForYou => TableNames.GamesWaitingForYou,
+                GameFilterType.WaitingForOpponent => TableNames.GamesWaitingForOpponent,
+                GameFilterType.Archive => TableNames.GamesArchive,
+                _ => TableNames.GamesWaitingForYou
+            };
 
-            await foreach (var gameEntity in _context.GetAllAsync<GameEntity>(TableNames.GamesWaitingForYou, userID))
+            await foreach (var gameEntity in _context.GetAllAsync<GameEntity>(table, userID))
             {
                 var game = _compactor.Decompress(gameEntity.Data);
                 games.Add(game);

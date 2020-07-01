@@ -9,6 +9,7 @@ namespace MyChess.Handlers.Internal
     {
         private static readonly Action<ILogger, string, Exception> _gameHandlerGameFound;
         private static readonly Action<ILogger, string, Exception> _gameHandlerGameNotFound;
+        private static readonly Action<ILogger, string, string, Exception> _gameHandlerGameNotFoundFromTable;
         private static readonly Action<ILogger, int, Exception> _gameHandlerGamesFound;
 
         private static readonly Action<ILogger, string, Exception> _gameHandlerMoveGameNotFound;
@@ -25,6 +26,10 @@ namespace MyChess.Handlers.Internal
                 LogLevel.Warning,
                 new EventId(LoggingEvents.GameHandlerGameNotFound, nameof(GameHandlerGameNotFound)),
                 "Game not found {GameID}");
+            _gameHandlerGameNotFoundFromTable = LoggerMessage.Define<string, string>(
+                LogLevel.Trace,
+                new EventId(LoggingEvents.GameHandlerGameNotFoundFromTable, nameof(GameHandlerGameNotFoundFromTable)),
+                "Game not found {GameID} from {Table}");
             _gameHandlerGamesFound = LoggerMessage.Define<int>(
                 LogLevel.Information,
                 new EventId(LoggingEvents.GameHandlerGamesFound, nameof(GameHandlerGamesFound)),
@@ -45,6 +50,7 @@ namespace MyChess.Handlers.Internal
         }
 
         public static void GameHandlerGameFound(this ILogger logger, string gameID) => _gameHandlerGameFound(logger, gameID, null);
+        public static void GameHandlerGameNotFoundFromTable(this ILogger logger, string gameID, string table) => _gameHandlerGameNotFoundFromTable(logger, gameID, table, null);
         public static void GameHandlerGameNotFound(this ILogger logger, string gameID) => _gameHandlerGameNotFound(logger, gameID, null);
         public static void GameHandlerGamesFound(this ILogger logger, int count) => _gameHandlerGamesFound(logger, count, null);
 

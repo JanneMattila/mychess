@@ -9,6 +9,7 @@ import { setTimeout } from "timers";
 import { QueryStringParser } from "../helpers/QueryStringParser";
 import { MyChessGameMove } from "../models/MyChessGameMove";
 import { Database, DatabaseFields } from "../data/Database";
+import { GameStateFilter } from "../models/GameStateFilter";
 
 export class ChessBoardView {
     private board: ChessBoard = new ChessBoard();
@@ -231,6 +232,8 @@ export class ChessBoardView {
                 }
                 else {
                     const gameID = path.substring(path.lastIndexOf("/") + 1);
+                    const state = queryString.get("state") ?? "";
+
                     try {
                         const request: RequestInit = {
                             method: "GET",
@@ -239,7 +242,7 @@ export class ChessBoardView {
                                 "Authorization": "Bearer " + this.accessToken
                             }
                         };
-                        const response = await fetch(this.endpoint + "/api/games/" + gameID, request);
+                        const response = await fetch(this.endpoint + `/api/games/${gameID}?state=${state}`, request);
                         this.game = await response.json() as MyChessGame;
                         console.log(this.game);
 
@@ -277,7 +280,7 @@ export class ChessBoardView {
             this.game = await response.json() as MyChessGame;
             console.log(this.game);
 
-            document.location.pathname = `/play/${this.game.id}`;
+            document.location.href = `/play/${this.game.id}?state=${GameStateFilter.WAITING_FOR_OPPONENT}`;
         } catch (error) {
             //ai.trackException(error);
 

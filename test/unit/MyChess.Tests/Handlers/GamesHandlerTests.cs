@@ -36,7 +36,7 @@ namespace MyChess.Tests.Handlers
             };
 
             // Act
-            var actual = await _gamesHandler.GetGamesAsync(user);
+            var actual = await _gamesHandler.GetGamesAsync(user, null);
 
             // Assert
             Assert.Equal(expected, actual.Count);
@@ -70,7 +70,7 @@ namespace MyChess.Tests.Handlers
             });
 
             // Act
-            var actual = await _gamesHandler.GetGameAsync(user, "123");
+            var actual = await _gamesHandler.GetGameAsync(user, "123", null);
 
             // Assert
             Assert.NotNull(actual);

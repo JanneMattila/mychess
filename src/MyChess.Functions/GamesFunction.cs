@@ -50,28 +50,35 @@ namespace MyChess.Functions
 
             var authenticatedUser = principal.ToAuthenticatedUser();
 
+
+            var state = "";
+            if (req.Query.ContainsKey("state"))
+            {
+                state = req.Query["state"];
+            }
+
             _log.FuncGamesProcessingMethod(req.Method);
             return req.Method switch
             {
-                "GET" => await Get(authenticatedUser, id),
+                "GET" => await Get(authenticatedUser, id, state),
                 "POST" => await PostAsync(authenticatedUser, req, id),
                 "DELETE" => Delete(authenticatedUser, id),
                 _ => new StatusCodeResult((int)HttpStatusCode.NotImplemented)
             };
         }
 
-        private async Task<IActionResult> Get(AuthenticatedUser authenticatedUser, string id)
+        private async Task<IActionResult> Get(AuthenticatedUser authenticatedUser, string id, string state)
         {
             if (string.IsNullOrEmpty(id))
             {
                 _log.FuncGamesFetchAllGames();
-                var games = await _gamesHandler.GetGamesAsync(authenticatedUser);
+                var games = await _gamesHandler.GetGamesAsync(authenticatedUser, state);
                 return new OkObjectResult(games);
             }
             else
             {
                 _log.FuncGamesFetchSingleGame(id);
-                var game = await _gamesHandler.GetGameAsync(authenticatedUser, id);
+                var game = await _gamesHandler.GetGameAsync(authenticatedUser, id, state);
                 if (game == null)
                 {
                     return new NotFoundResult();

@@ -20,12 +20,12 @@ namespace MyChess.Functions.Tests.Stubs
             return (SingleGame, Error);
         }
 
-        public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID)
+        public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID, string state)
         {
             return await Task.FromResult(SingleGame);
         }
 
-        public async Task<List<MyChessGame>> GetGamesAsync(AuthenticatedUser authenticatedUser)
+        public async Task<List<MyChessGame>> GetGamesAsync(AuthenticatedUser authenticatedUser, string state)
         {
             return await Task.FromResult(Games);
         }

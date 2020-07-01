@@ -8,6 +8,7 @@ import { User } from "../models/User";
 import { useHistory } from "react-router-dom";
 import { useTypedSelector } from "../reducers";
 import { UserSettings } from "../models/UserSettings";
+import { GameStateFilter } from "../models/GameStateFilter";
 
 type BackendServiceProps = {
     endpoint: string;
@@ -77,7 +78,7 @@ export function BackendService(props: BackendServiceProps) {
             };
 
             try {
-                const response = await fetch(endpoint + "/api/games", request);
+                const response = await fetch(endpoint + "/api/games?state=" + GameStateFilter.WAITING_FOR_YOU, request);
                 const data = await response.json();
 
                 dispatch(gamesLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));

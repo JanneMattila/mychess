@@ -8,6 +8,7 @@ import "./GameList.css";
 import { Database, DatabaseFields } from "../data/Database";
 import { User } from "../models/User";
 import { BackendService } from "./BackendService";
+import { GameStateFilter } from "../models/GameStateFilter";
 
 type GameListProps = {
     title: string;
@@ -47,7 +48,7 @@ export function GameList(props: GameListProps) {
             <div>
                 <div className="row">
                     {games?.map(game =>
-                        <Link to={{ pathname: "/play/" + game?.id }} className="GameList-link" key={game?.id}>
+                        <Link to={{ pathname: `/play/${game?.id}?state=${GameStateFilter.WAITING_FOR_YOU}` }} className="GameList-link" key={game?.id}>
                             <div className="gameTemplate">
                                 <div className="nameTemplate">
                                     {game?.name}
