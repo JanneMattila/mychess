@@ -116,7 +116,13 @@ export function BackendService(props: BackendServiceProps) {
 
                 if (response.ok) {
                     dispatch(friendUpsertEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
-                    history.push("/friends");
+                    const meID = Database.get<string>(DatabaseFields.ME_ID);
+                    if (meID) {
+                        history.push("/friends");
+                    }
+                    else {
+                        history.push("/settings");
+                    }
                 } else {
                     const ex = data as ProblemDetail;
                     if (ex.title !== undefined && ex.instance !== undefined) {

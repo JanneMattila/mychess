@@ -1,5 +1,5 @@
 import React, { useEffect, MouseEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Switch from "react-switch";
 import "./SettingsPage.css";
 import { ProcessState } from "../actions";
@@ -16,6 +16,7 @@ type SettingsProps = {
 };
 
 export function SettingsPage(props: SettingsProps) {
+    const history = useHistory();
     const loginState = useTypedSelector(state => state.loginState);
     const me = useTypedSelector(state => state.me);
     const meID = Database.get<string>(DatabaseFields.ME_ID);
@@ -60,7 +61,7 @@ export function SettingsPage(props: SettingsProps) {
             console.log("remove event beforeinstallprompt");
             window.removeEventListener('beforeinstallprompt', setPrompt);
         }
-    }, [me, meID]);
+    }, [me, meID, ai]);
 
 
     useEffect(() => {
@@ -95,11 +96,13 @@ export function SettingsPage(props: SettingsProps) {
             console.log(userSettings);
 
             setExecuteSetSettings(userSettings);
+            history.push("/");
         }
     }
 
     const cancel = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
+        history.push("/");
     }
 
     const copy = (event: MouseEvent<HTMLButtonElement>) => {
