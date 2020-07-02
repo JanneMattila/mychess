@@ -26,6 +26,7 @@ export class ChessBoardView {
 
     private isLocalGame: boolean = true;
     private isNewGame: boolean = false;
+    private isDialogOpen: boolean = false;
     private friendID: string = "";
 
     private pieceSize: number = 45;
@@ -96,6 +97,11 @@ export class ChessBoardView {
     }
 
     private keyupHandler(event: KeyboardEvent) {
+
+        if (this.isDialogOpen) {
+            return;
+        }
+
         switch (event.keyCode) {
             case 36: // Home
                 this.firstMove();
@@ -565,6 +571,7 @@ export class ChessBoardView {
         }
         this.showCommentDialog(!this.isLocalGame);
         this.showGameNameDialog(!this.isLocalGame && this.isNewGame);
+        this.isDialogOpen = !this.isLocalGame;
     }
 
     public confirmComment = (): void => {
@@ -610,6 +617,7 @@ export class ChessBoardView {
 
         this.showGameNameDialog(false);
         this.showCommentDialog(false);
+        this.isDialogOpen = false;
     }
 
     public resignGame = (): void => {
@@ -639,6 +647,7 @@ export class ChessBoardView {
         let confirmationDialogElement = document.getElementById("confirmation");
         if (confirmationDialogElement !== null) {
             confirmationDialogElement.style.display = show ? "inline" : "none";
+            this.isDialogOpen = true;
         }
     }
 
