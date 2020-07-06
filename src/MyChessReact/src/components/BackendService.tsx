@@ -52,7 +52,8 @@ export function BackendService(props: BackendServiceProps) {
 
                 dispatch(friendsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
             } catch (error) {
-                ai.trackException(error);
+                console.log(error);
+                ai.trackException({ exception: error });
 
                 const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve friends.";
                 dispatch(friendsLoadingEvent(ProcessState.Error, errorMessage));
@@ -84,7 +85,7 @@ export function BackendService(props: BackendServiceProps) {
                 dispatch(gamesLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
             } catch (error) {
                 console.log(error);
-                ai.trackException(error);
+                ai.trackException({ exception: error });
 
                 const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
                 dispatch(gamesLoadingEvent(ProcessState.Error, errorMessage));
@@ -132,12 +133,12 @@ export function BackendService(props: BackendServiceProps) {
                     }
                 }
             } catch (error) {
-                ai.trackException(error);
+                console.log(error);
+                ai.trackException({ exception: error });
 
                 const errorMessage = error.errorMessage ? error.errorMessage : "Unable to modify friend.";
                 dispatch(friendUpsertEvent(ProcessState.Error, errorMessage, ""));
 
-                console.log(error);
                 console.log(errorMessage);
             }
         }
@@ -168,7 +169,7 @@ export function BackendService(props: BackendServiceProps) {
                 dispatch(settingsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
             } catch (error) {
                 console.log(error);
-                ai.trackException(error);
+                ai.trackException({ exception: error });
 
                 const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
                 dispatch(settingsLoadingEvent(ProcessState.Error, errorMessage));
@@ -210,7 +211,8 @@ export function BackendService(props: BackendServiceProps) {
                     }
                 }
             } catch (error) {
-                ai.trackException(error);
+                console.log(error);
+                ai.trackException({ exception: error });
 
                 const errorMessage = error.errorMessage ? error.errorMessage : "Unable to update settings.";
                 dispatch(settingsUpsertEvent(ProcessState.Error, errorMessage, ""));
@@ -245,8 +247,8 @@ export function BackendService(props: BackendServiceProps) {
 
                 dispatch(meLoadingEvent(ProcessState.Success, "" /* Clear error message */, data.id));
             } catch (error) {
-                ai.trackException(error);
                 console.log(error);
+                ai.trackException({ exception: error });
 
                 const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve settings.";
                 console.log(errorMessage);

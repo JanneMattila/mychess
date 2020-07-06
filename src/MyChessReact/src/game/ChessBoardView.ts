@@ -288,6 +288,7 @@ export class ChessBoardView {
 
             document.location.href = `/play/${this.game.id}?state=${GameStateFilter.WAITING_FOR_OPPONENT}`;
         } catch (error) {
+            console.log(error);
             //ai.trackException(error);
 
             const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create new game.";

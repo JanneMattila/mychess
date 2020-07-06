@@ -43,6 +43,7 @@ export function ModifyFriend(props: ModifyFriendProps) {
     }, [props]);
 
     const addFriend = () => {
+        console.log("save friend");
         setPlayer({
             id: friendID,
             name: friendName
