@@ -109,6 +109,7 @@ export function Auth(props: AuthProps) {
     }
 
     const onSignOut = () => {
+        Database.clear()
         userAgentApplication.logout();
     }
 

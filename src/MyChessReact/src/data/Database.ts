@@ -38,4 +38,8 @@ export class Database {
     public static delete(key: string): void {
         localStorage.removeItem(`${this.prefix}-${key}`);
     }
+
+    public static clear(): void {
+        localStorage.clear();
+    }
 }
