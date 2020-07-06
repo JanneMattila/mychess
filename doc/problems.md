@@ -16,3 +16,7 @@ While submitting the game move we could not find the actual game required.
 
 While submitting the game move we could not validate
 current player as correct player of the game.
+
+## 2203
+
+Could not find another player you tried to add as friend.
