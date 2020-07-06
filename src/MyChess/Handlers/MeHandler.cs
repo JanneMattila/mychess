@@ -14,10 +14,10 @@ namespace MyChess.Handlers
 
         public async Task<User> LoginAsync(AuthenticatedUser authenticatedUser)
         {
-            var userID = await GetOrCreateUserAsync(authenticatedUser);
+            var user = await GetOrCreateUserAsync(authenticatedUser);
             return new User()
             {
-                ID = userID
+                ID = user.UserID
             };
         }
     }

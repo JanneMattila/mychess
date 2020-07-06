@@ -31,22 +31,39 @@ namespace MyChess.Handlers
                 });
             }
 
-            var userID = await GetOrCreateUserAsync(authenticatedUser);
+            var user = await GetOrCreateUserAsync(authenticatedUser);
 
             await _context.UpsertAsync(TableNames.UserFriends, new UserFriendEntity
             {
-                PartitionKey = userID,
+                PartitionKey = user.UserID,
                 RowKey = friendID,
                 Name = player.Name
             });
-            
+
+            var existingFriendMapping = await _context.GetAsync<UserFriendEntity>(TableNames.UserFriends, friendID, user.UserID);
+            if (existingFriendMapping == null)
+            {
+                _log.FriendHandlerAddingNameToFriend(user.UserID, friendID);
+
+                await _context.UpsertAsync(TableNames.UserFriends, new UserFriendEntity
+                {
+                    PartitionKey = friendID,
+                    RowKey = user.UserID,
+                    Name = user.Name
+                });
+            }
+            else
+            {
+                _log.FriendHandlerExistingFriend(user.UserID, friendID);
+            }
+
             return (player, null);
         }
 
         public async Task<User?> GetFriendAsync(AuthenticatedUser authenticatedUser, string friendID)
         {
-            var userID = await GetOrCreateUserAsync(authenticatedUser);
-            var userFriendEntity = await _context.GetAsync<UserFriendEntity>(TableNames.UserFriends, userID, friendID);
+            var user = await GetOrCreateUserAsync(authenticatedUser);
+            var userFriendEntity = await _context.GetAsync<UserFriendEntity>(TableNames.UserFriends, user.UserID, friendID);
             if (userFriendEntity != null)
             {
                 _log.FriendHandlerFriendFound(friendID);
@@ -65,10 +82,10 @@ namespace MyChess.Handlers
 
         public async Task<List<User>> GetFriendsAsync(AuthenticatedUser authenticatedUser)
         {
-            var userID = await GetOrCreateUserAsync(authenticatedUser);
+            var user = await GetOrCreateUserAsync(authenticatedUser);
             var friends = new List<User>();
 
-            await foreach (var userFriendEntity in _context.GetAllAsync<UserFriendEntity>(TableNames.UserFriends, userID))
+            await foreach (var userFriendEntity in _context.GetAllAsync<UserFriendEntity>(TableNames.UserFriends, user.UserID))
             {
                 friends.Add(new User()
                 {

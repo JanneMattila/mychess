@@ -39,10 +39,10 @@ namespace MyChess.Handlers
                 });
             }
 
-            var userID = await GetOrCreateUserAsync(authenticatedUser);
+            var user = await GetOrCreateUserAsync(authenticatedUser);
 
             game.ID = Guid.NewGuid().ToString("D");
-            game.Players.White.ID = userID;
+            game.Players.White.ID = user.UserID;
             var data = _compactor.Compact(game);
 
             // TODO: Validate game data
@@ -56,7 +56,7 @@ namespace MyChess.Handlers
             });
             await _context.UpsertAsync(TableNames.GamesWaitingForOpponent, new GameEntity
             {
-                PartitionKey = userID,
+                PartitionKey = user.UserID,
                 RowKey = game.ID,
                 Data = data
             });
@@ -68,11 +68,11 @@ namespace MyChess.Handlers
 
         public async Task<MyChessGame?> GetGameAsync(AuthenticatedUser authenticatedUser, string gameID, string state)
         {
-            var userID = await GetOrCreateUserAsync(authenticatedUser);
+            var user = await GetOrCreateUserAsync(authenticatedUser);
             var tableNames = GetTableNames(state);
             foreach (var tableName in tableNames)
             {
-                var gameEntity = await _context.GetAsync<GameEntity>(tableName, userID, gameID);
+                var gameEntity = await _context.GetAsync<GameEntity>(tableName, user.UserID, gameID);
                 if (gameEntity != null)
                 {
                     _log.GameHandlerGameFound(gameID);
@@ -111,7 +111,7 @@ namespace MyChess.Handlers
 
         public async Task<List<MyChessGame>> GetGamesAsync(AuthenticatedUser authenticatedUser, string state)
         {
-            var userID = await GetOrCreateUserAsync(authenticatedUser);
+            var user = await GetOrCreateUserAsync(authenticatedUser);
             var games = new List<MyChessGame>();
             var table = state switch
             {
@@ -121,7 +121,7 @@ namespace MyChess.Handlers
                 _ => TableNames.GamesWaitingForYou
             };
 
-            await foreach (var gameEntity in _context.GetAllAsync<GameEntity>(table, userID))
+            await foreach (var gameEntity in _context.GetAllAsync<GameEntity>(table, user.UserID))
             {
                 var game = _compactor.Decompress(gameEntity.Data);
                 games.Add(game);
@@ -133,8 +133,8 @@ namespace MyChess.Handlers
 
         public async Task<HandlerError?> AddMoveAsync(AuthenticatedUser authenticatedUser, string gameID, MyChessGameMove move)
         {
-            var userID = await GetOrCreateUserAsync(authenticatedUser);
-            var gameEntity = await _context.GetAsync<GameEntity>(TableNames.GamesWaitingForYou, userID, gameID);
+            var user = await GetOrCreateUserAsync(authenticatedUser);
+            var gameEntity = await _context.GetAsync<GameEntity>(TableNames.GamesWaitingForYou, user.UserID, gameID);
             if (gameEntity == null)
             {
                 _log.GameHandlerMoveGameNotFound(gameID);
@@ -150,10 +150,10 @@ namespace MyChess.Handlers
             _log.GameHandlerGameFound(gameID);
             var game = _compactor.Decompress(gameEntity.Data);
 
-            if (game.Players.White.ID != userID &&
-                game.Players.Black.ID != userID)
+            if (game.Players.White.ID != user.UserID &&
+                game.Players.Black.ID != user.UserID)
             {
-                _log.GameHandlerMoveInvalidPlayer(gameID, userID, game.Players.White.ID, game.Players.Black.ID);
+                _log.GameHandlerMoveInvalidPlayer(gameID, user.UserID, game.Players.White.ID, game.Players.Black.ID);
                 return new HandlerError()
                 {
                     Instance = LoggingEvents.CreateLinkToProblemDescription(LoggingEvents.GameHandlerMoveInvalidPlayer),
@@ -187,18 +187,18 @@ namespace MyChess.Handlers
 
             string opponentID;
             if (_chessBoard.CurrentPlayer == PiecePlayer.White &&
-                game.Players.Black.ID == userID)
+                game.Players.Black.ID == user.UserID)
             {
                 opponentID = game.Players.White.ID;
             }
             else if (_chessBoard.CurrentPlayer == PiecePlayer.Black && 
-                     game.Players.White.ID == userID)
+                     game.Players.White.ID == user.UserID)
             {
                 opponentID = game.Players.Black.ID;
             }
             else
             {
-                _log.GameHandlerMoveNotPlayerTurn(gameID, userID, _chessBoard.CurrentPlayer.ToString());
+                _log.GameHandlerMoveNotPlayerTurn(gameID, user.UserID, _chessBoard.CurrentPlayer.ToString());
                 return new HandlerError()
                 {
                     Instance = LoggingEvents.CreateLinkToProblemDescription(LoggingEvents.GameHandlerMoveNotPlayerTurn),
@@ -221,7 +221,7 @@ namespace MyChess.Handlers
             });
             await _context.UpsertAsync(TableNames.GamesWaitingForOpponent, new GameEntity
             {
-                PartitionKey = userID,
+                PartitionKey = user.UserID,
                 RowKey = game.ID,
                 Data = data
             });
@@ -235,7 +235,7 @@ namespace MyChess.Handlers
             });
             await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity
             {
-                PartitionKey = userID,
+                PartitionKey = user.UserID,
                 RowKey = game.ID,
                 Data = data
             });

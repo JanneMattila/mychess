@@ -18,7 +18,7 @@ namespace MyChess.Handlers
             _context = context;
         }
 
-        protected async Task<string> GetOrCreateUserAsync(AuthenticatedUser authenticatedUser)
+        protected async Task<UserEntity> GetOrCreateUserAsync(AuthenticatedUser authenticatedUser)
         {
             var user = await _context.GetAsync<UserEntity>(TableNames.Users,
                 authenticatedUser.UserIdentifier, authenticatedUser.ProviderIdentifier);
@@ -50,12 +50,12 @@ namespace MyChess.Handlers
                 await _context.UpsertAsync(TableNames.UserID2User, userID2UserEntity);
                 _log.BaseHandlerNewUserCreated(userID);
 
-                return userID;
+                return userEntity;
             }
             else
             {
                 _log.BaseHandlerExistingUserFound(user.UserID);
-                return user.UserID;
+                return user;
             }
         }
 

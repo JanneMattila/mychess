@@ -119,7 +119,8 @@ namespace MyChess.Tests.Handlers
             {
                 PartitionKey = "u1",
                 RowKey = "p1",
-                UserID = "user123"
+                UserID = "user123",
+                Name = "My Name"
             });
 
             // Friend
@@ -150,6 +151,14 @@ namespace MyChess.Tests.Handlers
             Assert.NotNull(actual.Friend);
             Assert.Equal(expectedID, actual.Friend?.ID);
             Assert.Equal(expectedName, actual.Friend?.Name);
+            
+            var friend1 = await _context.GetAsync<UserFriendEntity>(TableNames.UserFriends, "user123", "user456");
+            Assert.NotNull(friend1);
+            Assert.Equal("My Best Friend", friend1?.Name);
+            
+            var friend2 = await _context.GetAsync<UserFriendEntity>(TableNames.UserFriends, "user456", "user123");
+            Assert.NotNull(friend2);
+            Assert.Equal("My Name", friend2?.Name);
         }
     }
 }

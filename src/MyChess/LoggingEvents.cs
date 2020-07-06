@@ -65,6 +65,8 @@
         public const int FriendHandlerFriendNotFound = 2201;
         public const int FriendHandlerFriendsFound = 2202;
         public const int FriendHandlerPlayerNotFound = 2203;
+        public const int FriendHandlerAddingNameToFriend = 2204;
+        public const int FriendHandlerExistingFriend = 2205;
 
         public const int SettingsHandlerSettingsFound = 2300;
         public const int SettingsHandlerSettingsNotFound = 2301;
