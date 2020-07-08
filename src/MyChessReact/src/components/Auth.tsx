@@ -77,6 +77,7 @@ export function Auth(props: AuthProps) {
             authEvent(accessTokenResponse.accessToken);
         }).catch(function (error) {
             // Acquire token silent failure, wait for user sign in
+            Database.clear();
         });
     }
 
@@ -104,6 +105,7 @@ export function Auth(props: AuthProps) {
     });
 
     const onSignIn = () => {
+        Database.clear();
         preAuthEvent();
         return userAgentApplication.loginRedirect(accessTokenRequest);
     }
