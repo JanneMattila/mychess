@@ -145,8 +145,6 @@ export function SettingsPage(props: SettingsProps) {
     }
 
     const handleNotificationChange = async (checked: boolean) => {
-        setNotifications(e => !e);
-
         if (!isNotificationsEnabled && navigator.serviceWorker) {
 
             ai.trackEvent({ name: "TryingToEnableNotifications" });
@@ -181,7 +179,7 @@ export function SettingsPage(props: SettingsProps) {
                         p256dh: p256dh,
                         auth: auth
                     });
-
+                    setNotifications(true);
                     ai.trackEvent({ name: "NotificationEnabled" });
                     return;
                 }
@@ -190,8 +188,8 @@ export function SettingsPage(props: SettingsProps) {
 
         console.log("Disabling notifications");
         ai.trackEvent({ name: "NotificationDisabled" });
-        setNotifications(false);
         setNotificationSettings(undefined);
+        setNotifications(false);
     }
 
     const installAsApp = (event: MouseEvent<HTMLButtonElement>) => {
