@@ -42,7 +42,8 @@ export function Auth(props: AuthProps) {
             postLogoutRedirectUri: window.location.origin
         },
         cache: {
-            cacheLocation: "localStorage"
+            cacheLocation: "localStorage",
+            storeAuthStateInCookie: true
         },
         system: {
             navigateFrameWait: 0
