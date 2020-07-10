@@ -1,0 +1,7 @@
+.welcomeText {
+  padding: 20px;
+  width: 90%;
+  font-size: calc(6px + 2vmin);
+  display: inline-block;
+  text-align: left;
+}
