@@ -12,7 +12,7 @@ let reactPlugin: ReactPlugin;
 let appInsights: ApplicationInsights;
 
 const createTelemetryService = () => {
-    const initialize = (): void => {
+    const initialize = (): ApplicationInsights => {
         reactPlugin = new ReactPlugin();
         appInsights = new ApplicationInsights({
             config: {
@@ -32,10 +32,19 @@ const createTelemetryService = () => {
         });
 
         appInsights.loadAppInsights();
+        return appInsights;
     };
 
     return { reactPlugin, appInsights, initialize };
 };
 
 export const ai = createTelemetryService();
-export const getAppInsights = () => appInsights;
+export const getAppInsights = () => {
+    if (appInsights) {
+        return appInsights;
+    }
+
+    const ts = createTelemetryService();
+    ts.initialize();
+    return appInsights;
+};

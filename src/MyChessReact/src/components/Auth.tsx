@@ -51,6 +51,12 @@ export function Auth(props: AuthProps) {
     };
 
     const preAuthEvent = () => {
+        ai.trackEvent({
+            name: "Auth-PreEvent", properties: {
+                pathname: location.pathname,
+            }
+        });
+
         if (location.pathname !== "/") {
             Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
         }
@@ -66,6 +72,13 @@ export function Auth(props: AuthProps) {
 
     const postAuthEvent = () => {
         const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
+
+        ai.trackEvent({
+            name: "Auth-PostEvent", properties: {
+                pathname: redirectUrl,
+            }
+        });
+
         Database.delete(DatabaseFields.AUTH_REDIRECT);
         if (redirectUrl) {
             history.push(redirectUrl);
@@ -75,9 +88,21 @@ export function Auth(props: AuthProps) {
     const acquireTokenSilent = () => {
         userAgentApplication.acquireTokenSilent(accessTokenRequest).then(function (accessTokenResponse) {
             // Acquire token silent success
+            ai.trackEvent({
+                name: "Auth-AcquireTokenSilent", properties: {
+                    success: true
+                }
+            });
+
             authEvent(accessTokenResponse.accessToken);
         }).catch(function (error) {
             // Acquire token silent failure, wait for user sign in
+            ai.trackEvent({
+                name: "Auth-AcquireTokenSilent", properties: {
+                    success: false
+                }
+            });
+
             Database.clear();
         });
     }
@@ -100,18 +125,24 @@ export function Auth(props: AuthProps) {
 
             acquireTokenSilent();
             setInterval(() => {
+                ai.trackEvent({ name: "Auth-BackgroundUpdate" });
+
                 acquireTokenSilent();
             }, 1000 * 60 * 45);
         }
     });
 
     const onSignIn = () => {
+        ai.trackEvent({ name: "Auth-SignIn" });
+
         Database.clear();
         preAuthEvent();
         return userAgentApplication.loginRedirect(accessTokenRequest);
     }
 
     const onSignOut = () => {
+        ai.trackEvent({ name: "Auth-SignOut" });
+
         Database.clear()
         userAgentApplication.logout();
     }
