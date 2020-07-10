@@ -29,6 +29,12 @@ export function ModifyFriend(props: ModifyFriendProps) {
     const ai = getAppInsights();
 
     useEffect(() => {
+        ai.trackEvent({
+            name: "ModifyFriend-Load", properties: {
+                identifier: props.id !== undefined,
+            }
+        });
+
         if (props.id) {
             setFriendID(props.id);
 
@@ -40,9 +46,11 @@ export function ModifyFriend(props: ModifyFriendProps) {
                 }
             }
         }
-    }, [props]);
+    }, [props, ai]);
 
     const addFriend = () => {
+        ai.trackEvent({ name: "ModifyFriend-Save" });
+
         console.log("save friend");
         setPlayer({
             id: friendID,
@@ -51,6 +59,8 @@ export function ModifyFriend(props: ModifyFriendProps) {
     }
 
     const cancel = () => {
+        ai.trackEvent({ name: "ModifyFriend-Cancel" });
+
         history.push("/friends");
     }
 

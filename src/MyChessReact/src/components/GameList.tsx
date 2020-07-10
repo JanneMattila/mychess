@@ -73,10 +73,14 @@ export function GameList(props: GameListProps) {
     }
 
     const refresh = () => {
+        ai.trackEvent({ name: "GameList-Refresh" });
+
         setExecuteGetGames(executeGetGames + 1);
     }
 
     const addNewGame = () => {
+        ai.trackEvent({ name: "GameList-Add" });
+
         push("/friends");
     }
 

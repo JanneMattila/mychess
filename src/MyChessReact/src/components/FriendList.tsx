@@ -45,15 +45,21 @@ export function FriendList(props: FriendListProps) {
     }
 
     const manageFriend = (event: any, friendID: string) => {
+        ai.trackEvent({ name: "Friends-Manage" });
+
         event.preventDefault();
         history.push("/friends/" + friendID);
     }
 
     const refresh = () => {
+        ai.trackEvent({ name: "Friends-Refresh" });
+
         setExecuteGetFriends(executeGetFriends + 1);
     }
 
     const addNewFriend = () => {
+        ai.trackEvent({ name: "Friends-Add" });
+
         history.push("/friends/add");
     }
 
