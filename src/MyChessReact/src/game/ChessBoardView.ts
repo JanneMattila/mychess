@@ -201,6 +201,12 @@ export class ChessBoardView {
             console.log("local game");
             this.isLocalGame = true;
 
+            this.ai.trackEvent({
+                name: "Play-NewGame", properties: {
+                    isLocalGame: true,
+                }
+            });
+
             this.game = new MyChessGame();
 
             const json = Database.get<string>(DatabaseFields.GAMES_LOCAL_GAME_STATE);
@@ -213,6 +219,8 @@ export class ChessBoardView {
                     this.currentMoveNumber = this.makeNumberOfMoves(this.game, this.game.moves.length);
                 } catch (error) {
                     console.log(error);
+                    this.ai.trackException({ exception: error });
+
                     this.game = new MyChessGame();
                 }
             }
@@ -224,6 +232,13 @@ export class ChessBoardView {
             }
 
             if (path.indexOf("/new") !== -1) {
+
+                this.ai.trackEvent({
+                    name: "Play-NewGame", properties: {
+                        isLocalGame: false,
+                    }
+                });
+
                 console.log("new game");
                 this.isNewGame = true;
                 const friendIDParameter = queryString.get("friendID");
@@ -264,6 +279,8 @@ export class ChessBoardView {
                     }
                     catch (error) {
                         console.log(error);
+                        this.ai.trackException({ exception: error });
+
                         // $("#errorText").text(textStatus);
                         // $("#errorDialog").dialog();
                     }
@@ -597,6 +614,13 @@ export class ChessBoardView {
         const lastPromotion = this.getLastMovePromotionAsString();
         if (!lastMove) {
             console.log("no last move available");
+
+            this.ai.trackEvent({
+                name: "Play-Errors", properties: {
+                    type: "NoLastMoveAvailable",
+                }
+            });
+
             return;
         }
 
@@ -613,6 +637,13 @@ export class ChessBoardView {
             const gameName = gameNameElement?.value;
             if (!gameName) {
                 console.log("no mandatory game name provided");
+
+                this.ai.trackEvent({
+                    name: "Play-Errors", properties: {
+                        type: "NoGameNameProvided",
+                    }
+                });
+
                 return;
             }
 
@@ -635,6 +666,11 @@ export class ChessBoardView {
     public resignGame = (): void => {
         console.log("game resigned");
 
+
+        this.ai.trackEvent({
+            name: "Play-Resign"
+        });
+
         if (this.isLocalGame) {
             Database.delete(DatabaseFields.GAMES_LOCAL_GAME_STATE);
             this.game = new MyChessGame();
@@ -649,6 +685,11 @@ export class ChessBoardView {
 
     public cancel = (): void => {
         console.log("cancel");
+
+        this.ai.trackEvent({
+            name: "Play-Cancel"
+        });
+
         this.showError("");
         this.showConfirmationDialog(false);
         this.showPromotionDialog(false);
@@ -710,6 +751,13 @@ export class ChessBoardView {
 
     private changePromotionFromString(name: string): boolean {
         console.log("changePromotionFromString to " + name);
+
+        this.ai.trackEvent({
+            name: "Play-Promotion", properties: {
+                type: name,
+            }
+        });
+
         if (name === "Queen") {
             // No changes to promotion
             return false;
@@ -851,21 +899,45 @@ export class ChessBoardView {
 
     public firstMove() {
         console.log("to first move");
+        this.ai.trackEvent({
+            name: "Play-MoveHistory", properties: {
+                type: "First",
+            }
+        });
+
         this.moveHistory(-999999);
     }
 
     public previousMove() {
         console.log("previous move");
+        this.ai.trackEvent({
+            name: "Play-MoveHistory", properties: {
+                type: "Previous",
+            }
+        });
+
         this.moveHistory(-1);
     }
 
     public nextMove() {
         console.log("next move");
+        this.ai.trackEvent({
+            name: "Play-MoveHistory", properties: {
+                type: "Next",
+            }
+        });
+
         this.moveHistory(1);
     }
 
     public lastMove() {
         console.log("to last move");
+        this.ai.trackEvent({
+            name: "Play-MoveHistory", properties: {
+                type: "Last",
+            }
+        });
+
         this.moveHistory(999999);
     }
 
