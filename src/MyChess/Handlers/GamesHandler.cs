@@ -233,7 +233,7 @@ namespace MyChess.Handlers
                 RowKey = game.ID,
                 Data = data
             });
-            await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity
+            await _context.DeleteAsync(TableNames.GamesWaitingForYou, new GameEntity
             {
                 PartitionKey = user.UserID,
                 RowKey = game.ID,

@@ -28,7 +28,7 @@ namespace MyChess.Tests.Handlers.Stubs
 
         public async Task<TableResult> DeleteAsync<T>(string tableName, T entity) where T : TableEntity
         {
-            Tables[tableName].Remove(entity);
+            Tables[tableName].RemoveAll(r => r.PartitionKey == entity.PartitionKey && r.RowKey == entity.RowKey);
             return await Task.FromResult(new TableResult());
         }
 

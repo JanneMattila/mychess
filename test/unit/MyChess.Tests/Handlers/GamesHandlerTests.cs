@@ -151,5 +151,74 @@ namespace MyChess.Tests.Handlers
             Assert.Equal(expectedWhitePlayer, actual.Game?.Players.White.ID);
             Assert.Equal(expectedBlackPlayer, actual.Game?.Players.Black.ID);
         }
+
+        [Fact]
+        public async Task Add_Move_To_Existing_Game()
+        {
+            // Arrange
+            var expectedWaitingForYou = 1;
+            var expectedWaitingForOpponent = 1;
+
+            var user1 = new AuthenticatedUser()
+            {
+                Name = "abc",
+                PreferredUsername = "a b",
+                UserIdentifier = "u1",
+                ProviderIdentifier = "p1"
+            };
+
+            var user2 = new AuthenticatedUser()
+            {
+                Name = "def",
+                PreferredUsername = "c d",
+                UserIdentifier = "u2",
+                ProviderIdentifier = "p2"
+            };
+
+            // Player creating the game
+            await _context.UpsertAsync(TableNames.Users, new UserEntity()
+            {
+                PartitionKey = "u1",
+                RowKey = "p1",
+                UserID = "user123"
+            });
+
+            // Opponent
+            await _context.UpsertAsync(TableNames.Users, new UserEntity()
+            {
+                PartitionKey = "u2",
+                RowKey = "p2",
+                UserID = "user456"
+            });
+            await _context.UpsertAsync(TableNames.UserID2User, new UserID2UserEntity()
+            {
+                PartitionKey = "user456",
+                RowKey = "user456",
+                UserPrimaryKey = "u2",
+                UserRowKey = "p2"
+            });
+            var gameToCreate = new MyChessGame();
+            gameToCreate.Players.Black.ID = "user456";
+            gameToCreate.Moves.Add(new MyChessGameMove()
+            {
+                Move = "A2A3"
+            });
+            var createResponse = await _gamesHandler.CreateGameAsync(user1, gameToCreate);
+            var gameID = createResponse.Game?.ID;
+            var move = new MyChessGameMove()
+            {
+                Move = "A7A6"
+            };
+
+            // Act
+            var actual = await _gamesHandler.AddMoveAsync(user2, gameID, move);
+
+            // Assert
+            Assert.Null(actual);
+            var actualWaitingForYou = _context.Tables[TableNames.GamesWaitingForYou].Count;
+            var actualWaitingForOpponent = _context.Tables[TableNames.GamesWaitingForOpponent].Count;
+            Assert.Equal(expectedWaitingForYou, actualWaitingForYou);
+            Assert.Equal(expectedWaitingForOpponent, actualWaitingForOpponent);
+        }
     }
 }
