@@ -301,7 +301,9 @@ export class ChessBoardView {
             }
         };
 
+        this.showSpinner(true);
         try {
+
             const response = await fetch(this.endpoint + "/api/games", request);
             this.game = await response.json() as MyChessGame;
             console.log(this.game);
@@ -311,10 +313,11 @@ export class ChessBoardView {
             console.log(error);
             this.ai.trackException({ exception: error });
 
-            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create new game.";
+            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create new game";
             this.showError(errorMessage);
             this.undo();
         }
+        this.showSpinner(false);
     }
 
     public async postMove(move: MyChessGameMove) {
@@ -327,6 +330,7 @@ export class ChessBoardView {
             }
         };
 
+        this.showSpinner(true);
         try {
             const response = await fetch(this.endpoint + `/api/games/${this.game.id}/moves`, request);
             if (response.ok) {
@@ -342,10 +346,11 @@ export class ChessBoardView {
             console.log(error);
             this.ai.trackException({ exception: error });
 
-            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to post your move.";
+            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to post your move";
             this.showError(errorMessage);
             this.undo();
         }
+        this.showSpinner(false);
     }
 
     private makeNumberOfMoves(game: MyChessGame, movesCount: number): number {
@@ -731,6 +736,7 @@ export class ChessBoardView {
             const show = message.length > 0;
             element.style.display = show ? "inline" : "none";
             if (show) {
+                element.innerHTML = message;
                 element.scrollIntoView();
                 element.focus();
             }
@@ -745,6 +751,17 @@ export class ChessBoardView {
             if (show) {
                 commentDialogElement.scrollIntoView();
                 commentDialogElement.focus();
+            }
+        }
+    }
+
+    private showSpinner(show: boolean) {
+        let element = document.getElementById("Loading");
+        if (element !== null) {
+            element.style.display = show ? "inline-flex" : "none";
+            if (show) {
+                element.scrollIntoView();
+                element.focus();
             }
         }
     }

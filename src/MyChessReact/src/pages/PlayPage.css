@@ -28,6 +28,31 @@
   width: 80%;
 }
 
+.Play-Spinner {
+   display: none;
+   align-items: center;
+}
+
+@keyframes Play-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.Play-logo {
+  pointer-events: none;
+  padding: 10px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .Play-logo {
+    animation: Play-logo-spin infinite 2s linear;
+  }
+}
+
 #table-game {
   margin-left: auto;
   margin-right: auto;

@@ -3,6 +3,7 @@ import "./PlayPage.css";
 import { ChessBoardView } from "../game/ChessBoardView";
 import { useTypedSelector } from "../reducers";
 import { Database, DatabaseFields } from "../data/Database";
+import logo from "../pages/logo.svg";
 
 type PlayProps = {
     endpoint: string;
@@ -129,6 +130,10 @@ export function PlayPage(props: PlayProps) {
                 <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
                 <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
             </div>
+            <div id="Loading" className="Play-Spinner">
+                <img src={logo} className="Play-logo" alt="logo" />
+                Submitting Your move...
+                </div>
             <div id="LastComment"></div>
             <div id="ellipse">
                 <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
