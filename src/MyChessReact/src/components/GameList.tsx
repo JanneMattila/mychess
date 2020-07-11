@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MyChessGame } from "../models/MyChessGame";
 import { useTypedSelector } from "../reducers";
 import { ProcessState } from "../actions";
@@ -75,7 +75,7 @@ export function GameList(props: GameListProps) {
     const refresh = () => {
         ai.trackEvent({ name: "GameList-Refresh" });
 
-        setExecuteGetGames(executeGetGames + 1);
+        setExecuteGetGames(e => e + 1);
     }
 
     const addNewGame = () => {
@@ -83,6 +83,12 @@ export function GameList(props: GameListProps) {
 
         push("/friends");
     }
+
+    useEffect(() => {
+        ai.trackEvent({ name: "GameList-Load" });
+
+        setExecuteGetGames(e => e + 1);
+    }, [setExecuteGetGames, ai]);
 
     if (loginState === ProcessState.Success) {
 
