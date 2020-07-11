@@ -10,6 +10,7 @@ import { QueryStringParser } from "../helpers/QueryStringParser";
 import { MyChessGameMove } from "../models/MyChessGameMove";
 import { Database, DatabaseFields } from "../data/Database";
 import { GameStateFilter } from "../models/GameStateFilter";
+import { getAppInsights } from "../components/TelemetryService";
 
 export class ChessBoardView {
     private board: ChessBoard = new ChessBoard();
@@ -40,6 +41,8 @@ export class ChessBoardView {
     private touchstart = this.touchstartHandler.bind(this);
     private touchend = this.touchendHandler.bind(this);
     private resize = this.resizeHandler.bind(this);
+
+    private ai = getAppInsights();
 
     public initialize() {
         // Start preparing the board
@@ -289,9 +292,11 @@ export class ChessBoardView {
             document.location.href = `/play/${this.game.id}?state=${GameStateFilter.WAITING_FOR_OPPONENT}`;
         } catch (error) {
             console.log(error);
-            //ai.trackException(error);
+            this.ai.trackException({ exception: error });
 
             const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create new game.";
+            this.showError(errorMessage);
+            this.undo();
         }
     }
 
@@ -318,8 +323,11 @@ export class ChessBoardView {
             }
         } catch (error) {
             console.log(error);
-            //ai.trackException(error);
-            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create new game.";
+            this.ai.trackException({ exception: error });
+
+            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to post your move.";
+            this.showError(errorMessage);
+            this.undo();
         }
     }
 
@@ -514,11 +522,13 @@ export class ChessBoardView {
                     let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
                     queenPromotionElement.checked = true;
 
+                    this.showError("");
                     this.showPromotionDialog(true);
                 }
                 else {
                     this.setBoardStatus(0, 0);
 
+                    this.showError("");
                     this.showConfirmationDialog(true);
                 }
 
@@ -546,6 +556,7 @@ export class ChessBoardView {
 
     public confirmMove = (): void => {
         console.log("move confirmed");
+        this.showError("");
         this.showConfirmationDialog(false);
         this.showPromotionDialog(false);
 
@@ -638,6 +649,7 @@ export class ChessBoardView {
 
     public cancel = (): void => {
         console.log("cancel");
+        this.showError("");
         this.showConfirmationDialog(false);
         this.showPromotionDialog(false);
         this.undo();
@@ -668,6 +680,18 @@ export class ChessBoardView {
             if (show) {
                 gameNameDialogElement.scrollIntoView();
                 gameNameDialogElement.focus();
+            }
+        }
+    }
+
+    private showError(message: string) {
+        let element = document.getElementById("error");
+        if (element !== null) {
+            const show = message.length > 0;
+            element.style.display = show ? "inline" : "none";
+            if (show) {
+                element.scrollIntoView();
+                element.focus();
             }
         }
     }

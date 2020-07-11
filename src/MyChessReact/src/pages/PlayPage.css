@@ -5,6 +5,14 @@
   font-size: calc(12px + 2vmin);
 }
 
+.Play-Error {
+  display: none;
+  padding: 10px;
+  text-align: left;
+  font-size: calc(10px + 2vmin);
+  color: red;
+}
+
 .Play-Form {
   display: none;
   padding: 10px;

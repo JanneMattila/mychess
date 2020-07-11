@@ -89,6 +89,7 @@ export function PlayPage(props: PlayProps) {
     return (
         <div className="Play-container">
             <div id="status"></div>
+            <div id="error" className="Play-Error">Could not post game</div>
             <table id="table-game"><tbody><tr><td>Loading...</td></tr></tbody></table>
             <div id="confirmation" className="Play-Form">
                 <button onClick={confirmMove}><span role="img" aria-label="OK">✅</span> Confirm</button>
