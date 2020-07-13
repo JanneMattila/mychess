@@ -17,8 +17,11 @@ namespace MyChess.Handlers
 
         public async Task<UserSettings> GetSettingsAsync(AuthenticatedUser authenticatedUser)
         {
-            var userSettings = new UserSettings();
             var user = await GetOrCreateUserAsync(authenticatedUser);
+            var userSettings = new UserSettings()
+            {
+                ID = user.UserID
+            };
             var userSettingsEntity = await _context.GetAsync<UserSettingEntity>(TableNames.UserSettings, user.UserID, user.UserID);
             if (userSettingsEntity != null)
             {

@@ -18,12 +18,9 @@ type SettingsProps = {
 export function SettingsPage(props: SettingsProps) {
     const history = useHistory();
     const loginState = useTypedSelector(state => state.loginState);
-    const me = useTypedSelector(state => state.me);
-    const meID = Database.get<string>(DatabaseFields.ME_ID);
+    const storedUserSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
     const userSettings = useTypedSelector(state => state.userSettings);
 
-    const [executeGetMe, setExecuteGetMe] = useState(0);
-    const [executeGetSettings, setExecuteGetSettings] = useState(0);
     const [executeSetSettings, setExecuteSetSettings] = useState<UserSettings | undefined>(undefined);
 
     const [playerIdentifier, setPlayerIdentifier] = useState("");
@@ -35,7 +32,6 @@ export function SettingsPage(props: SettingsProps) {
     const ai = getAppInsights();
 
     useEffect(() => {
-
         const setPrompt = (e: any) => {
             console.log("Show install prompt");
             ai.trackEvent({ name: "ShowInstallPrompt" });
@@ -47,24 +43,6 @@ export function SettingsPage(props: SettingsProps) {
             }
         }
 
-        if (meID) {
-            setPlayerIdentifier(meID);
-            setExecuteGetSettings(e => e + 1);
-        }
-        else {
-            setExecuteGetMe(e => e + 1);
-        }
-
-        console.log("add event beforeinstallprompt");
-        window.addEventListener('beforeinstallprompt', setPrompt);
-        return () => {
-            console.log("remove event beforeinstallprompt");
-            window.removeEventListener('beforeinstallprompt', setPrompt);
-        }
-    }, [me, meID, ai]);
-
-
-    useEffect(() => {
         if (userSettings) {
             let enabled = false;
             if (userSettings.notifications.length === 1 &&
@@ -73,10 +51,31 @@ export function SettingsPage(props: SettingsProps) {
                 enabled = true;
             }
 
+            setPlayerIdentifier(userSettings.id);
             setPlayAlwaysUp(userSettings.playAlwaysUp);
             setNotifications(enabled);
         }
-    }, [userSettings]);
+        else if (storedUserSettings) {
+            // Use cached settings if no newser updates are available
+            let enabled = false;
+            if (storedUserSettings.notifications.length === 1 &&
+                storedUserSettings.notifications[0].enabled) {
+                setNotificationSettings(storedUserSettings.notifications[0]);
+                enabled = true;
+            }
+
+            setPlayerIdentifier(storedUserSettings.id);
+            setPlayAlwaysUp(storedUserSettings.playAlwaysUp);
+            setNotifications(enabled);
+        }
+
+        console.log("add event beforeinstallprompt");
+        window.addEventListener('beforeinstallprompt', setPrompt);
+        return () => {
+            console.log("remove event beforeinstallprompt");
+            window.removeEventListener('beforeinstallprompt', setPrompt);
+        }
+    }, [ai, userSettings, storedUserSettings]);
 
     const save = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -242,7 +241,7 @@ export function SettingsPage(props: SettingsProps) {
                         <span role="img" aria-label="Manage your friends">👥</span> Manage your friends
                     </Link>
                 </div>
-                <BackendService endpoint={props.endpoint} getMe={executeGetMe} getSettings={executeGetSettings} upsertSettings={executeSetSettings} />
+                <BackendService endpoint={props.endpoint} getSettings={1} upsertSettings={executeSetSettings} />
             </div>
         );
     }

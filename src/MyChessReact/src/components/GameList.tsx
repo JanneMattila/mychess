@@ -9,6 +9,7 @@ import { Database, DatabaseFields } from "../data/Database";
 import { User } from "../models/User";
 import { BackendService } from "./BackendService";
 import { GameStateFilter } from "../models/GameStateFilter";
+import { UserSettings } from "../models/UserSettings";
 
 type GameListProps = {
     title: string;
@@ -26,12 +27,12 @@ export function GameList(props: GameListProps) {
     const ai = getAppInsights();
 
     const friends = Database.get<User[]>(DatabaseFields.FRIEND_LIST);
-    const meID = Database.get<string>(DatabaseFields.ME_ID);
+    const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
 
     const getOpponent = (game: MyChessGame) => {
         if (friends) {
             let friendID = game.players.white.id;
-            if (game.players.white.id === meID) {
+            if (game.players.white.id === userSettings?.id) {
                 friendID = game.players.black.id;
             }
 

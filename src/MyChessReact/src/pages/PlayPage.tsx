@@ -4,6 +4,7 @@ import { ChessBoardView } from "../game/ChessBoardView";
 import { useTypedSelector } from "../reducers";
 import { Database, DatabaseFields } from "../data/Database";
 import logo from "../pages/logo.svg";
+import { UserSettings } from "../models/UserSettings";
 
 type PlayProps = {
     endpoint: string;
@@ -11,18 +12,18 @@ type PlayProps = {
 
 export function PlayPage(props: PlayProps) {
     const accessToken = useTypedSelector(state => state.accessToken);
-    const meID = Database.get<string>(DatabaseFields.ME_ID);
+    const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
 
     const board = new ChessBoardView();
     let isEllipse = false;
 
     useEffect(() => {
         board.addEventHandlers();
-        board.load(props.endpoint, accessToken, meID);
+        board.load(props.endpoint, accessToken, userSettings?.id);
         return () => {
             board.removeEventHandlers();
         }
-    }, [props.endpoint, accessToken, meID, board]);
+    }, [props.endpoint, accessToken, userSettings, board]);
 
     const confirmMove = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();

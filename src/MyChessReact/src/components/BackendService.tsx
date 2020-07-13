@@ -118,8 +118,8 @@ export function BackendService(props: BackendServiceProps) {
 
                 if (response.ok) {
                     dispatch(friendUpsertEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
-                    const meID = Database.get<string>(DatabaseFields.ME_ID);
-                    if (meID) {
+                    const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
+                    if (userSettings) {
                         history.push("/friends");
                     }
                     else {
@@ -227,6 +227,7 @@ export function BackendService(props: BackendServiceProps) {
         }
     }, [props.upsertSettings, ai, dispatch, history, endpoint, accessToken]);
 
+    // Obsolete
     useEffect(() => {
         const getMe = async () => {
             dispatch(meLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
@@ -242,8 +243,6 @@ export function BackendService(props: BackendServiceProps) {
                 const response = await fetch(endpoint + "/api/users/me", request);
                 const data = await response.json() as User;
                 console.log(data);
-
-                Database.set(DatabaseFields.ME_ID, data.id);
 
                 dispatch(meLoadingEvent(ProcessState.Success, "" /* Clear error message */, data.id));
             } catch (error) {
