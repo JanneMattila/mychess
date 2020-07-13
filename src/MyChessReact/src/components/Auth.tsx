@@ -102,8 +102,6 @@ export function Auth(props: AuthProps) {
                     success: false
                 }
             });
-
-            Database.clear();
         });
     }
 
@@ -135,7 +133,6 @@ export function Auth(props: AuthProps) {
     const onSignIn = () => {
         ai.trackEvent({ name: "Auth-SignIn" });
 
-        Database.clear();
         preAuthEvent();
         return userAgentApplication.loginRedirect(accessTokenRequest);
     }
@@ -143,7 +140,7 @@ export function Auth(props: AuthProps) {
     const onSignOut = () => {
         ai.trackEvent({ name: "Auth-SignOut" });
 
-        Database.clear()
+        Database.clear();
         userAgentApplication.logout();
     }
 
