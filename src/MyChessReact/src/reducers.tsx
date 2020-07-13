@@ -4,6 +4,7 @@ import { EventTypes, RootState, RootAction, ProcessState, DialogType } from "./a
 export const getInitialState = () => {
     return {
         loginState: ProcessState.NotStarted,
+        loginRequested: 0,
         gamesState: ProcessState.NotStarted,
         friendsState: ProcessState.NotStarted,
         settingsState: ProcessState.NotStarted
@@ -20,6 +21,11 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 error: action.error,
                 account: action.account,
                 accessToken: action.accessToken
+            })
+        }
+        case EventTypes.AUTH_LOGIN_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                loginRequested: state.loginRequested ? state.loginRequested + 1 : 1,
             })
         }
         case EventTypes.AUTH_LOGOUT:
