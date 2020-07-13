@@ -23,6 +23,7 @@ export enum DialogType {
 export enum EventTypes {
     // Auth related events
     AUTH_LOGIN = "Auth/Login",
+    AUTH_LOGIN_REQUESTED = "Auth/LoginRequested",
     AUTH_LOGIN_EXPIRED = "Auth/Login Expired",
     AUTH_LOGOUT = "Auth/Logout",
 
@@ -46,6 +47,7 @@ export enum EventTypes {
 };
 
 type LoginAction = { type: EventTypes.AUTH_LOGIN, loginState: ProcessState, error?: string, account?: Account, accessToken?: string }
+type LoginRequestedAction = { type: EventTypes.AUTH_LOGIN_REQUESTED }
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
@@ -59,6 +61,7 @@ type PlayShowDialogAction = { type: EventTypes.PLAY_SHOW_DIALOG, dialog: DialogT
 // Root action
 export type RootAction =
     | LoginAction
+    | LoginRequestedAction
     | LogoutAction
     | LoginExpiredAction
     | GamesLoadingAction
@@ -71,6 +74,7 @@ export type RootAction =
 
 export interface RootState {
     readonly loginState?: ProcessState
+    readonly loginRequested?: number,
     readonly error?: string
     readonly errorLink?: string
     readonly account?: Account
@@ -100,6 +104,10 @@ export interface RootState {
  */
 export function loginEvent(loginState: ProcessState, error?: string, account?: Account, accessToken?: string): LoginAction {
     return { type: EventTypes.AUTH_LOGIN, loginState, error, account, accessToken };
+}
+
+export function loginRequestedEvent(): LoginRequestedAction {
+    return { type: EventTypes.AUTH_LOGIN_REQUESTED };
 }
 
 export function gamesLoadingEvent(gamesState: ProcessState, error?: string, games?: MyChessGame[]): GamesLoadingAction {
