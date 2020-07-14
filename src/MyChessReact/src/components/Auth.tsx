@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { ProcessState, loginRequestedEvent, logoutRequestedEvent } from "../actions";
 import { Link } from "react-router-dom";
-import { getAppInsights } from "./TelemetryService";
 import "./Auth.css";
 
 export function Auth() {
@@ -11,7 +10,6 @@ export function Auth() {
     const account = useTypedSelector(state => state.account);
 
     const dispatch = useDispatch();
-    const ai = getAppInsights();
 
     const onSignIn = () => {
         dispatch(loginRequestedEvent());
@@ -26,7 +24,6 @@ export function Auth() {
             <div className="Auth">
                 <Link to="/settings" className="Auth-link">{account?.name}</Link>
                 <button onClick={onSignOut} className="Auth-button">Sign out</button>
-
             </div>
         );
     }

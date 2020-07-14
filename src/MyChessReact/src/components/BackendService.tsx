@@ -20,10 +20,6 @@ type BackendServiceProps = {
     upsertFriend?: User;
 
     getGames?: number;
-
-    getSettings?: number;
-    upsertSettings?: UserSettings;
-
     getMe?: number;
 };
 
@@ -33,6 +29,8 @@ export function BackendService(props: BackendServiceProps) {
 
     const loginRequested = useTypedSelector(state => state.loginRequested);
     const logoutRequested = useTypedSelector(state => state.logoutRequested);
+    const settingsLoadingRequested = useTypedSelector(state => state.settingsLoadingRequested);
+    const settingsUpsertRequested = useTypedSelector(state => state.settingsUpsertRequested);
     const accessToken = useTypedSelector(state => state.accessToken);
 
     const dispatch = useDispatch();
@@ -137,6 +135,7 @@ export function BackendService(props: BackendServiceProps) {
                 }
             });
 
+            console.log("acquireTokenSilent");
             acquireTokenSilent();
             setInterval(() => {
                 ai.trackEvent({ name: "Auth-BackgroundUpdate" });
@@ -162,7 +161,44 @@ export function BackendService(props: BackendServiceProps) {
             Database.clear();
             userAgentApplication.logout();
         }
-    });
+    }, [logoutRequested, ai]);
+
+
+    useEffect(() => {
+        const getSettings = async () => {
+            dispatch(settingsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
+            const request: RequestInit = {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
+
+            try {
+                const response = await fetch(endpoint + "/api/users/me/settings", request);
+                const data = await response.json();
+
+                Database.set(DatabaseFields.ME_SETTINGS, data);
+
+                dispatch(settingsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
+            } catch (error) {
+                console.log(error);
+                ai.trackException({ exception: error });
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
+                dispatch(settingsLoadingEvent(ProcessState.Error, errorMessage));
+            }
+        }
+
+        if (settingsLoadingRequested && settingsLoadingRequested >= 0) {
+            ai.trackEvent({ name: "Settings-Load" });
+
+            if (accessToken) {
+                getSettings();
+            }
+        }
+    }, [settingsLoadingRequested, ai, accessToken, dispatch, endpoint]);
 
     useEffect(() => {
         const getFriends = async () => {
@@ -279,41 +315,6 @@ export function BackendService(props: BackendServiceProps) {
         }
     }, [props.upsertFriend, ai, dispatch, history, endpoint, accessToken]);
 
-
-    useEffect(() => {
-        const getSettings = async () => {
-            dispatch(settingsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
-            const request: RequestInit = {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                    "Authorization": "Bearer " + accessToken
-                }
-            };
-
-            try {
-                const response = await fetch(endpoint + "/api/users/me/settings", request);
-                const data = await response.json();
-
-                Database.set(DatabaseFields.ME_SETTINGS, data);
-
-                dispatch(settingsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
-            } catch (error) {
-                console.log(error);
-                ai.trackException({ exception: error });
-
-                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve games.";
-                dispatch(settingsLoadingEvent(ProcessState.Error, errorMessage));
-            }
-        }
-
-        if (accessToken && props.getSettings) {
-            if (props.getSettings !== 0) {
-                getSettings();
-            }
-        }
-    }, [props.getSettings, ai, dispatch, endpoint, accessToken]);
-
     useEffect(() => {
         const upsertSettings = async (playerSettings: UserSettings) => {
             dispatch(settingsUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
@@ -353,10 +354,15 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (accessToken && props.upsertSettings) {
-            upsertSettings(props.upsertSettings);
+        if (settingsUpsertRequested) {
+            ai.trackEvent({ name: "Settings-Upsert" });
+
+            if (accessToken) {
+                console.log("settingsUpsertRequested: " + settingsUpsertRequested);
+                upsertSettings(settingsUpsertRequested);
+            }
         }
-    }, [props.upsertSettings, ai, dispatch, history, endpoint, accessToken]);
+    }, [settingsUpsertRequested, ai, dispatch, history, endpoint, accessToken]);
 
     // Obsolete
     useEffect(() => {

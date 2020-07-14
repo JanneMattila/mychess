@@ -12,6 +12,7 @@ import { GetConfiguration } from "./ConfigurationManager";
 import { ModifyFriendPage } from "./pages/ModifyFriendPage";
 import { PlayPage } from "./pages/PlayPage";
 import CookieConsent from "react-cookie-consent";
+import { BackendService } from "./components/BackendService";
 
 let configuration = GetConfiguration();
 
@@ -25,7 +26,7 @@ function App() {
               <img src={logo} alt="My Chess" className="App-logo" />
             </Link>
             <div className="App-auth">
-              <Auth clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
+              <Auth />
             </div>
           </div>
 
@@ -49,6 +50,7 @@ function App() {
             sameSite="strict">
             This website uses cookies to enhance the user experience.
           </CookieConsent>
+          <BackendService clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
         </div>
       </TelemetryProvider>
     </Router >

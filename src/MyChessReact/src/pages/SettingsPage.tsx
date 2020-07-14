@@ -1,12 +1,12 @@
 import React, { useEffect, MouseEvent, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import Switch from "react-switch";
 import "./SettingsPage.css";
-import { ProcessState } from "../actions";
+import { ProcessState, settingsLoadingRequestedEvent, settingsUpsertRequestedEvent } from "../actions";
 import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "../components/TelemetryService";
 import { Database, DatabaseFields } from "../data/Database";
-import { BackendService } from "../components/BackendService";
 import { UserSettings } from "../models/UserSettings";
 import { UserNotifications } from "../models/UserNotifications";
 
@@ -18,10 +18,10 @@ type SettingsProps = {
 export function SettingsPage(props: SettingsProps) {
     const history = useHistory();
     const loginState = useTypedSelector(state => state.loginState);
-    const storedUserSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
     const userSettings = useTypedSelector(state => state.userSettings);
+    const storedUserSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
 
-    const [executeSetSettings, setExecuteSetSettings] = useState<UserSettings | undefined>(undefined);
+    const dispatch = useDispatch();
 
     const [playerIdentifier, setPlayerIdentifier] = useState("");
     const [playAlwaysUp, setPlayAlwaysUp] = useState(false);
@@ -32,6 +32,11 @@ export function SettingsPage(props: SettingsProps) {
     const ai = getAppInsights();
 
     useEffect(() => {
+        if (loginState !== ProcessState.Success) {
+            console.log("Not logged in");
+            return;
+        }
+
         const setPrompt = (e: any) => {
             console.log("Show install prompt");
             ai.trackEvent({ name: "ShowInstallPrompt" });
@@ -41,6 +46,11 @@ export function SettingsPage(props: SettingsProps) {
             if (element) {
                 element.style.display = "";
             }
+        }
+
+        if (!playerIdentifier) {
+            console.log("fetch settings");
+            dispatch(settingsLoadingRequestedEvent());
         }
 
         if (userSettings) {
@@ -55,8 +65,8 @@ export function SettingsPage(props: SettingsProps) {
             setPlayAlwaysUp(userSettings.playAlwaysUp);
             setNotifications(enabled);
         }
-        else if (storedUserSettings) {
-            // Use cached settings if no newser updates are available
+        else if (storedUserSettings && !playerIdentifier) {
+            // Use cached settings if no newer updates are available
             let enabled = false;
             if (storedUserSettings.notifications.length === 1 &&
                 storedUserSettings.notifications[0].enabled) {
@@ -75,27 +85,26 @@ export function SettingsPage(props: SettingsProps) {
             console.log("remove event beforeinstallprompt");
             window.removeEventListener('beforeinstallprompt', setPrompt);
         }
-    }, [ai, userSettings, storedUserSettings]);
+    }, [userSettings, storedUserSettings, ai, dispatch, playerIdentifier, loginState]);
 
     const save = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
 
         ai.trackEvent({ name: "SaveSettings" });
 
-        if (userSettings) {
-            userSettings.playAlwaysUp = playAlwaysUp;
-            userSettings.notifications = [];
-            if (notificationSettings && isNotificationsEnabled) {
-                userSettings.notifications = [
-                    notificationSettings
-                ];
-            }
-
-            console.log("save");
-            console.log(userSettings);
-
-            setExecuteSetSettings(userSettings);
+        let updateUserSettings = new UserSettings();
+        updateUserSettings.playAlwaysUp = playAlwaysUp;
+        updateUserSettings.notifications = [];
+        if (notificationSettings && isNotificationsEnabled) {
+            updateUserSettings.notifications = [
+                notificationSettings
+            ];
         }
+
+        console.log("save");
+        console.log(updateUserSettings);
+
+        dispatch(settingsUpsertRequestedEvent(updateUserSettings));
     }
 
     const cancel = (event: MouseEvent<HTMLButtonElement>) => {
@@ -241,7 +250,6 @@ export function SettingsPage(props: SettingsProps) {
                         <span role="img" aria-label="Manage your friends">👥</span> Manage your friends
                     </Link>
                 </div>
-                <BackendService endpoint={props.endpoint} getSettings={1} upsertSettings={executeSetSettings} />
             </div>
         );
     }
