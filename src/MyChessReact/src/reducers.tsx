@@ -7,6 +7,7 @@ export const getInitialState = () => {
         loginRequested: 0,
         logoutRequested: 0,
         gamesState: ProcessState.NotStarted,
+        gamesRequested: 0,
         friendsState: ProcessState.NotStarted,
         friendsRequested: 0,
         settingsState: ProcessState.NotStarted,
@@ -51,6 +52,11 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 gamesState: action.gamesState,
                 error: action.error,
                 games: action.games
+            })
+        }
+        case EventTypes.GAMES_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                gamesRequested: state.gamesRequested ? state.gamesRequested + 1 : 1,
             })
         }
 

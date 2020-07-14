@@ -30,6 +30,7 @@ export enum EventTypes {
 
     // Game loading related events
     GAMES_LOADING = "Games/Loading",
+    GAMES_REQUESTED = "Games/Loading/Requested",
 
     // Me loading related events
     ME_LOADING = "Me/Loading",
@@ -56,6 +57,7 @@ type LogoutRequestedAction = { type: EventTypes.AUTH_LOGOUT_REQUESTED }
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
+type GamesRequestedAction = { type: EventTypes.GAMES_REQUESTED }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: User[] }
 type FriendsRequestedAction = { type: EventTypes.FRIENDS_REQUESTED }
@@ -74,6 +76,7 @@ export type RootAction =
     | LogoutAction
     | LoginExpiredAction
     | GamesLoadingAction
+    | GamesRequestedAction
     | MeLoadingAction
     | FriendsLoadingAction
     | FriendsRequestedAction
@@ -94,6 +97,7 @@ export interface RootState {
     readonly accessToken?: string
 
     readonly gamesState?: ProcessState
+    readonly gamesRequested?: number,
     readonly games?: MyChessGame[]
 
     readonly me?: string;
@@ -132,6 +136,10 @@ export function logoutRequestedEvent(): LogoutRequestedAction {
 
 export function gamesLoadingEvent(gamesState: ProcessState, error?: string, games?: MyChessGame[]): GamesLoadingAction {
     return { type: EventTypes.GAMES_LOADING, gamesState, error, games };
+}
+
+export function gamesRequestedEvent(): GamesRequestedAction {
+    return { type: EventTypes.GAMES_REQUESTED };
 }
 
 export function meLoadingEvent(meState: ProcessState, error?: string, me?: string): MeLoadingAction {

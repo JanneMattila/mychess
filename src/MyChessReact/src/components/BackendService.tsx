@@ -32,6 +32,7 @@ export function BackendService(props: BackendServiceProps) {
     const settingsLoadingRequested = useTypedSelector(state => state.settingsLoadingRequested);
     const settingsUpsertRequested = useTypedSelector(state => state.settingsUpsertRequested);
     const friendsRequested = useTypedSelector(state => state.friendsRequested);
+    const gamesRequested = useTypedSelector(state => state.gamesRequested);
     const accessToken = useTypedSelector(state => state.accessToken);
 
     const dispatch = useDispatch();
@@ -262,12 +263,15 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (accessToken && props.getGames) {
-            if (props.getGames !== 0) {
+
+        if (gamesRequested && gamesRequested >= 0) {
+            ai.trackEvent({ name: "Games-Load" });
+
+            if (accessToken) {
                 getGames();
             }
         }
-    }, [props.getGames, ai, dispatch, endpoint, accessToken]);
+    }, [gamesRequested, ai, dispatch, endpoint, accessToken]);
 
     useEffect(() => {
         const upsertFriend = async (player: User) => {

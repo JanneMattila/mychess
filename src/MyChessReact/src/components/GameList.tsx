@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { MyChessGame } from "../models/MyChessGame";
 import { useTypedSelector } from "../reducers";
-import { ProcessState } from "../actions";
+import { ProcessState, gamesRequestedEvent } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { Link, useHistory } from "react-router-dom";
 import "./GameList.css";
 import { Database, DatabaseFields } from "../data/Database";
 import { User } from "../models/User";
-import { BackendService } from "./BackendService";
 import { GameStateFilter } from "../models/GameStateFilter";
 import { UserSettings } from "../models/UserSettings";
+import { useDispatch } from "react-redux";
 
 type GameListProps = {
     title: string;
@@ -21,13 +21,27 @@ export function GameList(props: GameListProps) {
     const gamesState = useTypedSelector(state => state.gamesState);
     const games = useTypedSelector(state => state.games);
 
-    const [executeGetGames, setExecuteGetGames] = useState(1);
-
     const { push } = useHistory();
+
+    const dispatch = useDispatch();
+
     const ai = getAppInsights();
 
     const friends = Database.get<User[]>(DatabaseFields.FRIEND_LIST);
     const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
+
+
+    useEffect(() => {
+        if (loginState !== ProcessState.Success) {
+            console.log("Not logged in");
+            return;
+        }
+
+        console.log("fetch games");
+        ai.trackEvent({ name: "GameList-Load" });
+
+        dispatch(gamesRequestedEvent());
+    }, [dispatch, loginState, ai]);
 
     const getOpponent = (game: MyChessGame) => {
         if (friends) {
@@ -76,7 +90,7 @@ export function GameList(props: GameListProps) {
     const refresh = () => {
         ai.trackEvent({ name: "GameList-Refresh" });
 
-        setExecuteGetGames(e => e + 1);
+        dispatch(gamesRequestedEvent());
     }
 
     const addNewGame = () => {
@@ -84,12 +98,6 @@ export function GameList(props: GameListProps) {
 
         push("/friends");
     }
-
-    useEffect(() => {
-        ai.trackEvent({ name: "GameList-Load" });
-
-        setExecuteGetGames(e => e + 1);
-    }, [setExecuteGetGames, ai]);
 
     if (loginState === ProcessState.Success) {
 
@@ -116,7 +124,6 @@ export function GameList(props: GameListProps) {
             <div>
                 <div className="title">{props.title}</div>
                 {contents}
-                <BackendService endpoint={props.endpoint} getGames={executeGetGames} />
             </div>
         );
     }
