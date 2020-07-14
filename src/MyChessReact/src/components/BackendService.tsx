@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
-import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent } from "../actions";
+import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent, settingsLoadingRequestedEvent, friendsRequestedEvent } from "../actions";
 import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { User } from "../models/User";
@@ -230,6 +230,13 @@ export function BackendService(props: BackendServiceProps) {
             setSettingsLoadingProcessed(settingsLoadingRequested);
             ai.trackEvent({ name: "Settings-Load" });
             getSettings();
+
+            const friends = Database.get<UserSettings>(DatabaseFields.FRIEND_LIST);
+            if (!friends) {
+                // No friends available. Force fetching that information.
+                ai.trackEvent({ name: "Settings-FriendsMissing" });
+                dispatch(friendsRequestedEvent());
+            }
         }
     }, [settingsLoadingRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, settingsLoadingProcessed]);
 
@@ -302,6 +309,13 @@ export function BackendService(props: BackendServiceProps) {
             setGamesProcessed(gamesRequested);
             ai.trackEvent({ name: "Games-Load" });
             getGames();
+
+            const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
+            if (!userSettings) {
+                // No user settings available. Force fetching that information.
+                ai.trackEvent({ name: "Games-SettingsMissing" });
+                dispatch(settingsLoadingRequestedEvent());
+            }
         }
     }, [gamesRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesProcessed]);
 

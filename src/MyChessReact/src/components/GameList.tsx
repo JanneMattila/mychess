@@ -19,6 +19,7 @@ export function GameList(props: GameListProps) {
     const loginState = useTypedSelector(state => state.loginState);
     const gamesState = useTypedSelector(state => state.gamesState);
     const games = useTypedSelector(state => state.games);
+    const friends = useTypedSelector(state => state.friends);
 
     const { push } = useHistory();
 
@@ -26,7 +27,7 @@ export function GameList(props: GameListProps) {
 
     const ai = getAppInsights();
 
-    const friends = Database.get<User[]>(DatabaseFields.FRIEND_LIST);
+    const friendsStored = Database.get<User[]>(DatabaseFields.FRIEND_LIST);
     const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
 
 
@@ -36,20 +37,24 @@ export function GameList(props: GameListProps) {
             return;
         }
 
-        console.log("fetch games");
         ai.trackEvent({ name: "GameList-Load" });
 
         dispatch(gamesRequestedEvent());
     }, [dispatch, loginState, ai]);
 
     const getOpponent = (game: MyChessGame) => {
+        let friendID = game.players.white.id;
+        if (game.players.white.id === userSettings?.id) {
+            friendID = game.players.black.id;
+        }
         if (friends) {
-            let friendID = game.players.white.id;
-            if (game.players.white.id === userSettings?.id) {
-                friendID = game.players.black.id;
-            }
-
             const friend = friends.find(p => p.id === friendID);
+            if (friend) {
+                return friend.name;
+            }
+        }
+        else if (friendsStored) {
+            const friend = friendsStored.find(p => p.id === friendID);
             if (friend) {
                 return friend.name;
             }
