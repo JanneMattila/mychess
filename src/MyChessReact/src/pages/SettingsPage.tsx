@@ -262,7 +262,7 @@ export function SettingsPage(props: SettingsProps) {
                     <hr />
                     <br />
 
-                    <button onClick={onSignOut}><span role="img" aria-label="Sign out">📵</span> Sign out</button>
+                    <button onClick={onSignOut}>Sign out</button>
                 </div>
             </div>
         );
