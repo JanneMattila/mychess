@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useTypedSelector } from "../reducers";
-import { ProcessState } from "../actions";
+import { ProcessState, friendsRequestedEvent } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { Link, useHistory } from "react-router-dom";
 import "./FriendList.css";
 import { User } from "../models/User";
-import { BackendService } from "./BackendService";
+import { useDispatch } from "react-redux";
 
 type FriendListProps = {
     title: string;
@@ -19,9 +19,19 @@ export function FriendList(props: FriendListProps) {
     const friendsState = useTypedSelector(state => state.friendsState);
     const friends = useTypedSelector(state => state.friends);
 
-    const [executeGetFriends, setExecuteGetFriends] = useState(1);
+    const dispatch = useDispatch();
 
     const ai = getAppInsights();
+
+    useEffect(() => {
+        if (loginState !== ProcessState.Success) {
+            console.log("Not logged in");
+            return;
+        }
+
+        console.log("fetch friends");
+        dispatch(friendsRequestedEvent());
+    }, [dispatch, loginState]);
 
     const renderFriends = (friends?: User[]) => {
         return (
@@ -54,7 +64,7 @@ export function FriendList(props: FriendListProps) {
     const refresh = () => {
         ai.trackEvent({ name: "Friends-Refresh" });
 
-        setExecuteGetFriends(executeGetFriends + 1);
+        dispatch(friendsRequestedEvent());
     }
 
     const addNewFriend = () => {
@@ -96,7 +106,6 @@ export function FriendList(props: FriendListProps) {
             <div>
                 <div className="title">{props.title}</div>
                 {contents}
-                <BackendService endpoint={props.endpoint} getFriends={executeGetFriends} />
             </div>
         );
     }

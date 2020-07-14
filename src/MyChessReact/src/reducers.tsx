@@ -8,6 +8,7 @@ export const getInitialState = () => {
         logoutRequested: 0,
         gamesState: ProcessState.NotStarted,
         friendsState: ProcessState.NotStarted,
+        friendsRequested: 0,
         settingsState: ProcessState.NotStarted,
         settingsLoadingRequested: 0
     }
@@ -68,7 +69,11 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 friends: action.friends
             })
         }
-
+        case EventTypes.FRIENDS_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                friendsRequested: state.friendsRequested ? state.friendsRequested + 1 : 1,
+            })
+        }
         case EventTypes.FRIENDS_UPSERT: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 friendUpsertState: action.friendUpsertState,

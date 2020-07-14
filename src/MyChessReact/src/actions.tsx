@@ -24,7 +24,7 @@ export enum EventTypes {
     // Auth related events
     AUTH_LOGIN = "Auth/Login",
     AUTH_LOGIN_REQUESTED = "Auth/LoginRequested",
-    AUTH_LOGIN_EXPIRED = "Auth/Login Expired",
+    AUTH_LOGIN_EXPIRED = "Auth/LoginExpired",
     AUTH_LOGOUT_REQUESTED = "Auth/Logout/LoginRequested",
     AUTH_LOGOUT = "Auth/Logout",
 
@@ -36,6 +36,7 @@ export enum EventTypes {
 
     // Game loading related events
     FRIENDS_LOADING = "Friends/Loading",
+    FRIENDS_REQUESTED = "Friends/Loading/Requested",
     FRIENDS_UPSERT = "Friends/Upsert",
 
     // User settings related events
@@ -57,6 +58,7 @@ type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: User[] }
+type FriendsRequestedAction = { type: EventTypes.FRIENDS_REQUESTED }
 type FriendUpsertAction = { type: EventTypes.FRIENDS_UPSERT, friendUpsertState: ProcessState, error?: string, errorLink?: string }
 type SettingsLoadingAction = { type: EventTypes.SETTINGS_LOADING, settingsState: ProcessState, error?: string, userSettings?: UserSettings }
 type SettingsLoadingRequestedAction = { type: EventTypes.SETTINGS_LOADING_REQUESTED }
@@ -74,6 +76,7 @@ export type RootAction =
     | GamesLoadingAction
     | MeLoadingAction
     | FriendsLoadingAction
+    | FriendsRequestedAction
     | FriendUpsertAction
     | SettingsLoadingAction
     | SettingsLoadingRequestedAction
@@ -97,6 +100,7 @@ export interface RootState {
     readonly meState?: ProcessState
 
     readonly friendsState?: ProcessState
+    readonly friendsRequested?: number,
     readonly friends?: User[]
 
     readonly friendUpsertState?: ProcessState
@@ -136,6 +140,10 @@ export function meLoadingEvent(meState: ProcessState, error?: string, me?: strin
 
 export function friendsLoadingEvent(friendsState: ProcessState, error?: string, friends?: User[]): FriendsLoadingAction {
     return { type: EventTypes.FRIENDS_LOADING, friendsState, error, friends };
+}
+
+export function friendsRequestedEvent(): FriendsRequestedAction {
+    return { type: EventTypes.FRIENDS_REQUESTED };
 }
 
 export function friendUpsertEvent(friendUpsertState: ProcessState, error?: string, errorLink?: string): FriendUpsertAction {

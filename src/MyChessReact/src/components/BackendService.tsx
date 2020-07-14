@@ -31,6 +31,7 @@ export function BackendService(props: BackendServiceProps) {
     const logoutRequested = useTypedSelector(state => state.logoutRequested);
     const settingsLoadingRequested = useTypedSelector(state => state.settingsLoadingRequested);
     const settingsUpsertRequested = useTypedSelector(state => state.settingsUpsertRequested);
+    const friendsRequested = useTypedSelector(state => state.friendsRequested);
     const accessToken = useTypedSelector(state => state.accessToken);
 
     const dispatch = useDispatch();
@@ -227,12 +228,14 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (accessToken && props.getFriends) {
-            if (props.getFriends !== 0) {
+        if (friendsRequested && friendsRequested >= 0) {
+            ai.trackEvent({ name: "Friends-Load" });
+
+            if (accessToken) {
                 getFriends();
             }
         }
-    }, [props.getFriends, ai, dispatch, endpoint, accessToken]);
+    }, [friendsRequested, ai, dispatch, endpoint, accessToken]);
 
     useEffect(() => {
         const getGames = async () => {
