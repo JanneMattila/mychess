@@ -15,15 +15,10 @@ export function Profile() {
         dispatch(loginRequestedEvent());
     }
 
-    const onSignOut = () => {
-        dispatch(logoutRequestedEvent());
-    }
-
     if (loginState === ProcessState.Success) {
         return (
             <div className="Profile">
                 <Link to="/settings" className="Profile-link">{account?.name}</Link>
-                <button onClick={onSignOut} className="Auth-button">Sign out</button>
             </div>
         );
     }

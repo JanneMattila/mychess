@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import Switch from "react-switch";
 import "./SettingsPage.css";
-import { ProcessState, settingsLoadingRequestedEvent, settingsUpsertRequestedEvent } from "../actions";
+import { ProcessState, settingsLoadingRequestedEvent, settingsUpsertRequestedEvent, logoutRequestedEvent } from "../actions";
 import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "../components/TelemetryService";
 import { Database, DatabaseFields } from "../data/Database";
@@ -206,6 +206,10 @@ export function SettingsPage(props: SettingsProps) {
         deferredPrompt.prompt();
     }
 
+    const onSignOut = () => {
+        dispatch(logoutRequestedEvent());
+    }
+
     const hidden = {
         display: "none",
     }
@@ -246,9 +250,19 @@ export function SettingsPage(props: SettingsProps) {
                         <button onClick={installAsApp}><span role="img" aria-label="Install as App">📦</span> Install as App</button>
                     </div>
 
+                    <br />
+                    <hr />
+                    <br />
                     <Link to="/friends" className="Settings-link">
                         <span role="img" aria-label="Manage your friends">👥</span> Manage your friends
                     </Link>
+
+                    <br />
+                    <br />
+                    <hr />
+                    <br />
+
+                    <button onClick={onSignOut}><span role="img" aria-label="Sign out">📵</span> Sign out</button>
                 </div>
             </div>
         );
