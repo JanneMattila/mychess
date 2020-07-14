@@ -5,9 +5,11 @@ export const getInitialState = () => {
     return {
         loginState: ProcessState.NotStarted,
         loginRequested: 0,
+        logoutRequested: 0,
         gamesState: ProcessState.NotStarted,
         friendsState: ProcessState.NotStarted,
-        settingsState: ProcessState.NotStarted
+        settingsState: ProcessState.NotStarted,
+        settingsLoadingRequested: 0
     }
 }
 
@@ -35,6 +37,11 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 loginState: ProcessState.NotStarted,
                 account: undefined,
                 accessToken: undefined
+            })
+        }
+        case EventTypes.AUTH_LOGOUT_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                logoutRequested: state.logoutRequested ? state.logoutRequested + 1 : 1,
             })
         }
 
@@ -77,12 +84,21 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 userSettings: action.userSettings
             })
         }
-
+        case EventTypes.SETTINGS_LOADING_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                settingsLoadingRequested: state.settingsLoadingRequested ? state.settingsLoadingRequested + 1 : 1,
+            })
+        }
         case EventTypes.SETTINGS_UPSERT: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 settingsUpsertState: action.settingsUpsertState,
                 error: action.error,
                 errorLink: action.errorLink
+            })
+        }
+        case EventTypes.SETTINGS_UPSERT_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                settingsUpsertRequested: action.userSettings,
             })
         }
 

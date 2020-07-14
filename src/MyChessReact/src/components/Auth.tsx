@@ -1,147 +1,24 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
-import { loginEvent, ProcessState } from "../actions";
-import { UserAgentApplication, Configuration } from "msal";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { ProcessState, loginRequestedEvent, logoutRequestedEvent } from "../actions";
+import { Link } from "react-router-dom";
 import { getAppInsights } from "./TelemetryService";
 import "./Auth.css";
-import { Database, DatabaseFields } from "../data/Database";
 
-type AuthProps = {
-    clientId: string;
-    applicationIdURI: string;
-    endpoint: string;
-};
-
-let userAgentApplication: UserAgentApplication;
-
-export function Auth(props: AuthProps) {
-    const location = useLocation();
-    const history = useHistory();
-
+export function Auth() {
     const loginState = useTypedSelector(state => state.loginState);
     const account = useTypedSelector(state => state.account);
 
     const dispatch = useDispatch();
     const ai = getAppInsights();
 
-    const accessTokenRequest = {
-        scopes: [
-            props.applicationIdURI + "/User.ReadWrite",
-            props.applicationIdURI + "/Games.ReadWrite"
-        ]
-    };
-
-    const config: Configuration = {
-        auth: {
-            clientId: props.clientId,
-            authority: "https://login.microsoftonline.com/common",
-            navigateToLoginRequestUrl: false,
-            redirectUri: window.location.origin,
-            postLogoutRedirectUri: window.location.origin
-        },
-        cache: {
-            cacheLocation: "localStorage",
-            storeAuthStateInCookie: true
-        },
-        system: {
-            navigateFrameWait: 0
-        }
-    };
-
-    const preAuthEvent = () => {
-        ai.trackEvent({
-            name: "Auth-PreEvent", properties: {
-                pathname: location.pathname,
-            }
-        });
-
-        if (location.pathname !== "/") {
-            Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
-        }
-    }
-
-    const authEvent = (accessToken: string) => {
-        const loggedInAccount = userAgentApplication.getAccount();
-        if (loggedInAccount) {
-            dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessToken));
-        }
-        postAuthEvent();
-    }
-
-    const postAuthEvent = () => {
-        const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
-
-        ai.trackEvent({
-            name: "Auth-PostEvent", properties: {
-                pathname: redirectUrl,
-            }
-        });
-
-        Database.delete(DatabaseFields.AUTH_REDIRECT);
-        if (redirectUrl) {
-            history.push(redirectUrl);
-        }
-    }
-
-    const acquireTokenSilent = () => {
-        userAgentApplication.acquireTokenSilent(accessTokenRequest).then(function (accessTokenResponse) {
-            // Acquire token silent success
-            ai.trackEvent({
-                name: "Auth-AcquireTokenSilent", properties: {
-                    success: true
-                }
-            });
-
-            authEvent(accessTokenResponse.accessToken);
-        }).catch(function (error) {
-            // Acquire token silent failure, wait for user sign in
-            ai.trackEvent({
-                name: "Auth-AcquireTokenSilent", properties: {
-                    success: false
-                }
-            });
-        });
-    }
-
-    useEffect(() => {
-        if (!userAgentApplication) {
-            userAgentApplication = new UserAgentApplication(config);
-            userAgentApplication.handleRedirectCallback((error, response) => {
-                if (error) {
-                    console.log("Auth error");
-                    console.log(error);
-                    const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
-                    dispatch(loginEvent(ProcessState.Error, errorMessage));
-                }
-                else if (response) {
-                    // Acquire token after login
-                    authEvent(response.accessToken);
-                }
-            });
-
-            acquireTokenSilent();
-            setInterval(() => {
-                ai.trackEvent({ name: "Auth-BackgroundUpdate" });
-
-                acquireTokenSilent();
-            }, 1000 * 60 * 45);
-        }
-    });
-
     const onSignIn = () => {
-        ai.trackEvent({ name: "Auth-SignIn" });
-
-        preAuthEvent();
-        return userAgentApplication.loginRedirect(accessTokenRequest);
+        dispatch(loginRequestedEvent());
     }
 
     const onSignOut = () => {
-        ai.trackEvent({ name: "Auth-SignOut" });
-
-        Database.clear();
-        userAgentApplication.logout();
+        dispatch(logoutRequestedEvent());
     }
 
     if (loginState === ProcessState.Success) {
@@ -149,6 +26,7 @@ export function Auth(props: AuthProps) {
             <div className="Auth">
                 <Link to="/settings" className="Auth-link">{account?.name}</Link>
                 <button onClick={onSignOut} className="Auth-button">Sign out</button>
+
             </div>
         );
     }

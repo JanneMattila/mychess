@@ -1,16 +1,19 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
-import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, meLoadingEvent } from "../actions";
+import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, meLoadingEvent, loginEvent } from "../actions";
 import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { User } from "../models/User";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { useTypedSelector } from "../reducers";
 import { UserSettings } from "../models/UserSettings";
 import { GameStateFilter } from "../models/GameStateFilter";
+import { Configuration, UserAgentApplication } from "msal";
 
 type BackendServiceProps = {
+    clientId: string;
+    applicationIdURI: string;
     endpoint: string;
 
     getFriends?: number;
@@ -24,14 +27,142 @@ type BackendServiceProps = {
     getMe?: number;
 };
 
+let userAgentApplication: UserAgentApplication;
+
 export function BackendService(props: BackendServiceProps) {
 
+    const loginRequested = useTypedSelector(state => state.loginRequested);
+    const logoutRequested = useTypedSelector(state => state.logoutRequested);
     const accessToken = useTypedSelector(state => state.accessToken);
+
     const dispatch = useDispatch();
+    const location = useLocation();
     const history = useHistory();
     const ai = getAppInsights();
 
     const endpoint = props.endpoint;
+
+    const accessTokenRequest = {
+        scopes: [
+            props.applicationIdURI + "/User.ReadWrite",
+            props.applicationIdURI + "/Games.ReadWrite"
+        ]
+    };
+
+    const config: Configuration = {
+        auth: {
+            clientId: props.clientId,
+            authority: "https://login.microsoftonline.com/common",
+            navigateToLoginRequestUrl: false,
+            redirectUri: window.location.origin,
+            postLogoutRedirectUri: window.location.origin
+        },
+        cache: {
+            cacheLocation: "localStorage",
+            storeAuthStateInCookie: true
+        },
+        system: {
+            navigateFrameWait: 0
+        }
+    };
+
+    const preAuthEvent = () => {
+        ai.trackEvent({
+            name: "Auth-PreEvent", properties: {
+                pathname: location.pathname,
+            }
+        });
+
+        if (location.pathname !== "/") {
+            Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
+        }
+    }
+
+    const authEvent = (accessToken: string) => {
+        const loggedInAccount = userAgentApplication.getAccount();
+        if (loggedInAccount) {
+            dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessToken));
+        }
+        postAuthEvent();
+    }
+
+    const postAuthEvent = () => {
+        const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
+
+        ai.trackEvent({
+            name: "Auth-PostEvent", properties: {
+                pathname: redirectUrl,
+            }
+        });
+
+        Database.delete(DatabaseFields.AUTH_REDIRECT);
+        if (redirectUrl) {
+            history.push(redirectUrl);
+        }
+    }
+
+    const acquireTokenSilent = () => {
+        userAgentApplication.acquireTokenSilent(accessTokenRequest).then(function (accessTokenResponse) {
+            // Acquire token silent success
+            ai.trackEvent({
+                name: "Auth-AcquireTokenSilent", properties: {
+                    success: true
+                }
+            });
+
+            authEvent(accessTokenResponse.accessToken);
+        }).catch(function (error) {
+            // Acquire token silent failure, wait for user sign in
+            ai.trackEvent({
+                name: "Auth-AcquireTokenSilent", properties: {
+                    success: false
+                }
+            });
+        });
+    }
+
+    useEffect(() => {
+        if (!userAgentApplication) {
+            userAgentApplication = new UserAgentApplication(config);
+            userAgentApplication.handleRedirectCallback((error, response) => {
+                if (error) {
+                    console.log("Auth error");
+                    console.log(error);
+                    const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
+                    dispatch(loginEvent(ProcessState.Error, errorMessage));
+                }
+                else if (response) {
+                    // Acquire token after login
+                    authEvent(response.accessToken);
+                }
+            });
+
+            acquireTokenSilent();
+            setInterval(() => {
+                ai.trackEvent({ name: "Auth-BackgroundUpdate" });
+
+                acquireTokenSilent();
+            }, 1000 * 60 * 45);
+        }
+    });
+
+    useEffect(() => {
+        if (loginRequested && loginRequested >= 0) {
+            ai.trackEvent({ name: "Auth-SignIn" });
+
+            preAuthEvent();
+            userAgentApplication.loginRedirect(accessTokenRequest);
+        }
+    });
+
+    useEffect(() => {
+        if (logoutRequested && logoutRequested >= 0) {
+            ai.trackEvent({ name: "Auth-SignOut" });
+
+            Database.clear();
+            userAgentApplication.logout();
+        }
+    });
 
     useEffect(() => {
         const getFriends = async () => {
