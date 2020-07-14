@@ -5,12 +5,11 @@ import { useParams } from "react-router-dom";
 
 type ModifyFriendPageProps = {
     title: string;
-    endpoint: string;
 };
 
 export function ModifyFriendPage(props: ModifyFriendPageProps) {
     const { id } = useParams();
     return (
-        <ModifyFriend id={id} title={props.title} endpoint={props.endpoint} />
+        <ModifyFriend id={id} title={props.title} />
     );
 }

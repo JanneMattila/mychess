@@ -18,7 +18,7 @@ test("renders games and name is visible in output", () => {
   store.dispatch(gamesLoadingEvent(ProcessState.Success, "",
     [{ id: "1", name: "abc", updated: new Date(), moves: [], players: { white: { "id": "a", "name": "a" }, black: { "id": "b", "name": "b" } } }]))
 
-  const { getByText } = render(<Router><Provider store={store}><GameList title="custom title" endpoint="" /></Provider></Router>);
+  const { getByText } = render(<Router><Provider store={store}><GameList title="custom title" /></Provider></Router>);
   const signInElement = getByText(/abc/i);
   expect(signInElement).toBeInTheDocument();
   fetch.disableMocks();

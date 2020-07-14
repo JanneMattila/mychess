@@ -13,7 +13,6 @@ import { useDispatch } from "react-redux";
 
 type GameListProps = {
     title: string;
-    endpoint: string;
 };
 
 export function GameList(props: GameListProps) {

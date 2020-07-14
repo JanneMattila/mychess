@@ -1,12 +1,9 @@
 import React from 'react';
 import { GameList } from "../components/GameList";
-import { GetConfiguration } from "../ConfigurationManager";
 import { Link } from 'react-router-dom';
 import { useTypedSelector } from '../reducers';
 import { ProcessState } from '../actions';
 import "./HomePage.css";
-
-let configuration = GetConfiguration();
 
 export function HomePage() {
     const loginState = useTypedSelector(state => state.loginState);
@@ -26,10 +23,9 @@ export function HomePage() {
         return "";
     }
 
-
     return (
         <div>
-            <GameList title="Games waiting for you" endpoint={configuration.endpoint} />
+            <GameList title="Games waiting for you" />
             {renderWelcomeMessage()}
             <footer className="App-footer-container">
                 <Link to="/privacy" className="App-footer-link">

@@ -39,6 +39,7 @@ export enum EventTypes {
     FRIENDS_LOADING = "Friends/Loading",
     FRIENDS_REQUESTED = "Friends/Loading/Requested",
     FRIENDS_UPSERT = "Friends/Upsert",
+    FRIENDS_UPSERT_REQUESTED = "Friends/Upsert/Requested",
 
     // User settings related events
     SETTINGS_LOADING = "Settings/Loading",
@@ -62,6 +63,7 @@ type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, err
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: User[] }
 type FriendsRequestedAction = { type: EventTypes.FRIENDS_REQUESTED }
 type FriendUpsertAction = { type: EventTypes.FRIENDS_UPSERT, friendUpsertState: ProcessState, error?: string, errorLink?: string }
+type FriendsUpsertRequestedAction = { type: EventTypes.FRIENDS_UPSERT_REQUESTED, friend: User }
 type SettingsLoadingAction = { type: EventTypes.SETTINGS_LOADING, settingsState: ProcessState, error?: string, userSettings?: UserSettings }
 type SettingsLoadingRequestedAction = { type: EventTypes.SETTINGS_LOADING_REQUESTED }
 type SettingsUpsertAction = { type: EventTypes.SETTINGS_UPSERT, settingsUpsertState: ProcessState, error?: string, errorLink?: string }
@@ -81,6 +83,7 @@ export type RootAction =
     | FriendsLoadingAction
     | FriendsRequestedAction
     | FriendUpsertAction
+    | FriendsUpsertRequestedAction
     | SettingsLoadingAction
     | SettingsLoadingRequestedAction
     | SettingsUpsertAction
@@ -106,6 +109,7 @@ export interface RootState {
     readonly friendsState?: ProcessState
     readonly friendsRequested?: number,
     readonly friends?: User[]
+    readonly friendsUpsertRequested?: User,
 
     readonly friendUpsertState?: ProcessState
 
@@ -156,6 +160,10 @@ export function friendsRequestedEvent(): FriendsRequestedAction {
 
 export function friendUpsertEvent(friendUpsertState: ProcessState, error?: string, errorLink?: string): FriendUpsertAction {
     return { type: EventTypes.FRIENDS_UPSERT, friendUpsertState, error, errorLink };
+}
+
+export function friendUpsertRequestedEvent(friend: User): FriendsUpsertRequestedAction {
+    return { type: EventTypes.FRIENDS_UPSERT_REQUESTED, friend };
 }
 
 export function settingsLoadingEvent(settingsState: ProcessState, error?: string, userSettings?: UserSettings): SettingsLoadingAction {

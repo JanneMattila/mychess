@@ -80,6 +80,11 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 friendsRequested: state.friendsRequested ? state.friendsRequested + 1 : 1,
             })
         }
+        case EventTypes.FRIENDS_UPSERT_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                friendsUpsertRequested: action.friend,
+            })
+        }
         case EventTypes.FRIENDS_UPSERT: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 friendUpsertState: action.friendUpsertState,

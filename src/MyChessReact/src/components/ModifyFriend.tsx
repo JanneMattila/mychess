@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useTypedSelector } from "../reducers";
-import { ProcessState } from "../actions";
+import { ProcessState, friendUpsertRequestedEvent } from "../actions";
 import { getAppInsights } from "./TelemetryService";
 import { useHistory } from "react-router-dom";
 import "./FriendList.css";
 import { User } from "../models/User";
 import { Database, DatabaseFields } from "../data/Database";
-import { BackendService } from "./BackendService";
+import { useDispatch } from "react-redux";
 
 type ModifyFriendProps = {
     id?: string;
     title: string;
-    endpoint: string;
 };
 
 export function ModifyFriend(props: ModifyFriendProps) {
     const history = useHistory();
+    const dispatch = useDispatch();
 
     const loginState = useTypedSelector(state => state.loginState);
     const friendUpsertState = useTypedSelector(state => state.friendUpsertState);
@@ -24,7 +24,6 @@ export function ModifyFriend(props: ModifyFriendProps) {
 
     const [friendName, setFriendName] = useState("");
     const [friendID, setFriendID] = useState("");
-    const [player, setPlayer] = useState<User | undefined>(undefined);
 
     const ai = getAppInsights();
 
@@ -52,10 +51,11 @@ export function ModifyFriend(props: ModifyFriendProps) {
         ai.trackEvent({ name: "ModifyFriend-Save" });
 
         console.log("save friend");
-        setPlayer({
+        let friend = {
             id: friendID,
             name: friendName
-        });
+        };
+        dispatch(friendUpsertRequestedEvent(friend));
     }
 
     const cancel = () => {
@@ -99,7 +99,6 @@ export function ModifyFriend(props: ModifyFriendProps) {
                     <div style={friendUpsertState === ProcessState.Error ? visible : hidden}>
                         <a className="FriendList-AddFriendError" href={errorLink} target="_blank" rel="noopener noreferrer">{error}</a>
                     </div>
-                    <BackendService endpoint={props.endpoint} upsertFriend={player} />
                 </div>
             </div>
         );

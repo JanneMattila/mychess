@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
-import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, meLoadingEvent, loginEvent } from "../actions";
+import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent } from "../actions";
 import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { User } from "../models/User";
@@ -15,12 +15,6 @@ type BackendServiceProps = {
     clientId: string;
     applicationIdURI: string;
     endpoint: string;
-
-    getFriends?: number;
-    upsertFriend?: User;
-
-    getGames?: number;
-    getMe?: number;
 };
 
 let userAgentApplication: UserAgentApplication;
@@ -32,6 +26,7 @@ export function BackendService(props: BackendServiceProps) {
     const settingsLoadingRequested = useTypedSelector(state => state.settingsLoadingRequested);
     const settingsUpsertRequested = useTypedSelector(state => state.settingsUpsertRequested);
     const friendsRequested = useTypedSelector(state => state.friendsRequested);
+    const friendsUpsertRequested = useTypedSelector(state => state.friendsUpsertRequested);
     const gamesRequested = useTypedSelector(state => state.gamesRequested);
     const accessToken = useTypedSelector(state => state.accessToken);
 
@@ -263,7 +258,6 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-
         if (gamesRequested && gamesRequested >= 0) {
             ai.trackEvent({ name: "Games-Load" });
 
@@ -317,10 +311,14 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (accessToken && props.upsertFriend) {
-            upsertFriend(props.upsertFriend);
+        if (friendsUpsertRequested) {
+            ai.trackEvent({ name: "Friends-Upsert" });
+
+            if (accessToken) {
+                upsertFriend(friendsUpsertRequested);
+            }
         }
-    }, [props.upsertFriend, ai, dispatch, history, endpoint, accessToken]);
+    }, [friendsUpsertRequested, ai, dispatch, history, endpoint, accessToken]);
 
     useEffect(() => {
         const upsertSettings = async (playerSettings: UserSettings) => {
@@ -370,41 +368,6 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
     }, [settingsUpsertRequested, ai, dispatch, history, endpoint, accessToken]);
-
-    // Obsolete
-    useEffect(() => {
-        const getMe = async () => {
-            dispatch(meLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
-            const request: RequestInit = {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json",
-                    "Authorization": "Bearer " + accessToken
-                }
-            };
-
-            try {
-                const response = await fetch(endpoint + "/api/users/me", request);
-                const data = await response.json() as User;
-                console.log(data);
-
-                dispatch(meLoadingEvent(ProcessState.Success, "" /* Clear error message */, data.id));
-            } catch (error) {
-                console.log(error);
-                ai.trackException({ exception: error });
-
-                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve settings.";
-                console.log(errorMessage);
-                dispatch(meLoadingEvent(ProcessState.Error, errorMessage));
-            }
-        }
-
-        if (accessToken && props.getMe) {
-            if (props.getMe !== 0) {
-                getMe();
-            }
-        }
-    }, [props.getMe, ai, dispatch, history, endpoint, accessToken]);
 
     return (
         <>
