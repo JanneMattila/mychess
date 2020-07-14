@@ -53,7 +53,7 @@ export function SettingsPage(props: SettingsProps) {
             dispatch(settingsLoadingRequestedEvent());
         }
 
-        if (userSettings) {
+        if (userSettings && !playerIdentifier) {
             let enabled = false;
             if (userSettings.notifications.length === 1 &&
                 userSettings.notifications[0].enabled) {
