@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
-import { ProcessState, loginRequestedEvent, logoutRequestedEvent } from "../actions";
+import { ProcessState, loginRequestedEvent } from "../actions";
 import { Link } from "react-router-dom";
 import "./Profile.css";
 
