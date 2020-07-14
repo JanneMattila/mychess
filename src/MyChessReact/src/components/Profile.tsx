@@ -3,9 +3,9 @@ import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { ProcessState, loginRequestedEvent, logoutRequestedEvent } from "../actions";
 import { Link } from "react-router-dom";
-import "./Auth.css";
+import "./Profile.css";
 
-export function Auth() {
+export function Profile() {
     const loginState = useTypedSelector(state => state.loginState);
     const account = useTypedSelector(state => state.account);
 
@@ -21,16 +21,16 @@ export function Auth() {
 
     if (loginState === ProcessState.Success) {
         return (
-            <div className="Auth">
-                <Link to="/settings" className="Auth-link">{account?.name}</Link>
+            <div className="Profile">
+                <Link to="/settings" className="Profile-link">{account?.name}</Link>
                 <button onClick={onSignOut} className="Auth-button">Sign out</button>
             </div>
         );
     }
     return (
-        <div className="Auth">
+        <div className="Profile">
             Want to play? Please
-            <button onClick={onSignIn} className="Auth-button">sign In</button>
+            <button onClick={onSignIn} className="Profile-button">sign In</button>
         </div>
     );
 }

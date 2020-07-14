@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import { Auth } from "./components/Auth";
+import { Profile } from "./components/Profile";
 import { HomePage } from "./pages/HomePage";
 import { PrivacyPage } from "./pages/PrivacyPage";
 import { SettingsPage } from "./pages/SettingsPage";
@@ -26,7 +26,7 @@ function App() {
               <img src={logo} alt="My Chess" className="App-logo" />
             </Link>
             <div className="App-auth">
-              <Auth />
+              <Profile />
             </div>
           </div>
 
