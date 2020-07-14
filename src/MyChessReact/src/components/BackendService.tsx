@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
 import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent } from "../actions";
@@ -61,7 +61,7 @@ export function BackendService(props: BackendServiceProps) {
         }
     };
 
-    const preAuthEvent = () => {
+    const preAuthEvent = useCallback(() => {
         ai.trackEvent({
             name: "Auth-PreEvent", properties: {
                 pathname: location.pathname,
@@ -71,17 +71,9 @@ export function BackendService(props: BackendServiceProps) {
         if (location.pathname !== "/") {
             Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
         }
-    }
+    }, [ai, location.pathname]);
 
-    const authEvent = (accessToken: string) => {
-        const loggedInAccount = userAgentApplication.getAccount();
-        if (loggedInAccount) {
-            dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessToken));
-        }
-        postAuthEvent();
-    }
-
-    const postAuthEvent = () => {
+    const postAuthEvent = useCallback(() => {
         const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
 
         ai.trackEvent({
@@ -94,10 +86,20 @@ export function BackendService(props: BackendServiceProps) {
         if (redirectUrl) {
             history.push(redirectUrl);
         }
-    }
+    }, [ai, history]);
 
-    const acquireTokenSilent = () => {
-        userAgentApplication.acquireTokenSilent(accessTokenRequest).then(function (accessTokenResponse) {
+    const authEvent = useCallback((accessToken: string) => {
+        const loggedInAccount = userAgentApplication.getAccount();
+        if (loggedInAccount) {
+            dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessToken));
+        }
+        postAuthEvent();
+    }, [dispatch, postAuthEvent]);
+
+    const acquireTokenSilent = useCallback(async () => {
+        try {
+            const accessTokenResponse = await userAgentApplication.acquireTokenSilent(accessTokenRequest);
+
             // Acquire token silent success
             ai.trackEvent({
                 name: "Auth-AcquireTokenSilent", properties: {
@@ -106,15 +108,17 @@ export function BackendService(props: BackendServiceProps) {
             });
 
             authEvent(accessTokenResponse.accessToken);
-        }).catch(function (error) {
-            // Acquire token silent failure, wait for user sign in
+            return accessTokenResponse.accessToken;
+        }
+        catch (error) {
             ai.trackEvent({
                 name: "Auth-AcquireTokenSilent", properties: {
                     success: false
                 }
             });
-        });
-    }
+            return undefined;
+        }
+    }, [accessTokenRequest, ai, authEvent]);
 
     useEffect(() => {
         if (!userAgentApplication) {
@@ -149,7 +153,7 @@ export function BackendService(props: BackendServiceProps) {
             preAuthEvent();
             userAgentApplication.loginRedirect(accessTokenRequest);
         }
-    });
+    }, [loginRequested, ai, preAuthEvent, accessTokenRequest]);
 
     useEffect(() => {
         if (logoutRequested && logoutRequested >= 0) {
@@ -164,6 +168,9 @@ export function BackendService(props: BackendServiceProps) {
     useEffect(() => {
         const getSettings = async () => {
             dispatch(settingsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
+
+            const accessToken = await acquireTokenSilent();
+
             const request: RequestInit = {
                 method: "GET",
                 headers: {
@@ -190,16 +197,16 @@ export function BackendService(props: BackendServiceProps) {
 
         if (settingsLoadingRequested && settingsLoadingRequested >= 0) {
             ai.trackEvent({ name: "Settings-Load" });
-
-            if (accessToken) {
-                getSettings();
-            }
+            getSettings();
         }
-    }, [settingsLoadingRequested, ai, accessToken, dispatch, endpoint]);
+    }, [settingsLoadingRequested, ai, dispatch, endpoint, acquireTokenSilent]);
 
     useEffect(() => {
         const getFriends = async () => {
             dispatch(friendsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
+
+            const accessToken = await acquireTokenSilent();
+
             const request: RequestInit = {
                 method: "GET",
                 headers: {
@@ -226,16 +233,16 @@ export function BackendService(props: BackendServiceProps) {
 
         if (friendsRequested && friendsRequested >= 0) {
             ai.trackEvent({ name: "Friends-Load" });
-
-            if (accessToken) {
-                getFriends();
-            }
+            getFriends();
         }
-    }, [friendsRequested, ai, dispatch, endpoint, accessToken]);
+    }, [friendsRequested, ai, dispatch, endpoint, acquireTokenSilent]);
 
     useEffect(() => {
         const getGames = async () => {
             dispatch(gamesLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
+
+            const accessToken = await acquireTokenSilent();
+
             const request: RequestInit = {
                 method: "GET",
                 headers: {
@@ -260,16 +267,16 @@ export function BackendService(props: BackendServiceProps) {
 
         if (gamesRequested && gamesRequested >= 0) {
             ai.trackEvent({ name: "Games-Load" });
-
-            if (accessToken) {
-                getGames();
-            }
+            getGames();
         }
-    }, [gamesRequested, ai, dispatch, endpoint, accessToken]);
+    }, [gamesRequested, ai, dispatch, endpoint, accessToken, acquireTokenSilent]);
 
     useEffect(() => {
         const upsertFriend = async (player: User) => {
             dispatch(friendUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
+
+            const accessToken = await acquireTokenSilent();
+
             const request: RequestInit = {
                 method: "POST",
                 body: JSON.stringify(player),
@@ -313,16 +320,16 @@ export function BackendService(props: BackendServiceProps) {
 
         if (friendsUpsertRequested) {
             ai.trackEvent({ name: "Friends-Upsert" });
-
-            if (accessToken) {
-                upsertFriend(friendsUpsertRequested);
-            }
+            upsertFriend(friendsUpsertRequested);
         }
-    }, [friendsUpsertRequested, ai, dispatch, history, endpoint, accessToken]);
+    }, [friendsUpsertRequested, ai, dispatch, history, endpoint, acquireTokenSilent]);
 
     useEffect(() => {
         const upsertSettings = async (playerSettings: UserSettings) => {
             dispatch(settingsUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
+
+            const accessToken = await acquireTokenSilent();
+
             const request: RequestInit = {
                 method: "POST",
                 body: JSON.stringify(playerSettings),
@@ -361,13 +368,9 @@ export function BackendService(props: BackendServiceProps) {
 
         if (settingsUpsertRequested) {
             ai.trackEvent({ name: "Settings-Upsert" });
-
-            if (accessToken) {
-                console.log("settingsUpsertRequested: " + settingsUpsertRequested);
-                upsertSettings(settingsUpsertRequested);
-            }
+            upsertSettings(settingsUpsertRequested);
         }
-    }, [settingsUpsertRequested, ai, dispatch, history, endpoint, accessToken]);
+    }, [settingsUpsertRequested, ai, dispatch, history, endpoint, acquireTokenSilent]);
 
     return (
         <>
