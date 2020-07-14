@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
 import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent } from "../actions";
@@ -28,7 +28,14 @@ export function BackendService(props: BackendServiceProps) {
     const friendsRequested = useTypedSelector(state => state.friendsRequested);
     const friendsUpsertRequested = useTypedSelector(state => state.friendsUpsertRequested);
     const gamesRequested = useTypedSelector(state => state.gamesRequested);
-    const accessToken = useTypedSelector(state => state.accessToken);
+
+    const [loginProcessed, setLoginProcessed] = useState(0);
+    const [logoutProcessed, setLogoutProcessed] = useState(0);
+    const [settingsLoadingProcessed, setSettingsLoadingProcessed] = useState(0);
+    const [settingsUpsertProcessed, setSettingsUpsertProcessed] = useState<UserSettings | undefined>(undefined);
+    const [friendsProcessed, setFriendsProcessed] = useState(0);
+    const [friendsUpsertProcessed, setFriendsUpsertProcessed] = useState<User | undefined>(undefined);
+    const [gamesProcessed, setGamesProcessed] = useState(0);
 
     const dispatch = useDispatch();
     const location = useLocation();
@@ -120,6 +127,29 @@ export function BackendService(props: BackendServiceProps) {
         }
     }, [accessTokenRequest, ai, authEvent]);
 
+    const acquireTokenSilentOnly = useCallback(async () => {
+        try {
+            const accessTokenResponse = await userAgentApplication.acquireTokenSilent(accessTokenRequest);
+
+            // Acquire token silent success
+            ai.trackEvent({
+                name: "Auth-AcquireTokenSilentOnly", properties: {
+                    success: true
+                }
+            });
+
+            return accessTokenResponse.accessToken;
+        }
+        catch (error) {
+            ai.trackEvent({
+                name: "Auth-AcquireTokenSilentOnly", properties: {
+                    success: false
+                }
+            });
+            return undefined;
+        }
+    }, [accessTokenRequest, ai]);
+
     useEffect(() => {
         if (!userAgentApplication) {
             userAgentApplication = new UserAgentApplication(config);
@@ -136,7 +166,6 @@ export function BackendService(props: BackendServiceProps) {
                 }
             });
 
-            console.log("acquireTokenSilent");
             acquireTokenSilent();
             setInterval(() => {
                 ai.trackEvent({ name: "Auth-BackgroundUpdate" });
@@ -147,29 +176,31 @@ export function BackendService(props: BackendServiceProps) {
     });
 
     useEffect(() => {
-        if (loginRequested && loginRequested >= 0) {
+        if (loginRequested && loginRequested >= loginProcessed) {
+            setLoginProcessed(loginRequested);
             ai.trackEvent({ name: "Auth-SignIn" });
 
             preAuthEvent();
             userAgentApplication.loginRedirect(accessTokenRequest);
         }
-    }, [loginRequested, ai, preAuthEvent, accessTokenRequest]);
+    }, [loginRequested, ai, preAuthEvent, accessTokenRequest, loginProcessed]);
 
     useEffect(() => {
-        if (logoutRequested && logoutRequested >= 0) {
+        if (logoutRequested && logoutRequested >= logoutProcessed) {
+            setLogoutProcessed(logoutRequested);
             ai.trackEvent({ name: "Auth-SignOut" });
 
             Database.clear();
             userAgentApplication.logout();
         }
-    }, [logoutRequested, ai]);
+    }, [logoutRequested, ai, logoutProcessed]);
 
 
     useEffect(() => {
         const getSettings = async () => {
             dispatch(settingsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
 
-            const accessToken = await acquireTokenSilent();
+            const accessToken = await acquireTokenSilentOnly();
 
             const request: RequestInit = {
                 method: "GET",
@@ -195,17 +226,18 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (settingsLoadingRequested && settingsLoadingRequested >= 0) {
+        if (settingsLoadingRequested && settingsLoadingRequested > settingsLoadingProcessed) {
+            setSettingsLoadingProcessed(settingsLoadingRequested);
             ai.trackEvent({ name: "Settings-Load" });
             getSettings();
         }
-    }, [settingsLoadingRequested, ai, dispatch, endpoint, acquireTokenSilent]);
+    }, [settingsLoadingRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, settingsLoadingProcessed]);
 
     useEffect(() => {
         const getFriends = async () => {
             dispatch(friendsLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
 
-            const accessToken = await acquireTokenSilent();
+            const accessToken = await acquireTokenSilentOnly();
 
             const request: RequestInit = {
                 method: "GET",
@@ -231,17 +263,18 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (friendsRequested && friendsRequested >= 0) {
+        if (friendsRequested && friendsRequested > friendsProcessed) {
+            setFriendsProcessed(friendsRequested);
             ai.trackEvent({ name: "Friends-Load" });
             getFriends();
         }
-    }, [friendsRequested, ai, dispatch, endpoint, acquireTokenSilent]);
+    }, [friendsRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, friendsProcessed]);
 
     useEffect(() => {
         const getGames = async () => {
             dispatch(gamesLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
 
-            const accessToken = await acquireTokenSilent();
+            const accessToken = await acquireTokenSilentOnly();
 
             const request: RequestInit = {
                 method: "GET",
@@ -265,17 +298,18 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (gamesRequested && gamesRequested >= 0) {
+        if (gamesRequested && gamesRequested > gamesProcessed) {
+            setGamesProcessed(gamesRequested);
             ai.trackEvent({ name: "Games-Load" });
             getGames();
         }
-    }, [gamesRequested, ai, dispatch, endpoint, accessToken, acquireTokenSilent]);
+    }, [gamesRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesProcessed]);
 
     useEffect(() => {
         const upsertFriend = async (player: User) => {
             dispatch(friendUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
 
-            const accessToken = await acquireTokenSilent();
+            const accessToken = await acquireTokenSilentOnly();
 
             const request: RequestInit = {
                 method: "POST",
@@ -318,17 +352,18 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (friendsUpsertRequested) {
+        if (friendsUpsertRequested && friendsUpsertRequested !== friendsUpsertProcessed) {
+            setFriendsUpsertProcessed(friendsUpsertRequested);
             ai.trackEvent({ name: "Friends-Upsert" });
             upsertFriend(friendsUpsertRequested);
         }
-    }, [friendsUpsertRequested, ai, dispatch, history, endpoint, acquireTokenSilent]);
+    }, [friendsUpsertRequested, ai, dispatch, history, endpoint, acquireTokenSilentOnly, friendsUpsertProcessed]);
 
     useEffect(() => {
         const upsertSettings = async (playerSettings: UserSettings) => {
             dispatch(settingsUpsertEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
 
-            const accessToken = await acquireTokenSilent();
+            const accessToken = await acquireTokenSilentOnly();
 
             const request: RequestInit = {
                 method: "POST",
@@ -366,11 +401,12 @@ export function BackendService(props: BackendServiceProps) {
             }
         }
 
-        if (settingsUpsertRequested) {
+        if (settingsUpsertRequested && settingsUpsertRequested !== settingsUpsertProcessed) {
+            setSettingsUpsertProcessed(settingsUpsertRequested);
             ai.trackEvent({ name: "Settings-Upsert" });
             upsertSettings(settingsUpsertRequested);
         }
-    }, [settingsUpsertRequested, ai, dispatch, history, endpoint, acquireTokenSilent]);
+    }, [settingsUpsertRequested, ai, dispatch, history, endpoint, acquireTokenSilentOnly, settingsUpsertProcessed]);
 
     return (
         <>
