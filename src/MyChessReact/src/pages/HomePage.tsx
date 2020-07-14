@@ -2,11 +2,17 @@ import React from 'react';
 import { GameList } from "../components/GameList";
 import { Link } from 'react-router-dom';
 import { useTypedSelector } from '../reducers';
-import { ProcessState } from '../actions';
+import { ProcessState, loginRequestedEvent } from '../actions';
 import "./HomePage.css";
+import { useDispatch } from 'react-redux';
 
 export function HomePage() {
     const loginState = useTypedSelector(state => state.loginState);
+    const dispatch = useDispatch();
+
+    const onSignIn = () => {
+        dispatch(loginRequestedEvent());
+    }
 
     const renderWelcomeMessage = () => {
         if (loginState !== ProcessState.Success) {
@@ -16,7 +22,10 @@ export function HomePage() {
                     My Chess is social (and not that serious) chess game where
                     you can play chess online with your friends.
                     You can comment your moves and put some pressure to your friends (in fun way of course!).
-                        <br />
+                    <br />
+                    <br />
+                    Want to play? Please
+                    <button onClick={onSignIn}>sign In</button> to start playing right away.
                 </div>
             </div>;
         }
