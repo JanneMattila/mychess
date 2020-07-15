@@ -4,15 +4,16 @@
 
 .App-header-container {
   width: 100%;
-  height: 60px;
+  height: 55px;
 }
 
 .App-logo {
-  padding: 10px;
+  padding: 5px;
 }
 
 .App-auth {
   float: right;
+  display: block;
 }
 
 .title {
