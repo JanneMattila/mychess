@@ -1,15 +1,12 @@
 .Profile {
   padding: 5px;
   margin-right: 15px;
-  text-align: center;
-  display: inline-block;
 }
 
 .Profile-link {
   color: #ffffff;
   text-decoration: none;
   line-height: 45px;
-  height: 45px;
   display: block;
   text-align: center;
 }
