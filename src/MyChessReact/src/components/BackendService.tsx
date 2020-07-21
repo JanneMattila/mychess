@@ -9,7 +9,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useTypedSelector } from "../reducers";
 import { UserSettings } from "../models/UserSettings";
 import { GameStateFilter } from "../models/GameStateFilter";
-import { Configuration, UserAgentApplication } from "msal";
+import { Configuration, PublicClientApplication, AccountInfo } from "@azure/msal-browser";
 
 type BackendServiceProps = {
     clientId: string;
@@ -17,7 +17,7 @@ type BackendServiceProps = {
     endpoint: string;
 };
 
-let userAgentApplication: UserAgentApplication;
+let publicClientApplication: PublicClientApplication;
 
 export function BackendService(props: BackendServiceProps) {
 
@@ -28,6 +28,8 @@ export function BackendService(props: BackendServiceProps) {
     const friendsRequested = useTypedSelector(state => state.friendsRequested);
     const friendsUpsertRequested = useTypedSelector(state => state.friendsUpsertRequested);
     const gamesRequested = useTypedSelector(state => state.gamesRequested);
+
+    const account = Database.get<AccountInfo>(DatabaseFields.ACCOUNT);
 
     const [loginProcessed, setLoginProcessed] = useState(0);
     const [logoutProcessed, setLogoutProcessed] = useState(0);
@@ -62,9 +64,6 @@ export function BackendService(props: BackendServiceProps) {
         cache: {
             cacheLocation: "localStorage",
             storeAuthStateInCookie: true
-        },
-        system: {
-            navigateFrameWait: 0
         }
     };
 
@@ -96,16 +95,28 @@ export function BackendService(props: BackendServiceProps) {
     }, [ai, history]);
 
     const authEvent = useCallback((accessToken: string) => {
-        const loggedInAccount = userAgentApplication.getAccount();
-        if (loggedInAccount) {
+        const accounts = publicClientApplication.getAllAccounts();
+        if (accounts) {
+            // TODO: Support account switcher
+            const loggedInAccount = accounts[0];
+            Database.set(DatabaseFields.ACCOUNT, loggedInAccount);
             dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessToken));
+            postAuthEvent();
         }
-        postAuthEvent();
     }, [dispatch, postAuthEvent]);
 
     const acquireTokenSilent = useCallback(async () => {
+        if (!account) {
+            return undefined;
+        }
+
         try {
-            const accessTokenResponse = await userAgentApplication.acquireTokenSilent(accessTokenRequest);
+            const accessTokenRequestSilent = {
+                ...accessTokenRequest,
+                account: account
+            };
+
+            const accessTokenResponse = await publicClientApplication.acquireTokenSilent(accessTokenRequestSilent);
 
             // Acquire token silent success
             ai.trackEvent({
@@ -118,6 +129,7 @@ export function BackendService(props: BackendServiceProps) {
             return accessTokenResponse.accessToken;
         }
         catch (error) {
+            console.log(error);
             ai.trackEvent({
                 name: "Auth-AcquireTokenSilent", properties: {
                     success: false
@@ -125,11 +137,20 @@ export function BackendService(props: BackendServiceProps) {
             });
             return undefined;
         }
-    }, [accessTokenRequest, ai, authEvent]);
+    }, [accessTokenRequest, ai, authEvent, account]);
 
     const acquireTokenSilentOnly = useCallback(async () => {
+        if (!account) {
+            return undefined;
+        }
+
         try {
-            const accessTokenResponse = await userAgentApplication.acquireTokenSilent(accessTokenRequest);
+            const accessTokenRequestSilent = {
+                ...accessTokenRequest,
+                account: account
+            };
+
+            const accessTokenResponse = await publicClientApplication.acquireTokenSilent(accessTokenRequestSilent);
 
             // Acquire token silent success
             ai.trackEvent({
@@ -141,6 +162,7 @@ export function BackendService(props: BackendServiceProps) {
             return accessTokenResponse.accessToken;
         }
         catch (error) {
+            console.log(error);
             ai.trackEvent({
                 name: "Auth-AcquireTokenSilentOnly", properties: {
                     success: false
@@ -148,30 +170,25 @@ export function BackendService(props: BackendServiceProps) {
             });
             return undefined;
         }
-    }, [accessTokenRequest, ai]);
+    }, [accessTokenRequest, ai, account]);
 
     useEffect(() => {
-        if (!userAgentApplication) {
-            userAgentApplication = new UserAgentApplication(config);
-            userAgentApplication.handleRedirectCallback((error, response) => {
-                if (error) {
-                    console.log("Auth error");
-                    console.log(error);
-                    const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
-                    dispatch(loginEvent(ProcessState.Error, errorMessage));
-                }
-                else if (response) {
+        if (!publicClientApplication) {
+            publicClientApplication = new PublicClientApplication(config);
+
+            publicClientApplication.handleRedirectPromise().then((response) => {
+                if (response) {
                     // Acquire token after login
                     authEvent(response.accessToken);
                 }
+            }).catch((error) => {
+                console.log("Auth error");
+                console.log(error);
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
+                dispatch(loginEvent(ProcessState.Error, errorMessage));
             });
 
             acquireTokenSilent();
-            setInterval(() => {
-                ai.trackEvent({ name: "Auth-BackgroundUpdate" });
-
-                acquireTokenSilent();
-            }, 1000 * 60 * 45);
         }
     });
 
@@ -181,7 +198,7 @@ export function BackendService(props: BackendServiceProps) {
             ai.trackEvent({ name: "Auth-SignIn" });
 
             preAuthEvent();
-            userAgentApplication.loginRedirect(accessTokenRequest);
+            publicClientApplication.loginRedirect(accessTokenRequest);
         }
     }, [loginRequested, ai, preAuthEvent, accessTokenRequest, loginProcessed]);
 
@@ -191,7 +208,7 @@ export function BackendService(props: BackendServiceProps) {
             ai.trackEvent({ name: "Auth-SignOut" });
 
             Database.clear();
-            userAgentApplication.logout();
+            publicClientApplication.logout();
         }
     }, [logoutRequested, ai, logoutProcessed]);
 

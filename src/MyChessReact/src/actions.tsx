@@ -1,4 +1,4 @@
-import { Account } from "msal";
+import { AccountInfo } from "@azure/msal-browser";
 import { MyChessGame } from "./models/MyChessGame";
 import { User } from "./models/User";
 import { UserSettings } from "./models/UserSettings";
@@ -52,7 +52,7 @@ export enum EventTypes {
     PLAY_SHOW_DIALOG = "Play/Dialog",
 };
 
-type LoginAction = { type: EventTypes.AUTH_LOGIN, loginState: ProcessState, error?: string, account?: Account, accessToken?: string }
+type LoginAction = { type: EventTypes.AUTH_LOGIN, loginState: ProcessState, error?: string, account?: AccountInfo, accessToken?: string }
 type LoginRequestedAction = { type: EventTypes.AUTH_LOGIN_REQUESTED }
 type LogoutRequestedAction = { type: EventTypes.AUTH_LOGOUT_REQUESTED }
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
@@ -96,7 +96,7 @@ export interface RootState {
     readonly logoutRequested?: number,
     readonly error?: string
     readonly errorLink?: string
-    readonly account?: Account
+    readonly account?: AccountInfo
     readonly accessToken?: string
 
     readonly gamesState?: ProcessState
@@ -126,7 +126,7 @@ export interface RootState {
 /*
  * Action creators
  */
-export function loginEvent(loginState: ProcessState, error?: string, account?: Account, accessToken?: string): LoginAction {
+export function loginEvent(loginState: ProcessState, error?: string, account?: AccountInfo, accessToken?: string): LoginAction {
     return { type: EventTypes.AUTH_LOGIN, loginState, error, account, accessToken };
 }
 

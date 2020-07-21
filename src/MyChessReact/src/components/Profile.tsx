@@ -18,7 +18,7 @@ export function Profile() {
     if (loginState === ProcessState.Success) {
         return (
             <div className="Profile">
-                <Link to="/settings" className="Profile-link">{account?.name}</Link>
+                <Link to="/settings" className="Profile-link">{account?.username}</Link>
             </div>
         );
     }

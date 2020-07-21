@@ -1,5 +1,6 @@
 export enum DatabaseFields {
     // Auth related fields
+    ACCOUNT = "Account",
     AUTH_REDIRECT = "Auth/Redirect",
 
     // Game related fields
