@@ -7,7 +7,6 @@ import "./Profile.css";
 
 export function Profile() {
     const loginState = useTypedSelector(state => state.loginState);
-    const account = useTypedSelector(state => state.account);
 
     const dispatch = useDispatch();
 
@@ -18,7 +17,7 @@ export function Profile() {
     if (loginState === ProcessState.Success) {
         return (
             <div className="Profile">
-                <Link to="/settings" className="Profile-link">{account?.username}</Link>
+                <Link to="/settings" className="Profile-link">Profile<span role="img" aria-label="Profile">&rarr;</span></Link>
             </div>
         );
     }
