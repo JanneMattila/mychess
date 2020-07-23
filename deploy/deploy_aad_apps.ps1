@@ -97,7 +97,6 @@ You need to *manually* update these two properties:
 "@
     $spaApp = New-AzureADApplication -DisplayName $spaAppName `
         -AvailableToOtherTenants $true `
-        -Oauth2AllowImplicitFlow $true `
         -Homepage $SPAUri `
         -ReplyUrls $SPAUri
     $spaReaderApp
