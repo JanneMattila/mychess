@@ -74,6 +74,7 @@ export function BackendService(props: BackendServiceProps) {
             }
         });
 
+        Database.clear();
         if (location.pathname !== "/") {
             Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
         }
