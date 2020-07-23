@@ -410,6 +410,9 @@ export function BackendService(props: BackendServiceProps) {
                 const response = await fetch(endpoint + "/api/users/me/settings", request);
                 if (response.ok) {
                     dispatch(settingsUpsertEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
+                    dispatch(settingsLoadingEvent(ProcessState.Success, "" /* Clear error message */, playerSettings));
+                    Database.set(DatabaseFields.ME_SETTINGS, playerSettings);
+
                     history.push("/");
                 } else {
                     const data = await response.json();
