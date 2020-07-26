@@ -108,15 +108,16 @@ export function BackendService(props: BackendServiceProps) {
 
     const acquireTokenSilent = useCallback(async () => {
         if (!account) {
-            return undefined;
+            return;
         }
 
-        try {
-            const accessTokenRequestSilent = {
-                ...accessTokenRequest,
-                account: account
-            };
+        let interactionRequired = false;
+        const accessTokenRequestSilent = {
+            ...accessTokenRequest,
+            account: account
+        };
 
+        try {
             const accessTokenResponse = await publicClientApplication.acquireTokenSilent(accessTokenRequestSilent);
 
             // Acquire token silent success
@@ -127,16 +128,31 @@ export function BackendService(props: BackendServiceProps) {
             });
 
             authEvent(accessTokenResponse.accessToken);
-            return accessTokenResponse.accessToken;
         }
         catch (error) {
-            console.log(error);
-            ai.trackEvent({
-                name: "Auth-AcquireTokenSilent", properties: {
-                    success: false
-                }
-            });
-            return undefined;
+            const errorMessage: string = error.errorCode ? error.errorCode : error;
+            console.log(errorMessage);
+
+            // Acquire token silent failure, and send an interactive request
+            if (errorMessage.indexOf("interaction_required") !== -1) {
+                interactionRequired = true;
+                console.log("Auth-AcquireTokenSilent -> Interaction required");
+            }
+            else {
+                console.log("Auth-AcquireTokenSilent");
+                console.log(JSON.stringify(error));
+                ai.trackEvent({
+                    name: "Auth-AcquireTokenSilent", properties: {
+                        success: false
+                    }
+                });
+                ai.trackException({ exception: error });
+                return;
+            }
+        }
+
+        if (interactionRequired) {
+            await publicClientApplication.acquireTokenRedirect(accessTokenRequestSilent);
         }
     }, [accessTokenRequest, ai, authEvent, account]);
 
@@ -169,6 +185,7 @@ export function BackendService(props: BackendServiceProps) {
                     success: false
                 }
             });
+            ai.trackException({ exception: error });
             return undefined;
         }
     }, [accessTokenRequest, ai, account]);
