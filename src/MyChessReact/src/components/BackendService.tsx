@@ -161,12 +161,12 @@ export function BackendService(props: BackendServiceProps) {
             return undefined;
         }
 
-        try {
-            const accessTokenRequestSilent = {
-                ...accessTokenRequest,
-                account: account
-            };
+        const accessTokenRequestSilent = {
+            ...accessTokenRequest,
+            account: account
+        };
 
+        try {
             const accessTokenResponse = await publicClientApplication.acquireTokenSilent(accessTokenRequestSilent);
 
             // Acquire token silent success
@@ -179,14 +179,24 @@ export function BackendService(props: BackendServiceProps) {
             return accessTokenResponse.accessToken;
         }
         catch (error) {
-            console.log(error);
-            ai.trackEvent({
-                name: "Auth-AcquireTokenSilentOnly", properties: {
-                    success: false
-                }
-            });
-            ai.trackException({ exception: error });
-            return undefined;
+            const errorMessage: string = error.errorCode ? error.errorCode : error;
+            console.log(errorMessage);
+
+            // Acquire token silent failure, and send an interactive request
+            if (errorMessage.indexOf("interaction_required") !== -1) {
+                console.log("Auth-AcquireTokenSilentOnly -> Interaction required");
+                await publicClientApplication.acquireTokenRedirect(accessTokenRequestSilent);
+            }
+            else {
+                ai.trackEvent({
+                    name: "Auth-AcquireTokenSilentOnly", properties: {
+                        success: false
+                    }
+                });
+
+                ai.trackException({ exception: error });
+                return undefined;
+            }
         }
     }, [accessTokenRequest, ai, account]);
 
