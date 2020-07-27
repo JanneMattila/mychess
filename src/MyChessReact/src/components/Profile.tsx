@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { ProcessState, loginRequestedEvent } from "../actions";
 import { Link } from "react-router-dom";
+import logo from "../pages/profile.svg";
 import "./Profile.css";
 
 export function Profile() {
@@ -17,7 +18,7 @@ export function Profile() {
     if (loginState === ProcessState.Success) {
         return (
             <div className="Profile">
-                <Link to="/settings" className="Profile-link">Profile<span role="img" aria-label="Profile">&rarr;</span></Link>
+                <Link to="/settings" className="Profile-link"><img src={logo} alt="Profile" /></Link>
             </div>
         );
     }
