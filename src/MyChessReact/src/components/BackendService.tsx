@@ -154,6 +154,7 @@ export function BackendService(props: BackendServiceProps) {
                     }
                 });
                 ai.trackException({ exception: error });
+                dispatch(loginEvent(ProcessState.Error, errorMessage));
                 return;
             }
         }
@@ -161,7 +162,7 @@ export function BackendService(props: BackendServiceProps) {
         if (interactionRequired) {
             await publicClientApplication.acquireTokenRedirect(accessTokenRequestSilent);
         }
-    }, [accessTokenRequest, ai, authEvent, account]);
+    }, [accessTokenRequest, ai, authEvent, account, dispatch]);
 
     const acquireTokenSilentOnly = useCallback(async () => {
         if (!account) {
@@ -223,6 +224,7 @@ export function BackendService(props: BackendServiceProps) {
                 dispatch(loginEvent(ProcessState.Error, errorMessage));
             });
 
+            dispatch(loginEvent(ProcessState.Processing, "" /* No error message */));
             acquireTokenSilent();
         }
     });
