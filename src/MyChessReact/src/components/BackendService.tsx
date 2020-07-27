@@ -138,10 +138,10 @@ export function BackendService(props: BackendServiceProps) {
             const errorMessage: string = error.errorCode ? error.errorCode : error.toString();
             console.log(errorMessage);
 
-            // Acquire token silent failure, and send an interactive request
             if (errorMessage.indexOf("consent_required") !== -1 ||
                 errorMessage.indexOf("interaction_required") !== -1 ||
-                errorMessage.indexOf("login_required") !== -1) {
+                errorMessage.indexOf("login_required") !== -1 ||
+                errorMessage.indexOf("null_or_empty_id_token") !== -1) {
                 interactionRequired = true;
                 console.log("Auth-AcquireTokenSilent -> Interaction required");
             }
@@ -190,8 +190,10 @@ export function BackendService(props: BackendServiceProps) {
             const errorMessage: string = error.errorCode ? error.errorCode : error.toString();
             console.log(errorMessage);
 
-            // Acquire token silent failure, and send an interactive request
-            if (errorMessage.indexOf("interaction_required") !== -1) {
+            if (errorMessage.indexOf("consent_required") !== -1 ||
+                errorMessage.indexOf("interaction_required") !== -1 ||
+                errorMessage.indexOf("login_required") !== -1 ||
+                errorMessage.indexOf("null_or_empty_id_token") !== -1) {
                 console.log("Auth-AcquireTokenSilentOnly -> Interaction required");
                 await publicClientApplication.acquireTokenRedirect(accessTokenRequestSilent);
             }
