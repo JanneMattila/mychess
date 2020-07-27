@@ -29,7 +29,7 @@ export function BackendService(props: BackendServiceProps) {
     const friendsUpsertRequested = useTypedSelector(state => state.friendsUpsertRequested);
     const gamesRequested = useTypedSelector(state => state.gamesRequested);
 
-    const account = Database.get<AccountInfo>(DatabaseFields.ACCOUNT);
+    const [account, setAccount] = useState(Database.get<AccountInfo>(DatabaseFields.ACCOUNT));
 
     const [loginProcessed, setLoginProcessed] = useState(0);
     const [logoutProcessed, setLogoutProcessed] = useState(0);
@@ -75,10 +75,14 @@ export function BackendService(props: BackendServiceProps) {
         });
 
         Database.clear();
+        if (account) {
+            Database.set(DatabaseFields.ACCOUNT, account);
+        }
+
         if (location.pathname !== "/") {
             Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
         }
-    }, [ai, location.pathname]);
+    }, [ai, location.pathname, account]);
 
     const postAuthEvent = useCallback(() => {
         const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
@@ -101,6 +105,7 @@ export function BackendService(props: BackendServiceProps) {
             // TODO: Support account switcher
             const loggedInAccount = accounts[0];
             Database.set(DatabaseFields.ACCOUNT, loggedInAccount);
+            setAccount(loggedInAccount);
             dispatch(loginEvent(ProcessState.Success, "" /* Clear error message */, loggedInAccount, accessToken));
             postAuthEvent();
         }
@@ -130,11 +135,13 @@ export function BackendService(props: BackendServiceProps) {
             authEvent(accessTokenResponse.accessToken);
         }
         catch (error) {
-            const errorMessage: string = error.errorCode ? error.errorCode : error;
+            const errorMessage: string = error.errorCode ? error.errorCode : error.toString();
             console.log(errorMessage);
 
             // Acquire token silent failure, and send an interactive request
-            if (errorMessage.indexOf("interaction_required") !== -1) {
+            if (errorMessage.indexOf("consent_required") !== -1 ||
+                errorMessage.indexOf("interaction_required") !== -1 ||
+                errorMessage.indexOf("login_required") !== -1) {
                 interactionRequired = true;
                 console.log("Auth-AcquireTokenSilent -> Interaction required");
             }
@@ -179,7 +186,7 @@ export function BackendService(props: BackendServiceProps) {
             return accessTokenResponse.accessToken;
         }
         catch (error) {
-            const errorMessage: string = error.errorCode ? error.errorCode : error;
+            const errorMessage: string = error.errorCode ? error.errorCode : error.toString();
             console.log(errorMessage);
 
             // Acquire token silent failure, and send an interactive request
@@ -225,10 +232,15 @@ export function BackendService(props: BackendServiceProps) {
             setLoginProcessed(loginRequested);
             ai.trackEvent({ name: "Auth-SignIn" });
 
+            const accessTokenRequestSilent = {
+                ...accessTokenRequest,
+                account: account
+            };
+
             preAuthEvent();
-            publicClientApplication.loginRedirect(accessTokenRequest);
+            publicClientApplication.loginRedirect(accessTokenRequestSilent);
         }
-    }, [loginRequested, ai, preAuthEvent, accessTokenRequest, loginProcessed]);
+    }, [loginRequested, ai, preAuthEvent, accessTokenRequest, loginProcessed, account]);
 
     useEffect(() => {
         if (logoutRequested && logoutRequested >= logoutProcessed) {
