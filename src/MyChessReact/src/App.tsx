@@ -13,6 +13,7 @@ import { ModifyFriendPage } from "./pages/ModifyFriendPage";
 import { PlayPage } from "./pages/PlayPage";
 import CookieConsent from "react-cookie-consent";
 import { BackendService } from "./components/BackendService";
+import { ProfileLoader } from "./components/ProfileLoader";
 
 let configuration = GetConfiguration();
 
@@ -50,6 +51,7 @@ function App() {
             sameSite="strict">
             This website uses cookies to enhance the user experience.
           </CookieConsent>
+          <ProfileLoader />
           <BackendService clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
         </div>
       </TelemetryProvider>
