@@ -104,10 +104,14 @@ export function ModifyFriend(props: ModifyFriendProps) {
         );
     }
     else {
-        // Not logged in so render blank.
+        // Not logged in.
         return (
-            <>
-            </>
+            <div>
+                <div className="title">Add new friend</div>
+                <div className="welcomeText">
+                    You need to sign in to add new friends.
+                </div>
+            </div>
         );
     }
 }
