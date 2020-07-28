@@ -116,6 +116,8 @@ export function BackendService(props: BackendServiceProps) {
             return;
         }
 
+        dispatch(loginEvent(ProcessState.Processing, "" /* No error message */));
+
         let interactionRequired = false;
         const accessTokenRequestSilent = {
             ...accessTokenRequest,
@@ -226,7 +228,6 @@ export function BackendService(props: BackendServiceProps) {
                 dispatch(loginEvent(ProcessState.Error, errorMessage));
             });
 
-            dispatch(loginEvent(ProcessState.Processing, "" /* No error message */));
             acquireTokenSilent();
         }
     });
