@@ -14,6 +14,7 @@ import { PlayPage } from "./pages/PlayPage";
 import CookieConsent from "react-cookie-consent";
 import { BackendService } from "./components/BackendService";
 import { ProfileLoader } from "./components/ProfileLoader";
+import { AboutPage } from "./pages/AboutPage";
 
 let configuration = GetConfiguration();
 
@@ -33,6 +34,7 @@ function App() {
 
           <Switch>
             <Route exact path="/" component={HomePage} />
+            <Route exact path="/about" component={AboutPage} />
             <Route exact path="/privacy" component={PrivacyPage} />
             <Route exact path="/play/local" component={() => <PlayPage endpoint={configuration.endpoint} />} />
             <Route exact path="/play/:id" component={() => <PlayPage endpoint={configuration.endpoint} />} />

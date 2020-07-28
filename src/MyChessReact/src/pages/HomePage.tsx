@@ -37,6 +37,10 @@ export function HomePage() {
             <GameList title="Games waiting for you" />
             {renderWelcomeMessage()}
             <footer className="App-footer-container">
+                <Link to="/About" className="App-footer-link">
+                    About
+                </Link>
+                <span className="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
                 <Link to="/privacy" className="App-footer-link">
                     Privacy
                 </Link>
