@@ -9,7 +9,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useTypedSelector } from "../reducers";
 import { UserSettings } from "../models/UserSettings";
 import { GameStateFilter } from "../models/GameStateFilter";
-import { Configuration, PublicClientApplication, AccountInfo } from "@azure/msal-browser";
+import { Configuration, PublicClientApplication, AccountInfo, InteractionRequiredAuthError } from "@azure/msal-browser";
 
 type BackendServiceProps = {
     clientId: string;
@@ -48,6 +48,8 @@ export function BackendService(props: BackendServiceProps) {
 
     const accessTokenRequest = {
         scopes: [
+            "openid",
+            "profile",
             props.applicationIdURI + "/User.ReadWrite",
             props.applicationIdURI + "/Games.ReadWrite"
         ]
@@ -161,10 +163,7 @@ export function BackendService(props: BackendServiceProps) {
             const errorMessage: string = error.errorCode ? error.errorCode : error.toString();
             console.log(errorMessage);
 
-            if (errorMessage.indexOf("consent_required") !== -1 ||
-                errorMessage.indexOf("interaction_required") !== -1 ||
-                errorMessage.indexOf("login_required") !== -1 ||
-                errorMessage.indexOf("null_or_empty_id_token") !== -1) {
+            if (error instanceof InteractionRequiredAuthError) {
                 interactionRequired = true;
                 console.log("Auth-AcquireTokenSilent -> Interaction required");
             }
@@ -221,10 +220,7 @@ export function BackendService(props: BackendServiceProps) {
             const errorMessage: string = error.errorCode ? error.errorCode : error.toString();
             console.log(errorMessage);
 
-            if (errorMessage.indexOf("consent_required") !== -1 ||
-                errorMessage.indexOf("interaction_required") !== -1 ||
-                errorMessage.indexOf("login_required") !== -1 ||
-                errorMessage.indexOf("null_or_empty_id_token") !== -1) {
+            if (error instanceof InteractionRequiredAuthError) {
                 console.log("Auth-AcquireTokenSilentOnly -> Interaction required");
                 await publicClientApplication.acquireTokenRedirect(accessTokenRequestSilent);
             }
