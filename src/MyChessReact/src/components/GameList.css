@@ -44,6 +44,13 @@
     height: 25px;
 }
 
+.dateTemplate {
+    text-align: right;
+    font-size: 12pt;
+    color: #959595;
+    height: 25px;
+}
+
 .row {
     text-align: center;
     justify-content: center;

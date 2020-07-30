@@ -62,6 +62,40 @@ export function GameList(props: GameListProps) {
         return "";
     }
 
+    const getDate = (game: MyChessGame) => {
+        const move = game?.moves[game?.moves.length - 1];
+        if (move) {
+            const now = Date.now();
+            const update = Date.parse(move.end);
+
+            let seconds = (now - update) / 1000;
+
+            if (seconds < 60) {
+                return "Now";
+            }
+
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            if (days > 30) {
+                return `Over month ago`;
+            }
+            else if (days > 0) {
+                return `${days} day${days > 1 ? "s" : ""} ago`
+            }
+            else if (hours > 0) {
+                return `${hours} hour${hours > 1 ? "s" : ""} ago`
+            }
+            else if (minutes > 0) {
+                return `${minutes} minute${minutes > 1 ? "s" : ""} ago`
+            }
+            else {
+                return "Now";
+            }
+        }
+        return "";
+    }
+
     const renderGames = (games?: MyChessGame[]) => {
         return (
             <div>
@@ -77,6 +111,9 @@ export function GameList(props: GameListProps) {
                                 </div>
                                 <div className="opponentTemplate">
                                     {getOpponent(game)}
+                                </div>
+                                <div className="dateTemplate">
+                                    {getDate(game)}
                                 </div>
                             </div>
                         </Link>
