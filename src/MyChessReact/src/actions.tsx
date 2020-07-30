@@ -58,7 +58,7 @@ type LogoutRequestedAction = { type: EventTypes.AUTH_LOGOUT_REQUESTED }
 type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
-type GamesRequestedAction = { type: EventTypes.GAMES_REQUESTED }
+type GamesRequestedAction = { type: EventTypes.GAMES_REQUESTED, gamesFilter: string }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: User[] }
 type FriendsRequestedAction = { type: EventTypes.FRIENDS_REQUESTED }
@@ -101,6 +101,7 @@ export interface RootState {
 
     readonly gamesState?: ProcessState
     readonly gamesRequested?: number,
+    readonly gamesFilter?: string,
     readonly games?: MyChessGame[]
 
     readonly me?: string;
@@ -142,8 +143,8 @@ export function gamesLoadingEvent(gamesState: ProcessState, error?: string, game
     return { type: EventTypes.GAMES_LOADING, gamesState, error, games };
 }
 
-export function gamesRequestedEvent(): GamesRequestedAction {
-    return { type: EventTypes.GAMES_REQUESTED };
+export function gamesRequestedEvent(gamesFilter: string): GamesRequestedAction {
+    return { type: EventTypes.GAMES_REQUESTED, gamesFilter: gamesFilter };
 }
 
 export function meLoadingEvent(meState: ProcessState, error?: string, me?: string): MeLoadingAction {

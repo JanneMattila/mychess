@@ -57,6 +57,7 @@ export default function appReducer(state: RootState = getInitialState(), action:
         case EventTypes.GAMES_REQUESTED: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 gamesRequested: state.gamesRequested ? state.gamesRequested + 1 : 1,
+                gamesFilter: action.gamesFilter
             })
         }
 

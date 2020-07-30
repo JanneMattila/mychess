@@ -39,8 +39,8 @@ export function GameList() {
 
         ai.trackEvent({ name: "GameList-Load" });
 
-        dispatch(gamesRequestedEvent());
-    }, [dispatch, loginState, ai]);
+        dispatch(gamesRequestedEvent(gameStateFilter));
+    }, [dispatch, loginState, ai, gameStateFilter]);
 
     const getOpponent = (game: MyChessGame) => {
         let friendID = game.players.white.id;
@@ -131,7 +131,7 @@ export function GameList() {
     const refresh = () => {
         ai.trackEvent({ name: "GameList-Refresh" });
 
-        dispatch(gamesRequestedEvent());
+        dispatch(gamesRequestedEvent(gameStateFilter));
     }
 
     const addNewGame = () => {
@@ -154,8 +154,6 @@ export function GameList() {
                 filter: filter
             }
         });
-
-        dispatch(gamesRequestedEvent());
     }
 
     if (loginState === ProcessState.Success) {

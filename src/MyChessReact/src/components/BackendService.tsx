@@ -28,6 +28,7 @@ export function BackendService(props: BackendServiceProps) {
     const friendsRequested = useTypedSelector(state => state.friendsRequested);
     const friendsUpsertRequested = useTypedSelector(state => state.friendsUpsertRequested);
     const gamesRequested = useTypedSelector(state => state.gamesRequested);
+    const gamesFilter = useTypedSelector(state => state.gamesFilter);
 
     const [account, setAccount] = useState(Database.get<AccountInfo>(DatabaseFields.ACCOUNT));
 
@@ -342,7 +343,7 @@ export function BackendService(props: BackendServiceProps) {
     }, [friendsRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, friendsProcessed]);
 
     useEffect(() => {
-        const getGames = async () => {
+        const getGames = async (filter?: string) => {
             dispatch(gamesLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
 
             const accessToken = await acquireTokenSilentOnly();
@@ -359,8 +360,10 @@ export function BackendService(props: BackendServiceProps) {
                 }
             };
 
+            const requestFilter = filter ? filter : GameStateFilter.WAITING_FOR_YOU;
+
             try {
-                const response = await fetch(endpoint + "/api/games?state=" + GameStateFilter.WAITING_FOR_YOU, request);
+                const response = await fetch(endpoint + "/api/games?state=" + requestFilter, request);
                 const data = await response.json();
 
                 dispatch(gamesLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
@@ -383,9 +386,9 @@ export function BackendService(props: BackendServiceProps) {
         if (gamesRequested && gamesRequested > gamesProcessed) {
             setGamesProcessed(gamesRequested);
             ai.trackEvent({ name: "Games-Load" });
-            getGames();
+            getGames(gamesFilter);
         }
-    }, [gamesRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesProcessed]);
+    }, [gamesRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesProcessed, gamesFilter]);
 
     useEffect(() => {
         const upsertFriend = async (player: User) => {
