@@ -34,7 +34,7 @@ export function HomePage() {
 
     return (
         <div>
-            <GameList title="Games waiting for you" />
+            <GameList />
             {renderWelcomeMessage()}
             <footer className="App-footer-container">
                 <Link to="/About" className="App-footer-link">

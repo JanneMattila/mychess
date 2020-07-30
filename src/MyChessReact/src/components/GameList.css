@@ -2,6 +2,20 @@
   box-sizing: border-box;
 }
 
+.GameList-titleWrapper {
+  width: 100%;
+  text-align: center;
+}
+
+.GameList-title {
+  font-size: calc(14px + 2vmin);
+  text-align: center;
+  color: white;
+  background-color: #454545;
+  padding: 5px 15px 5px 15px;
+  margin: 10px;
+}
+
 .GameList-link {
   color: #ffffff;
 }

@@ -11,11 +11,7 @@ import { GameStateFilter } from "../models/GameStateFilter";
 import { UserSettings } from "../models/UserSettings";
 import { useDispatch } from "react-redux";
 
-type GameListProps = {
-    title: string;
-};
-
-export function GameList(props: GameListProps) {
+export function GameList() {
     const loginState = useTypedSelector(state => state.loginState);
     const gamesState = useTypedSelector(state => state.gamesState);
     const games = useTypedSelector(state => state.games);
@@ -30,6 +26,8 @@ export function GameList(props: GameListProps) {
     const friendsStored = Database.get<User[]>(DatabaseFields.FRIEND_LIST);
     const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
 
+    const gameStateFilter = GameStateFilter.WAITING_FOR_YOU;
+    const title = "Games waiting for you";
 
     useEffect(() => {
         if (loginState !== ProcessState.Success) {
@@ -101,7 +99,7 @@ export function GameList(props: GameListProps) {
             <div>
                 <div className="row">
                     {games?.map(game =>
-                        <Link to={{ pathname: `/play/${game?.id}?state=${GameStateFilter.WAITING_FOR_YOU}` }} className="GameList-link" key={game?.id}>
+                        <Link to={{ pathname: `/play/${game?.id}?state=${gameStateFilter}` }} className="GameList-link" key={game?.id}>
                             <div className="gameTemplate">
                                 <div className="nameTemplate">
                                     {game?.name}
@@ -163,7 +161,9 @@ export function GameList(props: GameListProps) {
 
         return (
             <div>
-                <div className="title">{props.title}</div>
+                <div className="GameList-titleWrapper">
+                    <button className="GameList-title">{title}</button>
+                </div>
                 {contents}
             </div>
         );
