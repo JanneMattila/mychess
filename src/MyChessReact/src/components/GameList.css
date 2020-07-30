@@ -16,6 +16,10 @@
   margin: 10px;
 }
 
+.GameList-filterList {
+  font-size: calc(10px + 2vmin);
+}
+
 .GameList-link {
   color: #ffffff;
 }

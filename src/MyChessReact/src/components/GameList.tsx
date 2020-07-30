@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MyChessGame } from "../models/MyChessGame";
 import { useTypedSelector } from "../reducers";
 import { ProcessState, gamesRequestedEvent } from "../actions";
@@ -26,8 +26,10 @@ export function GameList() {
     const friendsStored = Database.get<User[]>(DatabaseFields.FRIEND_LIST);
     const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
 
-    const gameStateFilter = GameStateFilter.WAITING_FOR_YOU;
-    const title = "Games waiting for you";
+    const [filterVisibility, setFilterVisibility] = useState(false);
+
+    const [gameStateFilter, setGameStateFilter] = useState(GameStateFilter.WAITING_FOR_YOU.toString());
+    const [title, setTitle] = useState("Games waiting for you");
 
     useEffect(() => {
         if (loginState !== ProcessState.Success) {
@@ -138,6 +140,24 @@ export function GameList() {
         push("/friends");
     }
 
+    const toggleFilterVisibility = () => {
+        setFilterVisibility(e => !e);
+    }
+
+    const setFilter = (pageTitle: string, filter: string) => {
+        setGameStateFilter(filter);
+        setTitle(pageTitle);
+        setFilterVisibility(e => !e);
+
+        ai.trackEvent({
+            name: "GameList-Filter", properties: {
+                filter: filter
+            }
+        });
+
+        dispatch(gamesRequestedEvent());
+    }
+
     if (loginState === ProcessState.Success) {
 
         let contents: JSX.Element;
@@ -162,7 +182,15 @@ export function GameList() {
         return (
             <div>
                 <div className="GameList-titleWrapper">
-                    <button className="GameList-title">{title}</button>
+                    <button className="GameList-title" onClick={toggleFilterVisibility}>{title}</button>
+                    {filterVisibility ?
+                        <div className="GameList-filterList">
+                            Show games:<br />
+                            <button className="GameList-title" onClick={() => setFilter("Games waiting for you", GameStateFilter.WAITING_FOR_YOU)}>Waiting for you</button>
+                            <button className="GameList-title" onClick={() => setFilter("Games waiting for opponent", GameStateFilter.WAITING_FOR_OPPONENT)}>Waiting for opponent</button>
+                            <button className="GameList-title" onClick={() => setFilter("Archive", GameStateFilter.ARCHIVE)}>Archive</button>
+                        </div>
+                        : <></>}
                 </div>
                 {contents}
             </div>
