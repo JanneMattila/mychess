@@ -70,9 +70,6 @@ export function BackendService(props: BackendServiceProps) {
     };
 
     const preAuthEvent = useCallback(() => {
-
-        console.log("preAuthEvent:");
-
         ai.trackEvent({
             name: "Auth-PreEvent", properties: {
                 pathname: location.pathname,
@@ -81,24 +78,16 @@ export function BackendService(props: BackendServiceProps) {
 
         Database.clear();
         if (account) {
-            console.log("preAuthEvent-account:");
-            console.log(account);
-
             Database.set(DatabaseFields.ACCOUNT, account);
         }
 
         if (location.pathname !== "/") {
-            console.log("preAuthEvent-pathname:");
-            console.log(location.pathname);
-
             Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
         }
     }, [ai, location.pathname, account]);
 
     const postAuthEvent = useCallback(() => {
         const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
-
-        console.log("postAuthEvent:");
 
         ai.trackEvent({
             name: "Auth-PostEvent", properties: {
@@ -115,9 +104,6 @@ export function BackendService(props: BackendServiceProps) {
     const authEvent = useCallback((accessToken: string) => {
         const accounts = publicClientApplication.getAllAccounts();
 
-        console.log("authEvent:");
-        console.log(accounts);
-
         if (accounts) {
             // TODO: Support account switcher
             const loggedInAccount = accounts[0];
@@ -129,10 +115,6 @@ export function BackendService(props: BackendServiceProps) {
     }, [dispatch, postAuthEvent]);
 
     const acquireTokenSilent = useCallback(async () => {
-
-        console.log("acquireTokenSilent:");
-        console.log(account);
-
         if (!account) {
             return;
         }
@@ -159,17 +141,13 @@ export function BackendService(props: BackendServiceProps) {
         }
         catch (error) {
             console.log(JSON.stringify(error));
-
             const errorMessage: string = error.errorCode ? error.errorCode : error.toString();
-            console.log(errorMessage);
 
             if (error instanceof InteractionRequiredAuthError) {
                 interactionRequired = true;
                 console.log("Auth-AcquireTokenSilent -> Interaction required");
             }
             else {
-                console.log("Auth-AcquireTokenSilent");
-                console.log(JSON.stringify(error));
                 ai.trackEvent({
                     name: "Auth-AcquireTokenSilent", properties: {
                         success: false
@@ -182,17 +160,11 @@ export function BackendService(props: BackendServiceProps) {
         }
 
         if (interactionRequired) {
-            console.log(accessTokenRequestSilent);
-
             await publicClientApplication.acquireTokenRedirect(accessTokenRequestSilent);
         }
     }, [accessTokenRequest, ai, authEvent, account, dispatch]);
 
     const acquireTokenSilentOnly = useCallback(async () => {
-
-        console.log("acquireTokenSilentOnly:");
-        console.log(account);
-
         if (!account) {
             return undefined;
         }
@@ -216,9 +188,6 @@ export function BackendService(props: BackendServiceProps) {
         }
         catch (error) {
             console.log(JSON.stringify(error));
-
-            const errorMessage: string = error.errorCode ? error.errorCode : error.toString();
-            console.log(errorMessage);
 
             if (error instanceof InteractionRequiredAuthError) {
                 console.log("Auth-AcquireTokenSilentOnly -> Interaction required");
