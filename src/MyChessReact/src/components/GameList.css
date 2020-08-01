@@ -11,9 +11,14 @@
   font-size: calc(14px + 2vmin);
   text-align: center;
   color: white;
-  background-color: #454545;
+  background-color: #353535;
   padding: 5px 15px 5px 15px;
   margin: 10px;
+  border: none;
+}
+
+.GameList-title:hover {
+  background-color: #656565;
 }
 
 .GameList-filterList {
