@@ -184,9 +184,9 @@ export function GameList() {
                     {filterVisibility ?
                         <div className="GameList-filterList">
                             Show games:<br />
-                            <button className="GameList-title" onClick={() => setFilter("Games waiting for you", GameStateFilter.WAITING_FOR_YOU)}>Waiting for you</button>
-                            <button className="GameList-title" onClick={() => setFilter("Games waiting for opponent", GameStateFilter.WAITING_FOR_OPPONENT)}>Waiting for opponent</button>
-                            <button className="GameList-title" onClick={() => setFilter("Archive", GameStateFilter.ARCHIVE)}>Archive</button>
+                            <button className="GameList-childtitle" onClick={() => setFilter("Games waiting for you", GameStateFilter.WAITING_FOR_YOU)}>Waiting for you</button>
+                            <button className="GameList-childtitle" onClick={() => setFilter("Games waiting for opponent", GameStateFilter.WAITING_FOR_OPPONENT)}>Waiting for opponent</button>
+                            <button className="GameList-childtitle" onClick={() => setFilter("Archive", GameStateFilter.ARCHIVE)}>Archive</button>
                         </div>
                         : <></>}
                 </div>

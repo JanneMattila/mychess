@@ -21,6 +21,20 @@
   background-color: #656565;
 }
 
+.GameList-childtitle {
+  font-size: calc(14px + 2vmin);
+  text-align: center;
+  color: white;
+  background-color: #454545;
+  padding: 5px 15px 5px 15px;
+  margin: 10px;
+  border: none;
+}
+
+.GameList-childtitle:hover {
+  background-color: #656565;
+}
+
 .GameList-filterList {
   font-size: calc(10px + 2vmin);
 }
