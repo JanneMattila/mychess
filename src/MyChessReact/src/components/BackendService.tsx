@@ -67,6 +67,9 @@ export function BackendService(props: BackendServiceProps) {
         cache: {
             cacheLocation: "localStorage",
             storeAuthStateInCookie: false
+        },
+        system: {
+
         }
     };
 
@@ -273,19 +276,31 @@ export function BackendService(props: BackendServiceProps) {
 
             try {
                 const response = await fetch(endpoint + "/api/users/me/settings", request);
-                const data = await response.json();
+                if (response.ok) {
+                    const data = await response.json();
 
-                Database.set(DatabaseFields.ME_SETTINGS, data);
+                    Database.set(DatabaseFields.ME_SETTINGS, data);
 
-                dispatch(settingsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
+                    dispatch(settingsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
 
-                const friends = Database.get<UserSettings>(DatabaseFields.FRIEND_LIST);
-                if (!friends) {
-                    // No friends available. Force fetching that information.
-                    ai.trackEvent({ name: "Settings-FriendsMissing" });
-                    dispatch(friendsRequestedEvent());
+                    const friends = Database.get<UserSettings>(DatabaseFields.FRIEND_LIST);
+                    if (!friends) {
+                        // No friends available. Force fetching that information.
+                        ai.trackEvent({ name: "Settings-FriendsMissing" });
+                        dispatch(friendsRequestedEvent());
+                    }
                 }
-            } catch (error) {
+                else {
+                    ai.trackEvent({
+                        name: "Settings-LoadFailed", properties: {
+                            status: response.status,
+                            statusText: response.statusText,
+                        }
+                    });
+                    dispatch(settingsLoadingEvent(ProcessState.Error, "Unable to retrieve settings."));
+                }
+            }
+            catch (error) {
                 console.log(error);
                 ai.trackException({ exception: error });
 
@@ -321,12 +336,24 @@ export function BackendService(props: BackendServiceProps) {
 
             try {
                 const response = await fetch(endpoint + "/api/users/me/friends", request);
-                const data = await response.json();
+                if (response.ok) {
+                    const data = await response.json();
 
-                Database.set(DatabaseFields.FRIEND_LIST, data);
+                    Database.set(DatabaseFields.FRIEND_LIST, data);
 
-                dispatch(friendsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
-            } catch (error) {
+                    dispatch(friendsLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
+                }
+                else {
+                    ai.trackEvent({
+                        name: "Friends-LoadFailed", properties: {
+                            status: response.status,
+                            statusText: response.statusText,
+                        }
+                    });
+                    dispatch(friendsLoadingEvent(ProcessState.Error, "Unable to retrieve friends."));
+                }
+            }
+            catch (error) {
                 console.log(error);
                 ai.trackException({ exception: error });
 
@@ -364,17 +391,29 @@ export function BackendService(props: BackendServiceProps) {
 
             try {
                 const response = await fetch(endpoint + "/api/games?state=" + requestFilter, request);
-                const data = await response.json();
+                if (response.ok) {
+                    const data = await response.json();
 
-                dispatch(gamesLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
+                    dispatch(gamesLoadingEvent(ProcessState.Success, "" /* Clear error message */, data));
 
-                const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
-                if (!userSettings) {
-                    // No user settings available. Force fetching that information.
-                    ai.trackEvent({ name: "Games-SettingsMissing" });
-                    dispatch(settingsLoadingRequestedEvent());
+                    const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
+                    if (!userSettings) {
+                        // No user settings available. Force fetching that information.
+                        ai.trackEvent({ name: "Games-SettingsMissing" });
+                        dispatch(settingsLoadingRequestedEvent());
+                    }
                 }
-            } catch (error) {
+                else {
+                    ai.trackEvent({
+                        name: "Games-LoadFailed", properties: {
+                            status: response.status,
+                            statusText: response.statusText,
+                        }
+                    });
+                    dispatch(gamesLoadingEvent(ProcessState.Error, "Unable to retrieve games."));
+                }
+            }
+            catch (error) {
                 console.log(error);
                 ai.trackException({ exception: error });
 
@@ -411,9 +450,6 @@ export function BackendService(props: BackendServiceProps) {
 
             try {
                 const response = await fetch(endpoint + "/api/users/me/friends", request);
-                const data = await response.json();
-                console.log(data);
-
                 if (response.ok) {
                     dispatch(friendUpsertEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
                     const userSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
@@ -423,14 +459,26 @@ export function BackendService(props: BackendServiceProps) {
                     else {
                         history.push("/settings");
                     }
-                } else {
+                }
+                else if (response.status === 400 /* Bad request */) {
+                    const data = await response.json();
                     const ex = data as ProblemDetail;
                     if (ex.title !== undefined && ex.instance !== undefined) {
                         console.log(ex);
                         dispatch(friendUpsertEvent(ProcessState.Error, ex.title, ex.instance));
                     }
                 }
-            } catch (error) {
+                else {
+                    ai.trackEvent({
+                        name: "Friends-UpsertFailed", properties: {
+                            status: response.status,
+                            statusText: response.statusText,
+                        }
+                    });
+                    dispatch(friendUpsertEvent(ProcessState.Error, "Unable to modify friend."));
+                }
+            }
+            catch (error) {
                 console.log(error);
                 ai.trackException({ exception: error });
 
@@ -475,7 +523,8 @@ export function BackendService(props: BackendServiceProps) {
                     Database.set(DatabaseFields.ME_SETTINGS, playerSettings);
 
                     history.push("/");
-                } else {
+                }
+                else if (response.status === 400 /* Bad request */) {
                     const data = await response.json();
                     console.log(data);
 
@@ -485,7 +534,17 @@ export function BackendService(props: BackendServiceProps) {
                         dispatch(settingsUpsertEvent(ProcessState.Error, ex.title, ex.instance));
                     }
                 }
-            } catch (error) {
+                else {
+                    ai.trackEvent({
+                        name: "Settings-UpsertFailed", properties: {
+                            status: response.status,
+                            statusText: response.statusText,
+                        }
+                    });
+                    dispatch(settingsUpsertEvent(ProcessState.Error, "Unable to update settings."));
+                }
+            }
+            catch (error) {
                 console.log(error);
                 ai.trackException({ exception: error });
 
