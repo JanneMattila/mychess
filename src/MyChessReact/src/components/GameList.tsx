@@ -42,6 +42,15 @@ export function GameList() {
         dispatch(gamesRequestedEvent(gameStateFilter));
     }, [dispatch, loginState, ai, gameStateFilter]);
 
+    useEffect(() => {
+        const filterOpenElement = document.getElementById("filterOpen");
+        const filterCloseElement = document.getElementById("filterClose");
+        if (filterOpenElement && filterCloseElement) {
+            filterOpenElement.style.display = filterVisibility ? "none" : "";
+            filterCloseElement.style.display = filterVisibility ? "" : "none";
+        }
+    }, [filterVisibility]);
+
     const getOpponent = (game: MyChessGame) => {
         let friendID = game.players.white.id;
         if (game.players.white.id === userSettings?.id) {
@@ -180,7 +189,7 @@ export function GameList() {
         return (
             <div>
                 <div className="GameList-titleWrapper">
-                    <button className="GameList-title" onClick={toggleFilterVisibility}>{title}</button>
+                    <button className="GameList-title" onClick={toggleFilterVisibility}>{title} <span role="img" aria-label="Open filter" id="filterOpen">&#9207;</span><span role="img" aria-label="Close filter" style={{ display: 'none' }} id="filterClose">&#9206;</span></button>
                     {filterVisibility ?
                         <div className="GameList-filterList">
                             Show games:<br />
