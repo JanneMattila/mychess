@@ -9,7 +9,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useTypedSelector } from "../reducers";
 import { UserSettings } from "../models/UserSettings";
 import { GameStateFilter } from "../models/GameStateFilter";
-import { Configuration, PublicClientApplication, AccountInfo, InteractionRequiredAuthError } from "@azure/msal-browser";
+import { Configuration, PublicClientApplication, AccountInfo, InteractionRequiredAuthError, SilentRequest, RedirectRequest } from "@azure/msal-browser";
 
 type BackendServiceProps = {
     clientId: string;
@@ -126,7 +126,7 @@ export function BackendService(props: BackendServiceProps) {
         dispatch(loginEvent(ProcessState.Processing, "" /* No error message */));
 
         let interactionRequired = false;
-        const accessTokenRequestSilent = {
+        const accessTokenRequestSilent: SilentRequest = {
             ...accessTokenRequest,
             account: account
         };
@@ -164,7 +164,11 @@ export function BackendService(props: BackendServiceProps) {
         }
 
         if (interactionRequired) {
-            await publicClientApplication.acquireTokenRedirect(accessTokenRequestSilent);
+            const accessTokenRequestRedirect: RedirectRequest = {
+                ...accessTokenRequest,
+                loginHint: account.username
+            };
+            await publicClientApplication.acquireTokenRedirect(accessTokenRequestRedirect);
         }
     }, [accessTokenRequest, ai, authEvent, account, dispatch]);
 
@@ -173,7 +177,7 @@ export function BackendService(props: BackendServiceProps) {
             return undefined;
         }
 
-        const accessTokenRequestSilent = {
+        const accessTokenRequestSilent: SilentRequest = {
             ...accessTokenRequest,
             account: account
         };
@@ -195,7 +199,11 @@ export function BackendService(props: BackendServiceProps) {
 
             if (error instanceof InteractionRequiredAuthError) {
                 console.log("Auth-AcquireTokenSilentOnly -> Interaction required");
-                await publicClientApplication.acquireTokenRedirect(accessTokenRequestSilent);
+                const accessTokenRequestRedirect: RedirectRequest = {
+                    ...accessTokenRequest,
+                    loginHint: account.username
+                };
+                await publicClientApplication.acquireTokenRedirect(accessTokenRequestRedirect);
             }
             else {
                 ai.trackEvent({
