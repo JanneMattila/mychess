@@ -220,5 +220,90 @@ namespace MyChess.Tests.Handlers
             Assert.Equal(expectedWaitingForYou, actualWaitingForYou);
             Assert.Equal(expectedWaitingForOpponent, actualWaitingForOpponent);
         }
+
+        [Fact]
+        public async Task Move_Game_To_Archive()
+        {
+            // Arrange
+            var expectedWaitingForYou = 0;
+            var expectedWaitingForOpponent = 0;
+            var expectedArchive = 2;
+
+            var user1 = new AuthenticatedUser()
+            {
+                Name = "abc",
+                PreferredUsername = "a b",
+                UserIdentifier = "u1",
+                ProviderIdentifier = "p1"
+            };
+
+            // Player creating the game
+            await _context.UpsertAsync(TableNames.Users, new UserEntity()
+            {
+                PartitionKey = "u1",
+                RowKey = "p1",
+                UserID = "user123"
+            });
+            await _context.UpsertAsync(TableNames.UserID2User, new UserID2UserEntity()
+            {
+                PartitionKey = "user123",
+                RowKey = "user123",
+                UserPrimaryKey = "u1",
+                UserRowKey = "p1"
+            });
+
+            // Opponent
+            await _context.UpsertAsync(TableNames.Users, new UserEntity()
+            {
+                PartitionKey = "u2",
+                RowKey = "p2",
+                UserID = "user456"
+            });
+
+            var game = new MyChessGame
+            {
+                ID = "aaa"
+            };
+            game.Players.White.ID = "user123";
+            game.Players.Black.ID = "user456";
+            var moves = new string[]
+            {
+                "E2E4", // White Pawn
+                "A7A6", // Black Pawn
+                "F1C4", // White Bishop
+                "H7H6", // Black Pawn
+                "D1F3", // White Queen
+                "A6A5"  // Black Pawn
+            };
+
+            foreach (var m in moves)
+            {
+                game.Moves.Add(new MyChessGameMove() { Move = m });
+            }
+
+            var compactor = new Compactor();
+            var data = compactor.Compact(game);
+            await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity()
+            {
+                PartitionKey = "user123",
+                RowKey = "aaa",
+                Data = data
+            });
+
+            // White Queen
+            var finalMove = new MyChessGameMove() { Move = "F3F7" };
+
+            // Act
+            var actual = await _gamesHandler.AddMoveAsync(user1, "aaa", finalMove);
+
+            // Assert
+            Assert.Null(actual);
+            var actualWaitingForYou = _context.Tables[TableNames.GamesWaitingForYou].Count;
+            var actualWaitingForOpponent = _context.Tables[TableNames.GamesWaitingForOpponent].Count;
+            var actualWaitingArchive = _context.Tables[TableNames.GamesArchive].Count;
+            Assert.Equal(expectedWaitingForYou, actualWaitingForYou);
+            Assert.Equal(expectedWaitingForOpponent, actualWaitingForOpponent);
+            Assert.Equal(expectedArchive, actualWaitingArchive);
+        }
     }
 }

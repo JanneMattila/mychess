@@ -208,23 +208,52 @@ namespace MyChess.Handlers
                 };
             }
 
-            // TODO: If game is over then move to archive.
+            var state = _chessBoard.GetBoardState();
+            game.State = state.ToString();
+            if (state == ChessBoardState.CheckMate)
+            {
+                var player = _chessBoard.CurrentPlayer == PiecePlayer.Black ? PiecePlayer.White : PiecePlayer.Black;
+                game.StateText = $"{player} won";
+            }
+            else if (state == ChessBoardState.StaleMate)
+            {
+                game.StateText = $"Draw";
+            }
 
             var data = _compactor.Compact(game);
-
-            // Add new games to storage
-            await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity
+            if (state == ChessBoardState.CheckMate ||
+                state == ChessBoardState.StaleMate)
             {
-                PartitionKey = opponentID,
-                RowKey = game.ID,
-                Data = data
-            });
-            await _context.UpsertAsync(TableNames.GamesWaitingForOpponent, new GameEntity
+                // We have to move this game to archive.
+                await _context.UpsertAsync(TableNames.GamesArchive, new GameEntity
+                {
+                    PartitionKey = opponentID,
+                    RowKey = game.ID,
+                    Data = data
+                });
+                await _context.UpsertAsync(TableNames.GamesArchive, new GameEntity
+                {
+                    PartitionKey = user.UserID,
+                    RowKey = game.ID,
+                    Data = data
+                });
+            }
+            else
             {
-                PartitionKey = user.UserID,
-                RowKey = game.ID,
-                Data = data
-            });
+                // Add new games to storage
+                await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity
+                {
+                    PartitionKey = opponentID,
+                    RowKey = game.ID,
+                    Data = data
+                });
+                await _context.UpsertAsync(TableNames.GamesWaitingForOpponent, new GameEntity
+                {
+                    PartitionKey = user.UserID,
+                    RowKey = game.ID,
+                    Data = data
+                });
+            }
 
             // Delete old ones from storage
             await _context.DeleteAsync(TableNames.GamesWaitingForOpponent, new GameEntity
