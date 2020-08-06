@@ -189,7 +189,7 @@ export function GameList() {
         return (
             <div>
                 <div className="GameList-titleWrapper">
-                    <button className="GameList-title" onClick={toggleFilterVisibility}>{title} <span role="img" aria-label="Open filter" id="filterOpen">&#9207;</span><span role="img" aria-label="Close filter" style={{ display: 'none' }} id="filterClose">&#9206;</span></button>
+                    <button className="GameList-title" onClick={toggleFilterVisibility}>{title} <span role="img" aria-label="Open filter" id="filterOpen">&#9662;</span><span role="img" aria-label="Close filter" style={{ display: 'none' }} id="filterClose">&#9652;</span></button>
                     {filterVisibility ?
                         <div className="GameList-filterList">
                             Show games:<br />
