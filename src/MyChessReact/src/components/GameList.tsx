@@ -105,6 +105,13 @@ export function GameList() {
         return "";
     }
 
+    const getStatus = (game: MyChessGame) => {
+        if (game && game.state && game.stateText && game.state !== "Normal") {
+            return game.stateText;
+        }
+        return "";
+    }
+
     const renderGames = (games?: MyChessGame[]) => {
         return (
             <div>
@@ -123,6 +130,9 @@ export function GameList() {
                                 </div>
                                 <div className="dateTemplate">
                                     {getDate(game)}
+                                </div>
+                                <div className="statusTemplate">
+                                    {getStatus(game)}
                                 </div>
                             </div>
                         </Link>

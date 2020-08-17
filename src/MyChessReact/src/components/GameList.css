@@ -58,39 +58,48 @@
 }
 
 .nameTemplate { 
-    text-align: center;
-    font-size: 18pt;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    height: 40px;
+  text-align: center;
+  font-size: 18pt;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 40px;
 }
 
 .commentTemplate { 
-    text-align: left;
-    font-size: 14pt;
-    text-overflow: ellipsis;
-    overflow-wrap: break-word;
-    overflow: hidden;
-    height: 50%;
+  text-align: left;
+  font-size: 14pt;
+  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  height: 50%;
 }
 
 .opponentTemplate {
-    text-align: right;
-    font-size: 12pt;
-    color: #959595;
-    height: 25px;
+  text-align: right;
+  font-size: 12pt;
+  color: #959595;
+  height: 25px;
 }
 
 .dateTemplate {
-    text-align: right;
-    font-size: 12pt;
-    color: #959595;
-    height: 25px;
+  text-align: right;
+  font-size: 12pt;
+  color: #959595;
+  height: 25px;
+}
+
+.statusTemplate {
+  position: relative;
+  top: -25px;
+  text-align: left;
+  font-size: 12pt;
+  color: #959595;
+  height: 25px;
 }
 
 .row {
-    text-align: center;
-    justify-content: center;
+  text-align: center;
+  justify-content: center;
 }
 
 .row::after {
@@ -101,6 +110,6 @@
 
 @media only screen and (max-width: 768px) {
   .gameTemplate {
-    width: 85%;
+  width: 85%;
   }
 }

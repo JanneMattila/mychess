@@ -219,6 +219,10 @@ namespace MyChess.Handlers
             {
                 game.StateText = $"Draw";
             }
+            else if (state == ChessBoardState.Check)
+            {
+                game.StateText = $"Check";
+            }
 
             var data = _compactor.Compact(game);
             if (state == ChessBoardState.CheckMate ||
