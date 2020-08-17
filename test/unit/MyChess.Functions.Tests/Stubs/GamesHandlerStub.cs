@@ -35,5 +35,9 @@ namespace MyChess.Functions.Tests.Stubs
             return await Task.FromResult(Error);
         }
 
+        public async Task<HandlerError?> DeleteGameAsync(AuthenticatedUser authenticatedUser, string gameID)
+        {
+            return await Task.FromResult(Error);
+        }
     }
 }

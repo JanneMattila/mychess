@@ -12,6 +12,7 @@
         public const int FuncGamesFetchAllGames = 1003;
         public const int FuncGamesFetchSingleGame = 1004;
         public const int FuncGamesCreateNewGame = 1005;
+        public const int FuncGamesDeleteGame = 1006;
 
         public const int FuncSecNoAuthHeader = 1100;
         public const int FuncSecNoBearerToken = 1101;
@@ -60,6 +61,7 @@
         public const int GameHandlerMoveInvalidPlayer = 2105;
         public const int GameHandlerMoveNotPlayerTurn = 2106;
         public const int GameHandlerGameNotFoundFromTable = 2107;
+        public const int GameHandlerDeleteGameNotFound = 2108;
 
         public const int FriendHandlerFriendFound = 2200;
         public const int FriendHandlerFriendNotFound = 2201;

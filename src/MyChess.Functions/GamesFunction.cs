@@ -60,14 +60,14 @@ namespace MyChess.Functions
             _log.FuncGamesProcessingMethod(req.Method);
             return req.Method switch
             {
-                "GET" => await Get(authenticatedUser, id, state),
+                "GET" => await GetAsync(authenticatedUser, id, state),
                 "POST" => await PostAsync(authenticatedUser, req, id),
-                "DELETE" => Delete(authenticatedUser, id),
+                "DELETE" => await DeleteAsync(authenticatedUser, id),
                 _ => new StatusCodeResult((int)HttpStatusCode.NotImplemented)
             };
         }
 
-        private async Task<IActionResult> Get(AuthenticatedUser authenticatedUser, string id, string state)
+        private async Task<IActionResult> GetAsync(AuthenticatedUser authenticatedUser, string id, string state)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -117,9 +117,29 @@ namespace MyChess.Functions
             }
         }
 
-        private IActionResult Delete(AuthenticatedUser authenticatedUser, string id)
+        private async Task<IActionResult> DeleteAsync(AuthenticatedUser authenticatedUser, string id)
         {
-            return new OkResult();
+            _log.FuncGamesDeleteGame(id);
+            var result = await _gamesHandler.DeleteGameAsync(authenticatedUser, id);
+            if (result == null)
+            {
+                return new OkResult();
+            }
+            else
+            {
+                var problemDetail = new ProblemDetails
+                {
+                    Detail = result.Detail,
+                    Instance = result.Instance,
+                    Status = result.Status,
+                    Title = result.Title
+                };
+
+                return new ObjectResult(problemDetail)
+                {
+                    StatusCode = problemDetail.Status
+                };
+            }
         }
     }
 }

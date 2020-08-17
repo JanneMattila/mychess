@@ -16,6 +16,8 @@ namespace MyChess.Handlers.Internal
         private static readonly Action<ILogger, string, string, string, string, Exception> _gameHandlerMoveInvalidPlayer;
         private static readonly Action<ILogger, string, string, string, Exception> _gameHandlerMoveNotPlayerTurn;
 
+        private static readonly Action<ILogger, string, Exception> _gameHandlerDeleteGameNotFound;
+
         static GamesHandlerLoggerExtensions()
         {
             _gameHandlerGameFound = LoggerMessage.Define<string>(
@@ -47,6 +49,11 @@ namespace MyChess.Handlers.Internal
                 LogLevel.Error,
                 new EventId(LoggingEvents.GameHandlerMoveNotPlayerTurn, nameof(GameHandlerMoveNotPlayerTurn)),
                 "User {UserID} is not currently in turn to make move in game {GameID}. Current turn: {CurrentTurn}");
+
+            _gameHandlerDeleteGameNotFound = LoggerMessage.Define<string>(
+                LogLevel.Warning,
+                new EventId(LoggingEvents.GameHandlerDeleteGameNotFound, nameof(GameHandlerDeleteGameNotFound)),
+                "Could not find game {GameID} to be deleted.");
         }
 
         public static void GameHandlerGameFound(this ILogger logger, string gameID) => _gameHandlerGameFound(logger, gameID, null);
@@ -57,5 +64,7 @@ namespace MyChess.Handlers.Internal
         public static void GameHandlerMoveGameNotFound(this ILogger logger, string gameID) => _gameHandlerMoveGameNotFound(logger, gameID, null);
         public static void GameHandlerMoveInvalidPlayer(this ILogger logger, string gameID, string userID, string whiteID, string blackID) => _gameHandlerMoveInvalidPlayer(logger, gameID, userID, whiteID, blackID, null);
         public static void GameHandlerMoveNotPlayerTurn(this ILogger logger, string gameID, string userID, string currentTurn) => _gameHandlerMoveNotPlayerTurn(logger, gameID, userID, currentTurn, null);
+
+        public static void GameHandlerDeleteGameNotFound(this ILogger logger, string gameID) => _gameHandlerDeleteGameNotFound(logger, gameID, null);
     }
 }

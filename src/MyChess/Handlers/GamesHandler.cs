@@ -277,5 +277,25 @@ namespace MyChess.Handlers
 
             return null;
         }
+
+        public async Task<HandlerError?> DeleteGameAsync(AuthenticatedUser authenticatedUser, string gameID)
+        {
+            var user = await GetOrCreateUserAsync(authenticatedUser);
+            var gameEntity = await GetGameAsync(authenticatedUser, gameID, "" /* Any table */);
+            if (gameEntity == null)
+            {
+                _log.GameHandlerDeleteGameNotFound(gameID);
+                return new HandlerError()
+                {
+                    Instance = LoggingEvents.CreateLinkToProblemDescription(LoggingEvents.GameHandlerDeleteGameNotFound),
+                    Status = (int)HttpStatusCode.NotFound,
+                    Title = "Game not found",
+                    Detail = "For some reason your game could not be found"
+                };
+            }
+
+            // TODO: Move game to archive.
+            return null;
+        }
     }
 }
