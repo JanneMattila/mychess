@@ -163,27 +163,9 @@ namespace MyChess.Handlers
                 };
             }
 
-            _chessBoard.Initialize();
             game.Moves.Add(move); // Add new move and validate the entire move chain
-            foreach (var gameMove in game.Moves)
-            {
-                _chessBoard.MakeMove(gameMove.Move);
-                if (gameMove.SpecialMove != null)
-                {
-                    switch (gameMove.SpecialMove)
-                    {
-                        case MyChessGameSpecialMove.PromotionToRook:
-                            _chessBoard.ChangePromotion(PieceRank.Rook);
-                            break;
-                        case MyChessGameSpecialMove.PromotionToKnight:
-                            _chessBoard.ChangePromotion(PieceRank.Knight);
-                            break;
-                        case MyChessGameSpecialMove.PromotionToBishop:
-                            _chessBoard.ChangePromotion(PieceRank.Bishop);
-                            break;
-                    }
-                }
-            }
+
+            MakeMoves(game);
 
             string opponentID;
             if (_chessBoard.CurrentPlayer == PiecePlayer.White &&
@@ -191,7 +173,7 @@ namespace MyChess.Handlers
             {
                 opponentID = game.Players.White.ID;
             }
-            else if (_chessBoard.CurrentPlayer == PiecePlayer.Black && 
+            else if (_chessBoard.CurrentPlayer == PiecePlayer.Black &&
                      game.Players.White.ID == user.UserID)
             {
                 opponentID = game.Players.Black.ID;
@@ -263,14 +245,12 @@ namespace MyChess.Handlers
             await _context.DeleteAsync(TableNames.GamesWaitingForOpponent, new GameEntity
             {
                 PartitionKey = opponentID,
-                RowKey = game.ID,
-                Data = data
+                RowKey = game.ID
             });
             await _context.DeleteAsync(TableNames.GamesWaitingForYou, new GameEntity
             {
                 PartitionKey = user.UserID,
-                RowKey = game.ID,
-                Data = data
+                RowKey = game.ID
             });
 
             await _notificationHandler.SendNotificationAsync(opponentID, game.ID, move.Comment);
@@ -278,11 +258,35 @@ namespace MyChess.Handlers
             return null;
         }
 
+        private void MakeMoves(MyChessGame game)
+        {
+            _chessBoard.Initialize();
+            foreach (var gameMove in game.Moves)
+            {
+                _chessBoard.MakeMove(gameMove.Move);
+                if (gameMove.SpecialMove != null)
+                {
+                    switch (gameMove.SpecialMove)
+                    {
+                        case MyChessGameSpecialMove.PromotionToRook:
+                            _chessBoard.ChangePromotion(PieceRank.Rook);
+                            break;
+                        case MyChessGameSpecialMove.PromotionToKnight:
+                            _chessBoard.ChangePromotion(PieceRank.Knight);
+                            break;
+                        case MyChessGameSpecialMove.PromotionToBishop:
+                            _chessBoard.ChangePromotion(PieceRank.Bishop);
+                            break;
+                    }
+                }
+            }
+        }
+
         public async Task<HandlerError?> DeleteGameAsync(AuthenticatedUser authenticatedUser, string gameID)
         {
             var user = await GetOrCreateUserAsync(authenticatedUser);
-            var gameEntity = await GetGameAsync(authenticatedUser, gameID, "" /* Any table */);
-            if (gameEntity == null)
+            var game = await GetGameAsync(authenticatedUser, gameID, "" /* Any table */);
+            if (game == null)
             {
                 _log.GameHandlerDeleteGameNotFound(gameID);
                 return new HandlerError()
@@ -294,7 +298,51 @@ namespace MyChess.Handlers
                 };
             }
 
-            // TODO: Move game to archive.
+            MakeMoves(game);
+
+            // Move game to archive
+            var player = game.Players.White.ID == user.PartitionKey ? PiecePlayer.White : PiecePlayer.Black;
+            game.State = GameState.Resigned;
+            game.StateText = $"{player} resigned";
+
+            var data = _compactor.Compact(game);
+            await _context.UpsertAsync(TableNames.GamesArchive, new GameEntity
+            {
+                PartitionKey = game.Players.White.ID,
+                RowKey = game.ID,
+                Data = data
+            });
+            await _context.UpsertAsync(TableNames.GamesArchive, new GameEntity
+            {
+                PartitionKey = game.Players.Black.ID,
+                RowKey = game.ID,
+                Data = data
+            });
+
+            // Clear waiting for you tables
+            await _context.DeleteAsync(TableNames.GamesWaitingForYou, new GameEntity
+            {
+                PartitionKey = game.Players.White.ID,
+                RowKey = game.ID
+            });
+            await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity
+            {
+                PartitionKey = game.Players.Black.ID,
+                RowKey = game.ID
+            });
+
+            // Clear waiting for opponent tables
+            await _context.DeleteAsync(TableNames.GamesWaitingForOpponent, new GameEntity
+            {
+                PartitionKey = game.Players.White.ID,
+                RowKey = game.ID
+            });
+            await _context.UpsertAsync(TableNames.GamesWaitingForOpponent, new GameEntity
+            {
+                PartitionKey = game.Players.Black.ID,
+                RowKey = game.ID
+            });
+
             return null;
         }
     }
