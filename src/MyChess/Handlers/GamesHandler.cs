@@ -337,7 +337,7 @@ namespace MyChess.Handlers
                     }
                     catch (StorageException ex)
                     {
-                        // Ignore all error when games are not found
+                        // Ignore all errors when games are not found
                         if (ex.RequestInformation.HttpStatusCode != 404)
                         {
                             throw;

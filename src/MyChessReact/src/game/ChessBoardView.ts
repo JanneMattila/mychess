@@ -512,6 +512,11 @@ export class ChessBoardView {
             }
         }
 
+        if (!this.isLocalGame && this.game.state === "Resigned") {
+            console.log(`Game state is readonly due to state: ${this.game.state}`);
+            return;
+        }
+
         let rowIndex: number = parseInt(id[0]);
         let columnIndex: number = parseInt(id[2]);
         let identifier = rowIndex + "-" + columnIndex;
