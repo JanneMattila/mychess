@@ -133,7 +133,7 @@ export function PlayPage(props: PlayProps) {
             </div>
             <div id="Loading" className="Play-Spinner">
                 <img src={logo} className="Play-logo" alt="logo" />
-                Submitting Your move...
+                Working on it...
                 </div>
             <div id="LastComment"></div>
             <div id="ellipse">

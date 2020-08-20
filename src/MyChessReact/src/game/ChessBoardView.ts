@@ -668,9 +668,8 @@ export class ChessBoardView {
         this.isDialogOpen = false;
     }
 
-    public resignGame = (): void => {
+    public resignGame = async () => {
         console.log("game resigned");
-
 
         this.ai.trackEvent({
             name: "Play-Resign"
@@ -685,6 +684,34 @@ export class ChessBoardView {
             this.currentMoveNumber = 0;
 
             this.drawBoard();
+        }
+        else {
+            const request: RequestInit = {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Bearer " + this.accessToken
+                }
+            };
+
+            this.showSpinner(true);
+            try {
+                const response = await fetch(this.endpoint + `/api/games/${this.game.id}`, request);
+                if (response.ok) {
+                    console.log("Game archived succesfully");
+                    document.location.href = "/";
+                }
+                else {
+                    throw new Error("Could not archive game!")
+                }
+            } catch (error) {
+                console.log(error);
+                this.ai.trackException({ exception: error });
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to archive the game";
+                this.showError(errorMessage);
+                this.undo();
+            }
+            this.showSpinner(false);
         }
     }
 

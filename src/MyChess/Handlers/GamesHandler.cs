@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;
 using MyChess.Data;
 using MyChess.Handlers.Internal;
@@ -320,28 +321,30 @@ namespace MyChess.Handlers
             });
 
             // Clear waiting for you tables
-            await _context.DeleteAsync(TableNames.GamesWaitingForYou, new GameEntity
+            var tables = new string[] { TableNames.GamesWaitingForYou, TableNames.GamesWaitingForOpponent };
+            var partitionKeys = new string[] { game.Players.White.ID, game.Players.Black.ID };
+            foreach (var table in tables)
             {
-                PartitionKey = game.Players.White.ID,
-                RowKey = game.ID
-            });
-            await _context.UpsertAsync(TableNames.GamesWaitingForYou, new GameEntity
-            {
-                PartitionKey = game.Players.Black.ID,
-                RowKey = game.ID
-            });
-
-            // Clear waiting for opponent tables
-            await _context.DeleteAsync(TableNames.GamesWaitingForOpponent, new GameEntity
-            {
-                PartitionKey = game.Players.White.ID,
-                RowKey = game.ID
-            });
-            await _context.UpsertAsync(TableNames.GamesWaitingForOpponent, new GameEntity
-            {
-                PartitionKey = game.Players.Black.ID,
-                RowKey = game.ID
-            });
+                foreach (var partitionKey in partitionKeys)
+                {
+                    try
+                    {
+                        await _context.DeleteAsync(table, new GameEntity
+                        {
+                            PartitionKey = partitionKey,
+                            RowKey = game.ID
+                        });
+                    }
+                    catch (StorageException ex)
+                    {
+                        // Ignore all error when games are not found
+                        if (ex.RequestInformation.HttpStatusCode != 404)
+                        {
+                            throw;
+                        }
+                    }
+                }
+            }
 
             return null;
         }
