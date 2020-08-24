@@ -53,22 +53,22 @@ export function GameList() {
 
     const getOpponent = (game: MyChessGame) => {
         let friendID = game.players.white.id;
-        let img = <img src="/images/PawnWhite.svg" alt="White" width="21" height="21" />;
+        let img = <img src="/images/KingWhite.svg" alt="White" width="25" height="25" className="opponentIconTemplate" />;
         if (game.players.white.id === userSettings?.id) {
             friendID = game.players.black.id;
-            img = <img src="/images/PawnBlack.svg" alt="Black" width="21" height="21" />;
+            img = <img src="/images/KingBlack.svg" alt="Black" width="25" height="25" className="opponentIconTemplate" />;
         }
 
         if (friends) {
             const friend = friends.find(p => p.id === friendID);
             if (friend) {
-                return <span>{friend.name} {img}</span>;
+                return <><span>{friend.name}</span> {img}</>;
             }
         }
         else if (friendsStored) {
             const friend = friendsStored.find(p => p.id === friendID);
             if (friend) {
-                return <span>{friend.name} {img}</span>;
+                return <><span>{friend.name}</span> {img}</>;
             }
         }
         return "";

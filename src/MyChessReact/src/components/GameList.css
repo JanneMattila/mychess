@@ -81,6 +81,10 @@
   height: 25px;
 }
 
+.opponentIconTemplate {
+  vertical-align: middle
+}
+
 .dateTemplate {
   text-align: right;
   font-size: 12pt;
