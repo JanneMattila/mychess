@@ -184,8 +184,12 @@ export function GameList() {
         switch (gamesState) {
             case ProcessState.Success:
                 if (games && games?.length === 0) {
-                    contents = <div className="subtitle">No games found. Click to <button onClick={refresh}>refresh</button> or
-                                <button onClick={addNewGame}>add new</button> game.</div>;
+                    contents = <>
+                        <div className="subtitle">No games found.</div>
+                        <div className="subtitle">Click to
+                            <button onClick={refresh}>refresh</button> or
+                            <button onClick={addNewGame}>add new</button> game.</div>
+                    </>;
                 }
                 else {
                     contents = renderGames(games);

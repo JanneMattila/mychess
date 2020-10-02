@@ -114,6 +114,6 @@
 
 @media only screen and (max-width: 768px) {
   .gameTemplate {
-  width: 85%;
+    width: 85%;
   }
 }
