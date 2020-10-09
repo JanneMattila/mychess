@@ -18,17 +18,11 @@ type ChessBoardView2Props = {
 };
 
 export function ChessBoardView2(props: ChessBoardView2Props) {
-    let board: ChessBoard = new ChessBoard();
-    let previousAvailableMoves: ChessMove[] = []
+    const [board, setBoard] = useState(new ChessBoard());
+    const [previousAvailableMoves, setPreviousAvailableMoves] = useState<Array<ChessMove>>([]);
     let game: MyChessGame = new MyChessGame();
     let currentMoveNumber: number = 0;
     let waitingForConfirmation = false;
-
-    let imagesLoaded = 0;
-    let imagesToLoad = -1;
-    let images: HTMLImageElement[] = [];
-
-    let touch: Touch | null;
 
     let isLocalGame: boolean = true;
     let isNewGame: boolean = false;
@@ -43,87 +37,121 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
 
     let ai = getAppInsights();
 
-    useEffect(() => {
+    console.log("previousAvailableMoves");
+    console.log(previousAvailableMoves);
+    console.log(pieceSize);
 
+    const pieceSelected = (event: React.MouseEvent<HTMLTableDataCellElement> | undefined, id: string) => {
+        if (waitingForConfirmation) {
+            console.log("Waiting for confirmation");
+            return;
+        }
+
+        if (game !== null && game.moves !== null &&
+            game.moves.length !== currentMoveNumber) {
+            console.log(`Not in last move: ${game.moves.length} <> ${currentMoveNumber}`);
+            return;
+        }
+
+        if (!isLocalGame && !isNewGame) {
+            if (board.currentPlayer === ChessPlayer.White &&
+                game.players.white.id !== me) {
+                console.log(`Not current players turn. Player is ${me} and turn is on player ${game.players.white.id}`);
+                return;
+            }
+            else if (board.currentPlayer === ChessPlayer.Black &&
+                game.players.black.id !== me) {
+                console.log(`Not current players turn. Player is ${me} and turn is on player ${game.players.black.id}`);
+                return;
+            }
+        }
+
+        if (!isLocalGame && game.state === "Resigned") {
+            console.log(`Game state is readonly due to state: ${game.state}`);
+            return;
+        }
+
+        let rowIndex: number = parseInt(id[0]);
+        let columnIndex: number = parseInt(id[2]);
+        let identifier = rowIndex + "-" + columnIndex;
+
+        if (columnIndex >= ChessBoard.BOARD_SIZE ||
+            rowIndex >= ChessBoard.BOARD_SIZE) {
+            console.log("Only de-select the current selection");
+            return;
+        }
+
+        if (previousAvailableMoves.length > 0) {
+
+            let selectedMove: ChessMove | null = null;
+            for (let i = 0; i < previousAvailableMoves.length; i++) {
+                let move: ChessMove = previousAvailableMoves[i];
+                let moveId: string = move.to.verticalLocation + "-" + move.to.horizontalLocation;
+                if (moveId === identifier) {
+                    selectedMove = move;
+                }
+            }
+
+            setPreviousAvailableMoves([]);
+            if (selectedMove !== null) {
+                // Make selected move
+                board.makeMove(selectedMove, true);
+
+                if (board.lastMovePromotion() !== null) {
+
+                    let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
+                    queenPromotionElement.checked = true;
+
+                    // showError("");
+                    // showPromotionDialog(true);
+                }
+                else {
+                    // setBoardStatus(0, 0);
+
+                    // showError("");
+                    // showConfirmationDialog(true);
+                }
+
+                setBoard(board);
+                return;
+            }
+        }
+
+        let moves: ChessMove[] = board.getAvailableMoves(columnIndex, rowIndex);
+        setPreviousAvailableMoves(moves);
+    }
+
+    useEffect(() => {
         const resizeHandler = () => {
             const table = document.getElementById("table-game") as HTMLTableElement;
             if (table) {
                 const width = Math.floor(window.innerWidth * 0.95);
                 const height = Math.floor(window.innerHeight * 0.75);
                 const size = Math.min(width, height);
-                console.log("" + width + "x" + height + " => " + size);
                 table.style.width = size + "px";
                 table.style.height = size + "px";
                 setPieceSize(Math.floor(size / 8))
             }
         }
 
+        const click = (event: MouseEvent) => {
+            if (!event.defaultPrevented) {
+                // Add "de-selection" when clicking outside the board
+                setPreviousAvailableMoves([]);
+            }
+        }
+
         resizeHandler();
-        // document.addEventListener("click", click);
+        document.addEventListener("click", click);
         // document.addEventListener('keyup', keyup);
         window.addEventListener('resize', resizeHandler);
 
         return () => {
-            // document.removeEventListener("click", click);
+            document.removeEventListener("click", click);
             // document.removeEventListener('keyup', keyup);
             window.removeEventListener('resize', resizeHandler);;
         }
-    }, [setPieceSize]);
-
-    // public initialize() {
-    //     // Start preparing the board
-    //     this.game = new MyChessGame();
-    //     this.board = new ChessBoard();
-    //     this.board.initialize();
-    //     this.previousAvailableMoves = [];
-
-    //     this.setBoardStatus(0, 0);
-    //     this.setComment("");
-    //     this.setThinkTime(0, -1);
-
-    //     // Update game board to the screen
-    //     this.drawBoard();
-
-    //     this.resizeHandler();
-    // }
-
-    // private clickHandler(event: MouseEvent) {
-    //     if (!event.defaultPrevented) {
-    //         // Add "de-selection" when clicking outside the board
-    //         this.pieceSelected("9-9");
-    //     }
-    // }
-
-    // private touchstartHandler(event: TouchEvent) {
-    //     this.touch = undefined;
-    //     if (event.changedTouches.length === 1) {
-    //         this.touch = event.changedTouches[0];
-    //     }
-    // }
-
-    // private touchendHandler(event: TouchEvent) {
-    //     if (this.touch !== undefined &&
-    //         event.changedTouches.length === 1) {
-    //         // const delta = 40;
-    //         // let touchEnd = event.changedTouches[0];
-    //         // if (Math.abs(touchEnd.clientY - this.touch.clientY) > delta) {
-    //         //     if (touchEnd.clientY < this.touch.clientY - delta) {
-    //         //         this.firstMove();
-    //         //     }
-    //         //     else {
-    //         //         this.lastMove();
-    //         //     }
-    //         // }
-    //         // else if (Math.abs(touchEnd.clientX - this.touch.clientX) > delta) {
-    //         //     if (touchEnd.clientX < this.touch.clientX - delta) {
-    //         //         this.previousMove();
-    //         //     }
-    //         //     else {
-    //         //         this.nextMove();
-    //         //     }
-    //         // }
-    //     }
-    // }
+    }, [setPieceSize, setPreviousAvailableMoves]);
 
     // private keyupHandler(event: KeyboardEvent) {
 
@@ -151,24 +179,6 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
     //     }
     //     event.preventDefault();
     // }
-
-    // public addEventHandlers() {
-    //     document.addEventListener("click", this.click);
-    //     document.addEventListener('keyup', this.keyup);
-    //     document.addEventListener('touchstart', this.touchstart);
-    //     document.addEventListener('touchend', this.touchend);
-    //     window.addEventListener('resize', this.resize);
-    // }
-
-    // public removeEventHandlers() {
-    //     document.removeEventListener("click", this.click);
-    //     document.removeEventListener('keyup', this.keyup);
-    //     document.removeEventListener('touchstart', this.touchstart);
-    //     document.removeEventListener('touchend', this.touchend);
-    //     window.removeEventListener('resize', this.resize);;
-    // }
-
-
 
     // public async load(endpoint: string, accessToken ?: string, me ?: string) {
     //     // Determine if this game is:
@@ -381,102 +391,6 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
     //     this.board.makeMoveFromString(move);
     //     if (promotion !== undefined && promotion.length > 0) {
     //         this.changePromotionFromString(promotion);
-    //     }
-    // }
-
-    // public pieceSelected(id: string) {
-    //     console.log("pieceSelected to " + id);
-
-    //     if (this.waitingForConfirmation) {
-    //         console.log("Waiting for confirmation");
-    //         return;
-    //     }
-
-    //     if (this.game !== null && this.game.moves !== null &&
-    //         this.game.moves.length !== this.currentMoveNumber) {
-    //         console.log(`Not in last move: ${this.game.moves.length} <> ${this.currentMoveNumber}`);
-    //         return;
-    //     }
-
-    //     if (!this.isLocalGame && !this.isNewGame) {
-    //         if (this.board.currentPlayer === ChessPlayer.White &&
-    //             this.game.players.white.id !== this.me) {
-    //             console.log(`Not current players turn. Player is ${this.me} and turn is on player ${this.game.players.white.id}`);
-    //             return;
-    //         }
-    //         else if (this.board.currentPlayer === ChessPlayer.Black &&
-    //             this.game.players.black.id !== this.me) {
-    //             console.log(`Not current players turn. Player is ${this.me} and turn is on player ${this.game.players.black.id}`);
-    //             return;
-    //         }
-    //     }
-
-    //     if (!this.isLocalGame && this.game.state === "Resigned") {
-    //         console.log(`Game state is readonly due to state: ${this.game.state}`);
-    //         return;
-    //     }
-
-    //     let rowIndex: number = parseInt(id[0]);
-    //     let columnIndex: number = parseInt(id[2]);
-    //     let identifier = rowIndex + "-" + columnIndex;
-
-    //     if (this.previousAvailableMoves.length > 0) {
-
-    //         let selectedMove: ChessMove | null = null;
-    //         for (let i = 0; i < this.previousAvailableMoves.length; i++) {
-
-    //             let move: ChessMove = this.previousAvailableMoves[i];
-    //             let moveId: string = move.to.verticalLocation + "-" + move.to.horizontalLocation;
-    //             let element = document.getElementById(moveId);
-
-    //             if (element?.id === identifier) {
-    //                 selectedMove = move;
-    //             }
-
-    //             element?.classList.remove("highlightMoveAvailable");
-    //         }
-
-    //         this.previousAvailableMoves = [];
-
-    //         if (selectedMove !== null) {
-    //             // Make selected move
-    //             /*let locations: ChessMove[] =*/ this.board.makeMove(selectedMove, true);
-    //             this.drawBoard();
-
-    //             if (this.board.lastMovePromotion() !== null) {
-
-    //                 let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
-    //                 queenPromotionElement.checked = true;
-
-    //                 this.showError("");
-    //                 this.showPromotionDialog(true);
-    //             }
-    //             else {
-    //                 this.setBoardStatus(0, 0);
-
-    //                 this.showError("");
-    //                 this.showConfirmationDialog(true);
-    //             }
-
-    //             return;
-    //         }
-    //     }
-
-    //     if (columnIndex >= ChessBoard.BOARD_SIZE ||
-    //         rowIndex >= ChessBoard.BOARD_SIZE) {
-    //         console.log("Only de-select the current selection");
-    //         return;
-    //     }
-
-    //     let moves: ChessMove[] = this.board.getAvailableMoves(columnIndex, rowIndex);
-
-    //     if (moves.length > 0) {
-    //         for (let i = 0; i < moves.length; i++) {
-    //             let move: ChessMove = moves[i];
-    //             let element = document.getElementById(move.to.verticalLocation + "-" + move.to.horizontalLocation);
-    //             element?.classList.add("highlightMoveAvailable");
-    //             this.previousAvailableMoves[i] = move;
-    //         }
     //     }
     // }
 
@@ -900,157 +814,74 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
     //     }
     // }
 
-    const pieceSelected = (event: React.MouseEvent<HTMLTableDataCellElement>, id: string) => {
-        console.log("pieceSelected to " + id);
+    const draw = () => {
+        console.log("draw");
+        let lastMove = board.lastMove();
+        let lastMoveCapture = board.lastMoveCapture();
+        let html = new Array<JSX.Element>();
 
-        if (waitingForConfirmation) {
-            console.log("Waiting for confirmation");
-            return;
-        }
+        for (let row = 0; row < ChessBoard.BOARD_SIZE; row++) {
+            const cells = new Array<JSX.Element>();
+            for (let column = 0; column < ChessBoard.BOARD_SIZE; column++) {
 
-        if (game !== null && game.moves !== null &&
-            game.moves.length !== currentMoveNumber) {
-            console.log(`Not in last move: ${game.moves.length} <> ${currentMoveNumber}`);
-            return;
-        }
+                let piece: ChessBoardPiece = board.getPiece(column, row);
 
-        if (!isLocalGame && !isNewGame) {
-            if (board.currentPlayer === ChessPlayer.White &&
-                game.players.white.id !== me) {
-                console.log(`Not current players turn. Player is ${me} and turn is on player ${game.players.white.id}`);
-                return;
-            }
-            else if (board.currentPlayer === ChessPlayer.Black &&
-                game.players.black.id !== me) {
-                console.log(`Not current players turn. Player is ${me} and turn is on player ${game.players.black.id}`);
-                return;
-            }
-        }
+                let className = (row + column) % 2 === 0 ?
+                    "lightCell" :
+                    "darkCell";
 
-        if (!isLocalGame && game.state === "Resigned") {
-            console.log(`Game state is readonly due to state: ${game.state}`);
-            return;
-        }
-
-        let rowIndex: number = parseInt(id[0]);
-        let columnIndex: number = parseInt(id[2]);
-        let identifier = rowIndex + "-" + columnIndex;
-
-        if (columnIndex >= ChessBoard.BOARD_SIZE ||
-            rowIndex >= ChessBoard.BOARD_SIZE) {
-            console.log("Only de-select the current selection");
-            return;
-        }
-
-        if (previousAvailableMoves.length > 0) {
-
-            let selectedMove: ChessMove | null = null;
-            for (let i = 0; i < previousAvailableMoves.length; i++) {
-
-                let move: ChessMove = previousAvailableMoves[i];
-                let moveId: string = move.to.verticalLocation + "-" + move.to.horizontalLocation;
-                let element = document.getElementById(moveId);
-
-                if (element?.id === identifier) {
-                    selectedMove = move;
+                for (let i = 0; i < previousAvailableMoves.length; i++) {
+                    let move: ChessMove = previousAvailableMoves[i];
+                    if (row === move.to.verticalLocation &&
+                        column === move.to.horizontalLocation) {
+                        className += " highlightMoveAvailable";
+                    }
                 }
 
-                element?.classList.remove("highlightMoveAvailable");
-            }
-
-            previousAvailableMoves = [];
-
-            if (selectedMove !== null) {
-                // Make selected move
-                /*let locations: ChessMove[] =*/ board.makeMove(selectedMove, true);
-                // this.drawBoard();
-
-                if (board.lastMovePromotion() !== null) {
-
-                    let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
-                    queenPromotionElement.checked = true;
-
-                    // showError("");
-                    // showPromotionDialog(true);
-                }
-                else {
-                    // setBoardStatus(0, 0);
-
-                    // showError("");
-                    // showConfirmationDialog(true);
+                if (lastMove !== null) {
+                    if (lastMove.from.horizontalLocation === column &&
+                        lastMove.from.verticalLocation === row) {
+                        className += " highlightPreviousFrom";
+                    }
+                    else if (lastMoveCapture !== null &&
+                        lastMoveCapture.from.horizontalLocation === column &&
+                        lastMoveCapture.from.verticalLocation === row) {
+                        className += " highlightCapture";
+                    }
+                    else if (lastMove.to.horizontalLocation === column &&
+                        lastMove.to.verticalLocation === row) {
+                        className += " highlightPreviousTo";
+                    }
                 }
 
-                return;
-            }
-        }
-
-        let moves: ChessMove[] = board.getAvailableMoves(columnIndex, rowIndex);
-
-        if (moves.length > 0) {
-            for (let i = 0; i < moves.length; i++) {
-                let move: ChessMove = moves[i];
-                let element = document.getElementById(move.to.verticalLocation + "-" + move.to.horizontalLocation);
-                element?.classList.add("highlightMoveAvailable");
-                previousAvailableMoves[i] = move;
-            }
-        }
-    }
-
-    let lastMove = board.lastMove();
-    let lastMoveCapture = board.lastMoveCapture();
-    let html = new Array<JSX.Element>();
-
-    console.log(`pieceSize: ${pieceSize}`);
-
-    for (let row = 0; row < ChessBoard.BOARD_SIZE; row++) {
-        const cells = new Array<JSX.Element>();
-        for (let column = 0; column < ChessBoard.BOARD_SIZE; column++) {
-
-            let piece: ChessBoardPiece = board.getPiece(column, row);
-
-            let className = (row + column) % 2 === 0 ?
-                "lightCell" :
-                "darkCell";
-
-            if (lastMove !== null) {
-                if (lastMove.from.horizontalLocation === column &&
-                    lastMove.from.verticalLocation === row) {
-                    className += " highlightPreviousFrom";
-                }
-                else if (lastMoveCapture !== null &&
-                    lastMoveCapture.from.horizontalLocation === column &&
-                    lastMoveCapture.from.verticalLocation === row) {
-                    className += " highlightCapture";
-                }
-                else if (lastMove.to.horizontalLocation === column &&
-                    lastMove.to.verticalLocation === row) {
-                    className += " highlightPreviousTo";
-                }
-            }
-
-            const key = "" + row + "-" + column;
-            const image = piece.player === ChessPlayer.None ?
-                "/images/Empty.svg" :
-                "/images/" + piece.piece + piece.player + ".svg";
-            const cell = <td
-                id={key}
-                key={key}
-                width={pieceSize + "px"}
-                height={pieceSize + "px"}
-                className={className}
-                onClick={(evt) => pieceSelected(evt, key)}
-            >
-                <img src={image}
-                    id={"" + row + "-" + column + "-image"}
+                const key = "" + row + "-" + column;
+                const image = piece.player === ChessPlayer.None ?
+                    "/images/Empty.svg" :
+                    "/images/" + piece.piece + piece.player + ".svg";
+                const cell = <td
+                    id={key}
+                    key={key}
                     width={pieceSize + "px"}
-                    height={pieceSize + "px"} />
-            </td>;
+                    height={pieceSize + "px"}
+                    className={className}
+                    onClick={(evt) => {
+                        evt.preventDefault();
+                        pieceSelected(evt, key);
+                    }}
+                >
+                    <img src={image}
+                        id={"" + row + "-" + column + "-image"}
+                        alt=""
+                        width={pieceSize + "px"}
+                        height={pieceSize + "px"} />
+                </td>;
 
-            cells.push(cell);
+                cells.push(cell);
+            }
+            html.push(<tr key={"" + row}>{cells}</tr>);
         }
-
-        html.push(<tr key={"" + row}>{cells}</tr>);
+        return html;
     }
 
-    return <table id="table-game"><tbody>{html}</tbody></table>;
+    return <table id="table-game"><tbody>{draw()}</tbody></table>;
 }
