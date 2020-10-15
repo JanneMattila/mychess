@@ -41,6 +41,93 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
     console.log(previousAvailableMoves);
     console.log(pieceSize);
 
+    const undo = () => {
+        let commentDialogElement = document.getElementById("commentDialog");
+        if (commentDialogElement !== null) {
+            commentDialogElement.style.display = "none";
+        }
+
+        board.undo();
+    }
+
+    const cancel = (): void => {
+        console.log("cancel");
+
+        ai.trackEvent({
+            name: "Play-Cancel"
+        });
+
+        showError("");
+        showConfirmationDialog(false);
+        showPromotionDialog(false);
+        undo();
+    }
+
+    const showConfirmationDialog = (show: boolean) => {
+        waitingForConfirmation = show;
+        let confirmationDialogElement = document.getElementById("confirmation");
+        if (confirmationDialogElement !== null) {
+            confirmationDialogElement.style.display = show ? "inline" : "none";
+            isDialogOpen = true;
+        }
+    }
+
+    const showPromotionDialog = (show: boolean) => {
+        waitingForConfirmation = show;
+        let promotionDialogElement = document.getElementById("promotionDialog");
+        if (promotionDialogElement !== null) {
+            promotionDialogElement.style.display = show ? "inline" : "none";
+        }
+    }
+
+    const showGameNameDialog = (show: boolean) => {
+        waitingForConfirmation = show;
+        let gameNameDialogElement = document.getElementById("gameNameDialog");
+        if (gameNameDialogElement !== null) {
+            gameNameDialogElement.style.display = show ? "inline" : "none";
+            if (show) {
+                gameNameDialogElement.scrollIntoView();
+                gameNameDialogElement.focus();
+            }
+        }
+    }
+
+    const showError = (message: string) => {
+        let element = document.getElementById("error");
+        if (element !== null) {
+            const show = message.length > 0;
+            element.style.display = show ? "inline" : "none";
+            if (show) {
+                element.innerHTML = message;
+                element.scrollIntoView();
+                element.focus();
+            }
+        }
+    }
+
+    const showCommentDialog = (show: boolean) => {
+        waitingForConfirmation = show;
+        let commentDialogElement = document.getElementById("commentDialog");
+        if (commentDialogElement !== null) {
+            commentDialogElement.style.display = show ? "inline" : "none";
+            if (show) {
+                commentDialogElement.scrollIntoView();
+                commentDialogElement.focus();
+            }
+        }
+    }
+
+    const showSpinner = (show: boolean) => {
+        let element = document.getElementById("Loading");
+        if (element !== null) {
+            element.style.display = show ? "inline-flex" : "none";
+            if (show) {
+                element.scrollIntoView();
+                element.focus();
+            }
+        }
+    }
+
     const pieceSelected = (event: React.MouseEvent<HTMLTableDataCellElement> | undefined, id: string) => {
         if (waitingForConfirmation) {
             console.log("Waiting for confirmation");
@@ -102,14 +189,14 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
                     let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
                     queenPromotionElement.checked = true;
 
-                    // showError("");
-                    // showPromotionDialog(true);
+                    showError("");
+                    showPromotionDialog(true);
                 }
                 else {
                     // setBoardStatus(0, 0);
 
-                    // showError("");
-                    // showConfirmationDialog(true);
+                    showError("");
+                    showConfirmationDialog(true);
                 }
 
                 setBoard(board);
@@ -883,5 +970,118 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
         return html;
     }
 
-    return <table id="table-game"><tbody>{draw()}</tbody></table>;
+    const getLastMoveAsString = (): string | undefined => {
+        return board.lastMove()?.getMoveString();
+    }
+
+    const getLastMovePromotionAsString = (): string => {
+        let lastPromotion = board.lastMovePromotion();
+        if (lastPromotion !== null) {
+            return lastPromotion.piece.toString();
+        }
+
+        return "";
+    }
+
+    const confirmMove = (): void => {
+        console.log("move confirmed");
+        showError("");
+        showConfirmationDialog(false);
+        showPromotionDialog(false);
+
+        if (isLocalGame) {
+            const lastMove = getLastMoveAsString();
+            const lastPromotion = getLastMovePromotionAsString();
+            if (!lastMove) {
+                console.log("no last move available");
+                return;
+            }
+
+            const move = new MyChessGameMove()
+            move.move = lastMove;
+            move.promotion = lastPromotion;
+            move.comment = "";
+            move.start = start;
+            move.end = new Date().toISOString();
+
+            game.moves.push(move);
+            currentMoveNumber++;
+
+            Database.set(DatabaseFields.GAMES_LOCAL_GAME_STATE, JSON.stringify(game));
+            start = new Date().toISOString();
+        }
+        showCommentDialog(!isLocalGame);
+        showGameNameDialog(!isLocalGame && isNewGame);
+        isDialogOpen = !isLocalGame;
+    }
+
+    const confirmComment = (event: MouseEvent) => {
+        event.preventDefault();
+
+        console.log("comment confirmed");
+
+        const commentElement = document.getElementById("comment") as HTMLTextAreaElement;
+        const content = commentElement?.value;
+        const comment = content ? content : "";
+
+        const lastMove = getLastMoveAsString();
+        const lastPromotion = getLastMovePromotionAsString();
+        if (!lastMove) {
+            console.log("no last move available");
+
+            ai.trackEvent({
+                name: "Play-Errors", properties: {
+                    type: "NoLastMoveAvailable",
+                }
+            });
+
+            return;
+        }
+
+        const move = new MyChessGameMove()
+        move.move = lastMove;
+        move.promotion = lastPromotion;
+        move.comment = comment;
+        move.start = start;
+        move.end = new Date().toISOString();
+
+        console.log(isNewGame);
+        if (isNewGame) {
+            const gameNameElement = document.getElementById("gameName") as HTMLInputElement;
+            const gameName = gameNameElement?.value;
+            if (!gameName) {
+                console.log("no mandatory game name provided");
+
+                ai.trackEvent({
+                    name: "Play-Errors", properties: {
+                        type: "NoGameNameProvided",
+                    }
+                });
+
+                return;
+            }
+
+            const game = new MyChessGame()
+            game.players.black.id = friendID;
+            game.name = gameName;
+            game.moves.push(move)
+
+            // postNewGame(game);
+        }
+        else {
+            // postMove(move);
+        }
+
+        // showGameNameDialog(false);
+        // showCommentDialog(false);
+        isDialogOpen = false;
+    }
+
+    return <>
+        <table id="table-game"><tbody>{draw()}</tbody></table>
+        <div id="confirmation" className="Play-Form">
+            <button onClick={confirmMove}><span role="img" aria-label="OK">✅</span> Confirm</button>
+            <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+        </div>
+    </>;
 }
