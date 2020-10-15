@@ -11,35 +11,32 @@ import { MyChessGameMove } from "../models/MyChessGameMove";
 import { Database, DatabaseFields } from "../data/Database";
 import { GameStateFilter } from "../models/GameStateFilter";
 import { getAppInsights } from "../components/TelemetryService";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import { UserSettings } from "../models/UserSettings";
 
 type ChessBoardView2Props = {
     endpoint: string;
 };
 
 export function ChessBoardView2(props: ChessBoardView2Props) {
+    const [game, setGame] = useState(new MyChessGame());
     const [board, setBoard] = useState(new ChessBoard());
     const [previousAvailableMoves, setPreviousAvailableMoves] = useState<Array<ChessMove>>([]);
-    let game: MyChessGame = new MyChessGame();
-    let currentMoveNumber: number = 0;
+    const [currentMoveNumber, setCurrentMoveNumber] = useState(0);
+
+    const [isLocalGame, setLocalGame] = useState(true);
+    const [isNewGame, setNewGame] = useState(false);
+    const [isDialogOpen, setDialogOpen] = useState(false);
+    const [friendID, setFriendID] = useState("");
+    const [start, setStart] = useState(new Date().toISOString());
+
+    const me = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
+
     let waitingForConfirmation = false;
 
-    let isLocalGame: boolean = true;
-    let isNewGame: boolean = false;
-    let isDialogOpen: boolean = false;
-    let friendID: string = "";
-
     const [pieceSize, setPieceSize] = useState(45);
-    let start: string = "";
-    let endpoint: string = "";
-    let accessToken: string = "";
-    let me: string = "";
 
     let ai = getAppInsights();
-
-    console.log("previousAvailableMoves");
-    console.log(previousAvailableMoves);
-    console.log(pieceSize);
 
     const undo = () => {
         let commentDialogElement = document.getElementById("commentDialog");
@@ -68,7 +65,7 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
         let confirmationDialogElement = document.getElementById("confirmation");
         if (confirmationDialogElement !== null) {
             confirmationDialogElement.style.display = show ? "inline" : "none";
-            isDialogOpen = true;
+            setDialogOpen(true);
         }
     }
 
@@ -142,13 +139,13 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
 
         if (!isLocalGame && !isNewGame) {
             if (board.currentPlayer === ChessPlayer.White &&
-                game.players.white.id !== me) {
-                console.log(`Not current players turn. Player is ${me} and turn is on player ${game.players.white.id}`);
+                game.players.white.id !== me?.id) {
+                console.log(`Not current players turn. Player is ${me?.id} and turn is on player ${game.players.white.id}`);
                 return;
             }
             else if (board.currentPlayer === ChessPlayer.Black &&
-                game.players.black.id !== me) {
-                console.log(`Not current players turn. Player is ${me} and turn is on player ${game.players.black.id}`);
+                game.players.black.id !== me?.id) {
+                console.log(`Not current players turn. Player is ${me?.id} and turn is on player ${game.players.black.id}`);
                 return;
             }
         }
@@ -239,6 +236,127 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
             window.removeEventListener('resize', resizeHandler);;
         }
     }, [setPieceSize, setPreviousAvailableMoves]);
+
+    const changePromotionFromString = useCallback((name: string): boolean => {
+        console.log("changePromotionFromString to " + name);
+
+        ai.trackEvent({
+            name: "Play-Promotion", properties: {
+                type: name,
+            }
+        });
+
+        if (name === "Queen") {
+            // No changes to promotion
+            return false;
+        }
+        else if (name === "Knight") {
+            board.changePromotion(ChessPiece.Knight);
+        }
+        else if (name === "Rook") {
+            board.changePromotion(ChessPiece.Rook);
+        }
+        else if (name === "Bishop") {
+            board.changePromotion(ChessPiece.Bishop);
+        }
+        return true;
+    }, [board, ai]);
+
+    const makeMove = useCallback((move: string, promotion: string) => {
+        console.log("Making move " + move + " with promotion " + promotion);
+        board.makeMoveFromString(move);
+        if (promotion !== undefined && promotion.length > 0) {
+            changePromotionFromString(promotion);
+        }
+    }, [board, changePromotionFromString]);
+
+    const makeNumberOfMoves = useCallback((game: MyChessGame, movesCount: number): number => {
+        let count = Math.min(game.moves.length, movesCount);
+        console.log("going to make " + count + " moves");
+
+        if (count > 0) {
+            for (let i = 0; i < count; i++) {
+                let move = game.moves[i];
+                let promotion = move.promotion !== null ? move.promotion : "";
+                makeMove(move.move, promotion);
+            }
+            // setBoardStatus(count, game.moves.length);
+
+            let move = game.moves[count - 1];
+
+            const start = Date.parse(move.start);
+            const end = Date.parse(move.end);
+
+            // setThinkTime(count, end - start);
+            // setComment(move.comment);
+        }
+        else {
+            // setThinkTime(0, -1);
+            // setComment("");
+        }
+
+        return count;
+    }, [makeMove]);
+
+    useEffect(() => {
+        console.log("USE EFFECT - " + new Date());
+        const path = window.location.pathname;
+        const query = window.location.search;
+        const queryString = QueryStringParser.parse(query);
+
+        if (path.indexOf("/local") !== -1) {
+            console.log("local game");
+            setLocalGame(true);
+
+            ai.trackEvent({
+                name: "Play-NewGame", properties: {
+                    isLocalGame: true,
+                }
+            });
+
+            const json = Database.get<string>(DatabaseFields.GAMES_LOCAL_GAME_STATE);
+            if (json) {
+                // Try to load game state from previously stored state
+                try {
+                    const gameLoaded = JSON.parse(json) as MyChessGame;
+                    if (JSON.stringify(game) !== json) {
+                        console.log(gameLoaded);
+
+                        const num = makeNumberOfMoves(gameLoaded, gameLoaded.moves.length);
+                        setGame(gameLoaded);
+                        setCurrentMoveNumber(num);
+                    }
+                } catch (error) {
+                    console.log(error);
+                    ai.trackException({ exception: error });
+                }
+            }
+        }
+        else {
+            setLocalGame(false);
+            if (path.indexOf("/new") !== -1) {
+
+                ai.trackEvent({
+                    name: "Play-NewGame", properties: {
+                        isLocalGame: false,
+                    }
+                });
+
+                console.log("new game");
+                setNewGame(true);
+                const friendIDParameter = queryString.get("friendID");
+                if (friendIDParameter) {
+                    setFriendID(friendIDParameter);
+                }
+                else {
+                    throw new Error("Required parameter for friend is missing!");
+                }
+            }
+            else {
+                console.log("existing game");
+            }
+        }
+    }, [ai, makeNumberOfMoves]);
 
     // private keyupHandler(event: KeyboardEvent) {
 
@@ -439,46 +557,6 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
     //         this.undo();
     //     }
     //     this.showSpinner(false);
-    // }
-
-    // private makeNumberOfMoves(game: MyChessGame, movesCount: number): number {
-    //     this.initialize();
-    //     this.game = game;
-
-    //     let count = Math.min(game.moves.length, movesCount);
-    //     console.log("going to make " + count + " moves");
-
-    //     if (count > 0) {
-    //         for (let i = 0; i < count; i++) {
-    //             let move = game.moves[i];
-    //             let promotion = move.promotion !== null ? move.promotion : "";
-    //             this.makeMove(move.move, promotion);
-    //         }
-    //         this.setBoardStatus(count, game.moves.length);
-
-    //         let move = game.moves[count - 1];
-
-    //         const start = Date.parse(move.start);
-    //         const end = Date.parse(move.end);
-
-    //         this.setThinkTime(count, end - start);
-    //         this.setComment(move.comment);
-    //     }
-    //     else {
-    //         this.setThinkTime(0, -1);
-    //         this.setComment("");
-    //     }
-    //     this.drawBoard();
-
-    //     return count;
-    // }
-
-    // public makeMove(move: string, promotion: string) {
-    //     console.log("Making move " + move + " with promotion " + promotion);
-    //     this.board.makeMoveFromString(move);
-    //     if (promotion !== undefined && promotion.length > 0) {
-    //         this.changePromotionFromString(promotion);
-    //     }
     // }
 
     // public confirmMove = (): void => {
@@ -696,32 +774,6 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
     //             element.focus();
     //         }
     //     }
-    // }
-
-    // private changePromotionFromString(name: string): boolean {
-    //     console.log("changePromotionFromString to " + name);
-
-    //     this.ai.trackEvent({
-    //         name: "Play-Promotion", properties: {
-    //             type: name,
-    //         }
-    //     });
-
-    //     if (name === "Queen") {
-    //         // No changes to promotion
-    //         return false;
-    //     }
-    //     else if (name === "Knight") {
-    //         this.board.changePromotion(ChessPiece.Knight);
-    //     }
-    //     else if (name === "Rook") {
-    //         this.board.changePromotion(ChessPiece.Rook);
-    //     }
-    //     else if (name === "Bishop") {
-    //         this.board.changePromotion(ChessPiece.Bishop);
-    //     }
-
-    //     return true;
     // }
 
     // public changePromotion(name: string) {
@@ -1005,14 +1057,14 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
             move.end = new Date().toISOString();
 
             game.moves.push(move);
-            currentMoveNumber++;
+            setCurrentMoveNumber(e => e + 1);
 
             Database.set(DatabaseFields.GAMES_LOCAL_GAME_STATE, JSON.stringify(game));
-            start = new Date().toISOString();
+            setStart(new Date().toISOString());
         }
         showCommentDialog(!isLocalGame);
         showGameNameDialog(!isLocalGame && isNewGame);
-        isDialogOpen = !isLocalGame;
+        setDialogOpen(!isLocalGame);
     }
 
     const confirmComment = (event: MouseEvent) => {
@@ -1074,7 +1126,7 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
 
         // showGameNameDialog(false);
         // showCommentDialog(false);
-        isDialogOpen = false;
+        setDialogOpen(false);
     }
 
     return <>
