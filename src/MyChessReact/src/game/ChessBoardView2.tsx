@@ -57,7 +57,7 @@ export function ChessBoardView2() {
         undo();
     }
 
-    const firstMove = () => {
+    const firstMove = useCallback(() => {
         console.log("to first move");
         ai.trackEvent({
             name: "Play-MoveHistory", properties: {
@@ -66,9 +66,9 @@ export function ChessBoardView2() {
         });
 
         setCurrentMoveNumber(1);
-    }
+    }, [ai, setCurrentMoveNumber]);
 
-    const previousMove = () => {
+    const previousMove = useCallback(() => {
         console.log("previous move");
         ai.trackEvent({
             name: "Play-MoveHistory", properties: {
@@ -77,9 +77,9 @@ export function ChessBoardView2() {
         });
 
         setCurrentMoveNumber(Math.max(currentMoveNumber - 1, 1));
-    }
+    }, [ai, currentMoveNumber, setCurrentMoveNumber]);
 
-    const nextMove = () => {
+    const nextMove = useCallback(() => {
         console.log("next move");
         ai.trackEvent({
             name: "Play-MoveHistory", properties: {
@@ -88,9 +88,9 @@ export function ChessBoardView2() {
         });
 
         setCurrentMoveNumber(Math.min(currentMoveNumber + 1, game.moves.length));
-    }
+    }, [ai, game, currentMoveNumber, setCurrentMoveNumber]);
 
-    const lastMove = () => {
+    const lastMove = useCallback(() => {
         console.log("to last move");
         ai.trackEvent({
             name: "Play-MoveHistory", properties: {
@@ -99,7 +99,7 @@ export function ChessBoardView2() {
         });
 
         setCurrentMoveNumber(game.moves.length);
-    }
+    }, [ai, game, setCurrentMoveNumber]);
 
     const showConfirmationDialog = (show: boolean) => {
         waitingForConfirmation = show;
@@ -246,6 +246,32 @@ export function ChessBoardView2() {
         setPreviousAvailableMoves(moves);
     }
 
+    const keyup = useCallback((event: KeyboardEvent) => {
+        if (isDialogOpen) {
+            return;
+        }
+
+        switch (event.keyCode) {
+            case 36: // Home
+                firstMove();
+                break;
+            case 37: // LeftArrow
+            case 40: // DownArrow
+                previousMove();
+                break;
+            case 39: // RightArrow
+            case 38: // UpArrow
+                nextMove();
+                break;
+            case 35: // End
+                lastMove();
+                break;
+            default:
+                break;
+        }
+        event.preventDefault();
+    }, [isDialogOpen, firstMove, previousMove, nextMove, lastMove]);
+
     useEffect(() => {
         const resizeHandler = () => {
             const table = document.getElementById("table-game") as HTMLTableElement;
@@ -268,15 +294,15 @@ export function ChessBoardView2() {
 
         resizeHandler();
         document.addEventListener("click", click);
-        // document.addEventListener('keyup', keyup);
-        window.addEventListener('resize', resizeHandler);
+        document.addEventListener("keyup", keyup);
+        window.addEventListener("resize", resizeHandler);
 
         return () => {
             document.removeEventListener("click", click);
-            // document.removeEventListener('keyup', keyup);
-            window.removeEventListener('resize', resizeHandler);;
+            document.removeEventListener("keyup", keyup);
+            window.removeEventListener("resize", resizeHandler);;
         }
-    }, [setPieceSize, setPreviousAvailableMoves]);
+    }, [setPieceSize, setPreviousAvailableMoves, keyup]);
 
     const changePromotionFromString = useCallback((name: string): boolean => {
         console.log("changePromotionFromString to " + name);
@@ -408,37 +434,6 @@ export function ChessBoardView2() {
             toggleEllipse();
         }
     }
-
-    const hidden = {
-        display: "none",
-    }
-
-    // private keyupHandler(event: KeyboardEvent) {
-
-    //     if (this.isDialogOpen) {
-    //         return;
-    //     }
-
-    //     switch (event.keyCode) {
-    //         case 36: // Home
-    //             this.firstMove();
-    //             break;
-    //         case 37: // LeftArrow
-    //         case 40: // DownArrow
-    //             this.previousMove();
-    //             break;
-    //         case 39: // RightArrow
-    //         case 38: // UpArrow
-    //             this.nextMove();
-    //             break;
-    //         case 35: // End
-    //             this.lastMove();
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    //     event.preventDefault();
-    // }
 
     // public async postNewGame(game: MyChessGame) {
     //     const request: RequestInit = {
