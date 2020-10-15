@@ -14,11 +14,7 @@ import { getAppInsights } from "../components/TelemetryService";
 import React, { useCallback, useEffect, useState } from "react";
 import { UserSettings } from "../models/UserSettings";
 
-type ChessBoardView2Props = {
-    endpoint: string;
-};
-
-export function ChessBoardView2(props: ChessBoardView2Props) {
+export function ChessBoardView2() {
     const [game, setGame] = useState(new MyChessGame());
     const [board, setBoard] = useState(new ChessBoard());
     const [previousAvailableMoves, setPreviousAvailableMoves] = useState<Array<ChessMove>>([]);
@@ -356,7 +352,7 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
                 console.log("existing game");
             }
         }
-    }, [ai, makeNumberOfMoves]);
+    }, [game, ai, makeNumberOfMoves]);
 
     // private keyupHandler(event: KeyboardEvent) {
 
@@ -1035,6 +1031,15 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
         return "";
     }
 
+    const confirmPromotion = () => {
+        const promotionSelection = document.querySelector("input[name=Promotion]:checked");
+        if (promotionSelection) {
+            const radio = promotionSelection as HTMLButtonElement;
+            changePromotionFromString(radio.value);
+        }
+        confirmMove();
+    }
+
     const confirmMove = (): void => {
         console.log("move confirmed");
         showError("");
@@ -1130,9 +1135,32 @@ export function ChessBoardView2(props: ChessBoardView2Props) {
     }
 
     return <>
+        <div id="status"></div>
+        <div id="error" className="Play-Error"></div>
         <table id="table-game"><tbody>{draw()}</tbody></table>
         <div id="confirmation" className="Play-Form">
             <button onClick={confirmMove}><span role="img" aria-label="OK">✅</span> Confirm</button>
+            <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+        </div>
+        <div id="promotionDialog" className="Play-Form">
+            Promote pawn to:<br />
+            <label>
+                <input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} />
+                        Queen
+                    </label><br />
+            <label>
+                <input id="promotionRadioKnight" type="radio" name="Promotion" value="Knight" title="Knight" />
+                        Knight
+                    </label><br />
+            <label>
+                <input id="promotionRadioRook" type="radio" name="Promotion" value="Rook" title="Rook" />
+                        Rook
+                    </label><br />
+            <label>
+                <input id="promotionRadioBishop" type="radio" name="Promotion" value="Bishop" title="Bishop" />
+                        Bishop
+                    </label><br />
+            <button onClick={confirmPromotion}><span role="img" aria-label="OK">✅</span> Confirm</button>
             <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
         </div>
     </>;
