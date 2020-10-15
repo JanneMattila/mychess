@@ -23,6 +23,7 @@ export function ChessBoardView2() {
     const [isLocalGame, setLocalGame] = useState(true);
     const [isNewGame, setNewGame] = useState(false);
     const [isDialogOpen, setDialogOpen] = useState(false);
+    const [isEllipseOpen, setEllipseOpen] = useState(false);
     const [friendID, setFriendID] = useState("");
     const [start, setStart] = useState(new Date().toISOString());
 
@@ -54,6 +55,50 @@ export function ChessBoardView2() {
         showConfirmationDialog(false);
         showPromotionDialog(false);
         undo();
+    }
+
+    const firstMove = () => {
+        console.log("to first move");
+        ai.trackEvent({
+            name: "Play-MoveHistory", properties: {
+                type: "First",
+            }
+        });
+
+        setCurrentMoveNumber(1);
+    }
+
+    const previousMove = () => {
+        console.log("previous move");
+        ai.trackEvent({
+            name: "Play-MoveHistory", properties: {
+                type: "Previous",
+            }
+        });
+
+        setCurrentMoveNumber(Math.max(currentMoveNumber - 1, 1));
+    }
+
+    const nextMove = () => {
+        console.log("next move");
+        ai.trackEvent({
+            name: "Play-MoveHistory", properties: {
+                type: "Next",
+            }
+        });
+
+        setCurrentMoveNumber(Math.min(currentMoveNumber + 1, game.moves.length));
+    }
+
+    const lastMove = () => {
+        console.log("to last move");
+        ai.trackEvent({
+            name: "Play-MoveHistory", properties: {
+                type: "Last",
+            }
+        });
+
+        setCurrentMoveNumber(game.moves.length);
     }
 
     const showConfirmationDialog = (show: boolean) => {
@@ -318,9 +363,8 @@ export function ChessBoardView2() {
                     if (JSON.stringify(game) !== json) {
                         console.log(gameLoaded);
 
-                        const num = makeNumberOfMoves(gameLoaded, gameLoaded.moves.length);
                         setGame(gameLoaded);
-                        setCurrentMoveNumber(num);
+                        setCurrentMoveNumber(gameLoaded.moves.length);
                     }
                 } catch (error) {
                     console.log(error);
@@ -354,6 +398,21 @@ export function ChessBoardView2() {
         }
     }, [game, ai, makeNumberOfMoves]);
 
+    const toggleEllipse = () => {
+        setEllipseOpen(e => !e);
+    }
+
+    const resignGame = () => {
+        if (window.confirm("Do you really want to resign the current game?")) {
+            // board.resignGame();
+            toggleEllipse();
+        }
+    }
+
+    const hidden = {
+        display: "none",
+    }
+
     // private keyupHandler(event: KeyboardEvent) {
 
     //     if (this.isDialogOpen) {
@@ -379,118 +438,6 @@ export function ChessBoardView2() {
     //             break;
     //     }
     //     event.preventDefault();
-    // }
-
-    // public async load(endpoint: string, accessToken ?: string, me ?: string) {
-    //     // Determine if this game is:
-    //     // - local game
-    //     // - new game *WITH* friendID in url
-    //     // - existing game
-    //     const path = window.location.pathname;
-    //     const query = window.location.search;
-    //     const queryString = QueryStringParser.parse(query);
-
-    //     this.endpoint = endpoint;
-    //     if (accessToken) {
-    //         this.accessToken = accessToken;
-    //     }
-
-    //     this.initialize();
-
-    //     this.start = new Date().toISOString();
-
-    //     if (path.indexOf("/local") !== -1) {
-    //         console.log("local game");
-    //         this.isLocalGame = true;
-
-    //         this.ai.trackEvent({
-    //             name: "Play-NewGame", properties: {
-    //                 isLocalGame: true,
-    //             }
-    //         });
-
-    //         this.game = new MyChessGame();
-
-    //         const json = Database.get<string>(DatabaseFields.GAMES_LOCAL_GAME_STATE);
-    //         if (json) {
-    //             // Try to load game state from previously stored state
-    //             try {
-    //                 this.game = JSON.parse(json) as MyChessGame;
-    //                 console.log(this.game);
-
-    //                 this.currentMoveNumber = this.makeNumberOfMoves(this.game, this.game.moves.length);
-    //             } catch (error) {
-    //                 console.log(error);
-    //                 this.ai.trackException({ exception: error });
-
-    //                 this.game = new MyChessGame();
-    //             }
-    //         }
-    //     }
-    //     else {
-    //         this.isLocalGame = false;
-    //         if (me) {
-    //             this.me = me;
-    //         }
-
-    //         if (path.indexOf("/new") !== -1) {
-
-    //             this.ai.trackEvent({
-    //                 name: "Play-NewGame", properties: {
-    //                     isLocalGame: false,
-    //                 }
-    //             });
-
-    //             console.log("new game");
-    //             this.isNewGame = true;
-    //             const friendIDParameter = queryString.get("friendID");
-    //             if (friendIDParameter) {
-    //                 this.friendID = friendIDParameter;
-    //             }
-    //             else {
-    //                 throw new Error("Required parameter for friend is missing!");
-    //             }
-    //         }
-    //         else {
-    //             console.log("existing game");
-    //             if (!accessToken) {
-    //                 console.log("skip fetching game before accessToken is available")
-    //             }
-    //             else {
-    //                 const gameID = path.substring(path.lastIndexOf("/") + 1);
-    //                 const state = queryString.get("state") ?? "";
-
-    //                 try {
-    //                     const request: RequestInit = {
-    //                         method: "GET",
-    //                         headers: {
-    //                             "Accept": "application/json",
-    //                             "Authorization": "Bearer " + this.accessToken
-    //                         }
-    //                     };
-    //                     const response = await fetch(this.endpoint + `/api/games/${gameID}?state=${state}`, request);
-    //                     this.game = await response.json() as MyChessGame;
-    //                     console.log(this.game);
-
-    //                     // let animatedMoves = Math.min(3, this.game.moves.length);
-    //                     // let moves = this.game.moves.length - animatedMoves;
-    //                     this.currentMoveNumber = this.makeNumberOfMoves(this.game, this.game.moves.length);
-    //                     // setTimeout(() => {
-    //                     //     this.animateNextMove();
-    //                     // }, 1000);
-    //                 }
-    //                 catch (error) {
-    //                     console.log(error);
-    //                     this.ai.trackException({ exception: error });
-
-    //                     // $("#errorText").text(textStatus);
-    //                     // $("#errorDialog").dialog();
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     this.loadImages();
     // }
 
     // public async postNewGame(game: MyChessGame) {
@@ -553,38 +500,6 @@ export function ChessBoardView2() {
     //         this.undo();
     //     }
     //     this.showSpinner(false);
-    // }
-
-    // public confirmMove = (): void => {
-    //     console.log("move confirmed");
-    //     this.showError("");
-    //     this.showConfirmationDialog(false);
-    //     this.showPromotionDialog(false);
-
-    //     if (this.isLocalGame) {
-    //         const lastMove = this.getLastMoveAsString();
-    //         const lastPromotion = this.getLastMovePromotionAsString();
-    //         if (!lastMove) {
-    //             console.log("no last move available");
-    //             return;
-    //         }
-
-    //         const move = new MyChessGameMove()
-    //         move.move = lastMove;
-    //         move.promotion = lastPromotion;
-    //         move.comment = "";
-    //         move.start = this.start;
-    //         move.end = new Date().toISOString();
-
-    //         this.game.moves.push(move);
-    //         this.currentMoveNumber++;
-
-    //         Database.set(DatabaseFields.GAMES_LOCAL_GAME_STATE, JSON.stringify(this.game));
-    //         this.start = new Date().toISOString();
-    //     }
-    //     this.showCommentDialog(!this.isLocalGame);
-    //     this.showGameNameDialog(!this.isLocalGame && this.isNewGame);
-    //     this.isDialogOpen = !this.isLocalGame;
     // }
 
     // public confirmComment = (): void => {
@@ -694,126 +609,6 @@ export function ChessBoardView2() {
     //     }
     // }
 
-    // public cancel = (): void => {
-    //     console.log("cancel");
-
-    //     this.ai.trackEvent({
-    //         name: "Play-Cancel"
-    //     });
-
-    //     this.showError("");
-    //     this.showConfirmationDialog(false);
-    //     this.showPromotionDialog(false);
-    //     this.undo();
-    // }
-
-    // private showConfirmationDialog(show: boolean) {
-    //     this.waitingForConfirmation = show;
-    //     let confirmationDialogElement = document.getElementById("confirmation");
-    //     if (confirmationDialogElement !== null) {
-    //         confirmationDialogElement.style.display = show ? "inline" : "none";
-    //         this.isDialogOpen = true;
-    //     }
-    // }
-
-    // private showPromotionDialog(show: boolean) {
-    //     this.waitingForConfirmation = show;
-    //     let promotionDialogElement = document.getElementById("promotionDialog");
-    //     if (promotionDialogElement !== null) {
-    //         promotionDialogElement.style.display = show ? "inline" : "none";
-    //     }
-    // }
-
-    // private showGameNameDialog(show: boolean) {
-    //     this.waitingForConfirmation = show;
-    //     let gameNameDialogElement = document.getElementById("gameNameDialog");
-    //     if (gameNameDialogElement !== null) {
-    //         gameNameDialogElement.style.display = show ? "inline" : "none";
-    //         if (show) {
-    //             gameNameDialogElement.scrollIntoView();
-    //             gameNameDialogElement.focus();
-    //         }
-    //     }
-    // }
-
-    // private showError(message: string) {
-    //     let element = document.getElementById("error");
-    //     if (element !== null) {
-    //         const show = message.length > 0;
-    //         element.style.display = show ? "inline" : "none";
-    //         if (show) {
-    //             element.innerHTML = message;
-    //             element.scrollIntoView();
-    //             element.focus();
-    //         }
-    //     }
-    // }
-
-    // private showCommentDialog(show: boolean) {
-    //     this.waitingForConfirmation = show;
-    //     let commentDialogElement = document.getElementById("commentDialog");
-    //     if (commentDialogElement !== null) {
-    //         commentDialogElement.style.display = show ? "inline" : "none";
-    //         if (show) {
-    //             commentDialogElement.scrollIntoView();
-    //             commentDialogElement.focus();
-    //         }
-    //     }
-    // }
-
-    // private showSpinner(show: boolean) {
-    //     let element = document.getElementById("Loading");
-    //     if (element !== null) {
-    //         element.style.display = show ? "inline-flex" : "none";
-    //         if (show) {
-    //             element.scrollIntoView();
-    //             element.focus();
-    //         }
-    //     }
-    // }
-
-    // public changePromotion(name: string) {
-    //     let promotionDialogElement = document.getElementById("promotionDialog");
-    //     if (promotionDialogElement !== null) {
-    //         promotionDialogElement.style.display = "none";
-
-    //         let nodes: NodeList = document.getElementsByName(name)
-    //         for (let i: number = 0; i < nodes.length; i++) {
-    //             let radioElement = nodes[i] as HTMLInputElement;
-    //             if (radioElement.checked === true) {
-    //                 if (this.changePromotionFromString(radioElement.value)) {
-    //                     this.drawBoard();
-    //                 }
-    //                 return;
-    //             }
-    //         }
-
-    //     }
-    // }
-
-    // public undo() {
-    //     let commentDialogElement = document.getElementById("commentDialog");
-    //     if (commentDialogElement !== null) {
-    //         commentDialogElement.style.display = "none";
-    //     }
-
-    //     this.board.undo();
-    //     this.drawBoard();
-    // }
-
-    // public getLastMoveAsString(): string | undefined {
-    //     return this.board.lastMove()?.getMoveString();
-    // }
-
-    // public getLastMovePromotionAsString(): string {
-    //     let lastPromotion = this.board.lastMovePromotion();
-    //     if (lastPromotion !== null) {
-    //         return lastPromotion.piece.toString();
-    //     }
-
-    //     return "";
-    // }
-
     // public setComment(commentText: string) {
     //     commentText = commentText !== null ? commentText : "&nbsp;";
 
@@ -879,65 +674,6 @@ export function ChessBoardView2() {
     //     statusElement.innerHTML = gameStatusMessage;
     // }
 
-    // private moveHistory(direction: number) {
-    //     this.currentMoveNumber += direction;
-    //     console.log("direction: " + direction);
-    //     console.log(this.game);
-    //     console.log("currentMoveNumber: " + this.currentMoveNumber);
-
-    //     if (this.currentMoveNumber < 1) {
-    //         this.currentMoveNumber = 1;
-    //     }
-    //     else if (this.currentMoveNumber > this.game.moves.length) {
-    //         this.currentMoveNumber = this.game.moves.length;
-    //     }
-    //     this.makeNumberOfMoves(this.game, this.currentMoveNumber);
-    // }
-
-    // public firstMove() {
-    //     console.log("to first move");
-    //     this.ai.trackEvent({
-    //         name: "Play-MoveHistory", properties: {
-    //             type: "First",
-    //         }
-    //     });
-
-    //     this.moveHistory(-999999);
-    // }
-
-    // public previousMove() {
-    //     console.log("previous move");
-    //     this.ai.trackEvent({
-    //         name: "Play-MoveHistory", properties: {
-    //             type: "Previous",
-    //         }
-    //     });
-
-    //     this.moveHistory(-1);
-    // }
-
-    // public nextMove() {
-    //     console.log("next move");
-    //     this.ai.trackEvent({
-    //         name: "Play-MoveHistory", properties: {
-    //             type: "Next",
-    //         }
-    //     });
-
-    //     this.moveHistory(1);
-    // }
-
-    // public lastMove() {
-    //     console.log("to last move");
-    //     this.ai.trackEvent({
-    //         name: "Play-MoveHistory", properties: {
-    //             type: "Last",
-    //         }
-    //     });
-
-    //     this.moveHistory(999999);
-    // }
-
     // public animateNextMove() {
     //     console.log("animating next move");
     //     this.moveHistory(1);
@@ -949,8 +685,17 @@ export function ChessBoardView2() {
     //     }
     // }
 
+    // useEffect(() => {
+    //     console.log("draw moves");
+    //     board.initialize();
+    //     makeNumberOfMoves(game, currentMoveNumber);
+    // }, [board, game, currentMoveNumber, makeNumberOfMoves]);
+
     const draw = () => {
         console.log("draw");
+        board.initialize();
+        makeNumberOfMoves(game, currentMoveNumber);
+
         let lastMove = board.lastMove();
         let lastMoveCapture = board.lastMoveCapture();
         let html = new Array<JSX.Element>();
@@ -1162,6 +907,24 @@ export function ChessBoardView2() {
                     </label><br />
             <button onClick={confirmPromotion}><span role="img" aria-label="OK">✅</span> Confirm</button>
             <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+        </div>
+        <div id="LastComment"></div>
+        <div id="ellipse">
+            <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
+        </div>
+        <div id="ellipseContent" style={isEllipseOpen ? { display: "inline" } : { display: "none" }}>
+            <button onClick={firstMove}><span role="img" aria-label="Move to first move">&nbsp; &#9664; &#9664; &nbsp;</span></button>
+            <button onClick={previousMove}><span role="img" aria-label="Move to previous move">&nbsp; &#9664; &nbsp;</span></button>
+            <button onClick={nextMove}><span role="img" aria-label="Move to next move">&nbsp; &#9654; &nbsp;</span></button>
+            <button onClick={lastMove}><span role="img" aria-label="Move to last move">&nbsp; &#9654; &#9654; &nbsp;</span></button>
+
+            <div id="ThinkTime"></div>
+
+            <br />
+            <hr />
+            <br />
+
+            <button onClick={resignGame}><span role="img" aria-label="Resign">🛑</span> Resign game</button>
         </div>
     </>;
 }
