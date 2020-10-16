@@ -57,6 +57,74 @@ export function ChessBoardView2() {
         undo();
     }
 
+    const changePromotionFromString = useCallback((name: string): boolean => {
+        console.log("changePromotionFromString to " + name);
+
+        ai.trackEvent({
+            name: "Play-Promotion", properties: {
+                type: name,
+            }
+        });
+
+        if (name === "Queen") {
+            // No changes to promotion
+            return false;
+        }
+        else if (name === "Knight") {
+            board.changePromotion(ChessPiece.Knight);
+        }
+        else if (name === "Rook") {
+            board.changePromotion(ChessPiece.Rook);
+        }
+        else if (name === "Bishop") {
+            board.changePromotion(ChessPiece.Bishop);
+        }
+        return true;
+    }, [board, ai]);
+
+    const makeMove = useCallback((move: string, promotion: string) => {
+        console.log("Making move " + move + " with promotion " + promotion);
+        board.makeMoveFromString(move);
+        if (promotion !== undefined && promotion.length > 0) {
+            changePromotionFromString(promotion);
+        }
+    }, [board, changePromotionFromString]);
+
+    const makeNumberOfMoves = useCallback((gameUpdate: MyChessGame, movesCount: number): void => {
+        board.initialize();
+        let count = Math.min(gameUpdate.moves.length, movesCount);
+        console.log(`going to make ${count} moves (out of ${gameUpdate.moves.length} moves)`);
+
+        if (count > 0) {
+            for (let i = 0; i < count; i++) {
+                let move = gameUpdate.moves[i];
+                let promotion = move.promotion !== null ? move.promotion : "";
+                makeMove(move.move, promotion);
+            }
+            // setBoardStatus(count, game.moves.length);
+
+            let move = gameUpdate.moves[count - 1];
+
+            const start = Date.parse(move.start);
+            const end = Date.parse(move.end);
+
+            // setThinkTime(count, end - start);
+            // setComment(move.comment);
+        }
+        else {
+            // setThinkTime(0, -1);
+            // setComment("");
+        }
+
+        setBoard(board);
+        setCurrentMoveNumber(count);
+    }, [makeMove, board]);
+
+    const moveHistory = useCallback((moveNumber: number) => {
+        console.log("USE EFFECT - UPDATE BOARD " + new Date());
+        makeNumberOfMoves(game, moveNumber);
+    }, [game, makeNumberOfMoves]);
+
     const firstMove = useCallback(() => {
         console.log("to first move");
         ai.trackEvent({
@@ -65,8 +133,8 @@ export function ChessBoardView2() {
             }
         });
 
-        setCurrentMoveNumber(1);
-    }, [ai, setCurrentMoveNumber]);
+        moveHistory(1);
+    }, [ai, moveHistory]);
 
     const previousMove = useCallback(() => {
         console.log("previous move");
@@ -76,8 +144,8 @@ export function ChessBoardView2() {
             }
         });
 
-        setCurrentMoveNumber(Math.max(currentMoveNumber - 1, 1));
-    }, [ai, currentMoveNumber, setCurrentMoveNumber]);
+        moveHistory(Math.max(currentMoveNumber - 1, 1));
+    }, [ai, currentMoveNumber, moveHistory]);
 
     const nextMove = useCallback(() => {
         console.log("next move");
@@ -87,8 +155,8 @@ export function ChessBoardView2() {
             }
         });
 
-        setCurrentMoveNumber(Math.min(currentMoveNumber + 1, game.moves.length));
-    }, [ai, game, currentMoveNumber, setCurrentMoveNumber]);
+        moveHistory(Math.min(currentMoveNumber + 1, game.moves.length));
+    }, [ai, game, currentMoveNumber, moveHistory]);
 
     const lastMove = useCallback(() => {
         console.log("to last move");
@@ -98,8 +166,8 @@ export function ChessBoardView2() {
             }
         });
 
-        setCurrentMoveNumber(game.moves.length);
-    }, [ai, game, setCurrentMoveNumber]);
+        moveHistory(game.moves.length);
+    }, [ai, game, moveHistory]);
 
     const showConfirmationDialog = (show: boolean) => {
         waitingForConfirmation = show;
@@ -220,10 +288,10 @@ export function ChessBoardView2() {
             setPreviousAvailableMoves([]);
             if (selectedMove !== null) {
                 // Make selected move
+                console.log("Make selected move");
                 board.makeMove(selectedMove, true);
 
                 if (board.lastMovePromotion() !== null) {
-
                     let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
                     queenPromotionElement.checked = true;
 
@@ -304,67 +372,6 @@ export function ChessBoardView2() {
         }
     }, [setPieceSize, setPreviousAvailableMoves, keyup]);
 
-    const changePromotionFromString = useCallback((name: string): boolean => {
-        console.log("changePromotionFromString to " + name);
-
-        ai.trackEvent({
-            name: "Play-Promotion", properties: {
-                type: name,
-            }
-        });
-
-        if (name === "Queen") {
-            // No changes to promotion
-            return false;
-        }
-        else if (name === "Knight") {
-            board.changePromotion(ChessPiece.Knight);
-        }
-        else if (name === "Rook") {
-            board.changePromotion(ChessPiece.Rook);
-        }
-        else if (name === "Bishop") {
-            board.changePromotion(ChessPiece.Bishop);
-        }
-        return true;
-    }, [board, ai]);
-
-    const makeMove = useCallback((move: string, promotion: string) => {
-        console.log("Making move " + move + " with promotion " + promotion);
-        board.makeMoveFromString(move);
-        if (promotion !== undefined && promotion.length > 0) {
-            changePromotionFromString(promotion);
-        }
-    }, [board, changePromotionFromString]);
-
-    const makeNumberOfMoves = useCallback((game: MyChessGame, movesCount: number): number => {
-        let count = Math.min(game.moves.length, movesCount);
-        console.log("going to make " + count + " moves");
-
-        if (count > 0) {
-            for (let i = 0; i < count; i++) {
-                let move = game.moves[i];
-                let promotion = move.promotion !== null ? move.promotion : "";
-                makeMove(move.move, promotion);
-            }
-            // setBoardStatus(count, game.moves.length);
-
-            let move = game.moves[count - 1];
-
-            const start = Date.parse(move.start);
-            const end = Date.parse(move.end);
-
-            // setThinkTime(count, end - start);
-            // setComment(move.comment);
-        }
-        else {
-            // setThinkTime(0, -1);
-            // setComment("");
-        }
-
-        return count;
-    }, [makeMove]);
-
     useEffect(() => {
         console.log("USE EFFECT - " + new Date());
         const path = window.location.pathname;
@@ -388,9 +395,7 @@ export function ChessBoardView2() {
                     const gameLoaded = JSON.parse(json) as MyChessGame;
                     if (JSON.stringify(game) !== json) {
                         console.log(gameLoaded);
-
-                        setGame(gameLoaded);
-                        setCurrentMoveNumber(gameLoaded.moves.length);
+                        makeNumberOfMoves(gameLoaded, gameLoaded.moves.length);
                     }
                 } catch (error) {
                     console.log(error);
@@ -688,8 +693,6 @@ export function ChessBoardView2() {
 
     const draw = () => {
         console.log("draw");
-        board.initialize();
-        makeNumberOfMoves(game, currentMoveNumber);
 
         let lastMove = board.lastMove();
         let lastMoveCapture = board.lastMoveCapture();
