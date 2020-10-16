@@ -396,6 +396,7 @@ export function ChessBoardView2() {
                     if (JSON.stringify(game) !== json) {
                         console.log(gameLoaded);
                         makeNumberOfMoves(gameLoaded, gameLoaded.moves.length);
+                        setGame(gameLoaded);
                     }
                 } catch (error) {
                     console.log(error);
@@ -616,63 +617,72 @@ export function ChessBoardView2() {
     //     commentElement.innerHTML = commentText;
     // }
 
-    // public setThinkTime(moveIndex: number, thinkTime: number) {
-    //     let thinkTimeElement = document.getElementById("ThinkTime") as HTMLDivElement;
+    const getThinkTime = () => {
+        if (currentMoveNumber === 0 ||
+            currentMoveNumber > game.moves.length) {
+            return "";
+        }
 
-    //     if (thinkTime === -1) {
-    //         thinkTimeElement.innerText = "";
-    //         return;
-    //     }
+        const move = game.moves[currentMoveNumber - 1];
+        if (move === undefined ||
+            move.start === undefined ||
+            move.end === undefined) {
+            return "";
+        }
 
-    //     let minutes = 0;
-    //     let seconds = thinkTime / 1000;
-    //     if (seconds > 60) {
-    //         minutes = Math.floor(seconds / 60);
-    //         seconds = Math.floor(seconds % 60);
-    //     }
-    //     else {
-    //         seconds = Math.floor(seconds);
-    //     }
+        const start = Date.parse(move.start);
+        const end = Date.parse(move.end);
 
-    //     if (minutes > 0) {
-    //         thinkTimeElement.innerText = "Move " + moveIndex + " think time was " + minutes + " minutes and " + seconds + " seconds.";
-    //     }
-    //     else {
-    //         thinkTimeElement.innerText = "Move " + moveIndex + " think time was " + seconds + " seconds.";
-    //     }
-    // }
+        const thinkTime = end - start;
+        let minutes = 0;
+        let seconds = thinkTime / 1000;
+        if (seconds > 60) {
+            minutes = Math.floor(seconds / 60);
+            seconds = Math.floor(seconds % 60);
+        }
+        else {
+            seconds = Math.floor(seconds);
+        }
 
-    // public setBoardStatus(currentMoveIndex: number, moves: number) {
-    //     let statusElement = document.getElementById("status") as HTMLDivElement;
-    //     let status = this.board.GetBoardState();
-    //     let gameStatusMessage = "";
+        if (minutes > 0) {
+            return `Move ${currentMoveNumber} think time was ${minutes} minutes and ${seconds} seconds.`;
+        }
+        return `Move ${currentMoveNumber} think time was ${seconds} seconds.`;
+    }
 
-    //     console.log("currentMoveIndex: " + currentMoveIndex + ", moves: " + moves);
-    //     if (currentMoveIndex !== moves) {
-    //         gameStatusMessage = "Move ";
-    //         gameStatusMessage += currentMoveIndex;
-    //     }
+    const getBoardStatus = (): string => {
+        let status = board.GetBoardState();
+        let gameStatusMessage = "";
 
-    //     switch (status) {
-    //         case ChessBoardState.StaleMate:
-    //             gameStatusMessage = "Stalemate";
-    //             break;
+        if (currentMoveNumber !== game.moves.length) {
+            gameStatusMessage = "Move ";
+            gameStatusMessage += currentMoveNumber;
+        }
 
-    //         case ChessBoardState.Check:
-    //             gameStatusMessage = "Check " + gameStatusMessage;
-    //             break;
+        switch (status) {
+            case ChessBoardState.StaleMate:
+                gameStatusMessage = "Stalemate";
+                break;
 
-    //         case ChessBoardState.CheckMate:
-    //             gameStatusMessage = "Checkmate!";
-    //             break;
+            case ChessBoardState.Check:
+                if (gameStatusMessage.length > 0) {
+                    gameStatusMessage += " - Check";
+                }
+                else {
+                    gameStatusMessage = "Check";
+                }
+                break;
 
-    //         default:
-    //             gameStatusMessage += "&nbsp;"
-    //             break;
-    //     }
+            case ChessBoardState.CheckMate:
+                gameStatusMessage = "Checkmate!";
+                break;
 
-    //     statusElement.innerHTML = gameStatusMessage;
-    // }
+            default:
+                gameStatusMessage += ""
+                break;
+        }
+        return gameStatusMessage;
+    }
 
     // public animateNextMove() {
     //     console.log("animating next move");
@@ -806,6 +816,7 @@ export function ChessBoardView2() {
 
             game.moves.push(move);
             setCurrentMoveNumber(e => e + 1);
+            setGame(game);
 
             Database.set(DatabaseFields.GAMES_LOCAL_GAME_STATE, JSON.stringify(game));
             setStart(new Date().toISOString());
@@ -878,7 +889,7 @@ export function ChessBoardView2() {
     }
 
     return <>
-        <div id="status"></div>
+        <div id="status">&nbsp; {getBoardStatus()} &nbsp;</div>
         <div id="error" className="Play-Error"></div>
         <table id="table-game"><tbody>{draw()}</tbody></table>
         <div id="confirmation" className="Play-Form">
@@ -916,7 +927,7 @@ export function ChessBoardView2() {
             <button onClick={nextMove}><span role="img" aria-label="Move to next move">&nbsp; &#9654; &nbsp;</span></button>
             <button onClick={lastMove}><span role="img" aria-label="Move to last move">&nbsp; &#9654; &#9654; &nbsp;</span></button>
 
-            <div id="ThinkTime"></div>
+            <div id="ThinkTime">{getThinkTime()}</div>
 
             <br />
             <hr />
