@@ -31,6 +31,8 @@ export enum EventTypes {
     // Game loading related events
     GAMES_LOADING = "Games/Loading",
     GAMES_REQUESTED = "Games/Loading/Requested",
+    GAMES_CREATE = "Games/Create",
+    GAMES_CREATE_REQUESTED = "Games/Create/Requested",
 
     // Me loading related events
     ME_LOADING = "Me/Loading",
@@ -59,6 +61,8 @@ type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
 type GamesRequestedAction = { type: EventTypes.GAMES_REQUESTED, gamesFilter: string }
+type GamesCreateAction = { type: EventTypes.GAMES_CREATE, gamesCreateState: ProcessState, error?: string, errorLink?: string }
+type GamesCreateRequestedAction = { type: EventTypes.GAMES_CREATE_REQUESTED, game: MyChessGame }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: User[] }
 type FriendsRequestedAction = { type: EventTypes.FRIENDS_REQUESTED }
@@ -79,6 +83,8 @@ export type RootAction =
     | LoginExpiredAction
     | GamesLoadingAction
     | GamesRequestedAction
+    | GamesCreateAction
+    | GamesCreateRequestedAction
     | MeLoadingAction
     | FriendsLoadingAction
     | FriendsRequestedAction
@@ -103,6 +109,8 @@ export interface RootState {
     readonly gamesRequested?: number,
     readonly gamesFilter?: string,
     readonly games?: MyChessGame[]
+    readonly gamesCreateState?: ProcessState
+    readonly gamesCreateRequested?: MyChessGame,
 
     readonly me?: string;
     readonly meState?: ProcessState
@@ -145,6 +153,14 @@ export function gamesLoadingEvent(gamesState: ProcessState, error?: string, game
 
 export function gamesRequestedEvent(gamesFilter: string): GamesRequestedAction {
     return { type: EventTypes.GAMES_REQUESTED, gamesFilter: gamesFilter };
+}
+
+export function gamesCreateEvent(gamesCreateState: ProcessState, error?: string, errorLink?: string): GamesCreateAction {
+    return { type: EventTypes.GAMES_CREATE, gamesCreateState, error, errorLink };
+}
+
+export function gamesCreateRequestedEvent(game: MyChessGame): GamesCreateRequestedAction {
+    return { type: EventTypes.GAMES_CREATE_REQUESTED, game };
 }
 
 export function meLoadingEvent(meState: ProcessState, error?: string, me?: string): MeLoadingAction {

@@ -1,10 +1,6 @@
-import React, { useEffect, MouseEvent } from "react";
-import "./PlayPage.css";
+import React from "react";
 import { ChessBoardView2 } from "../game/ChessBoardView2";
-import { useTypedSelector } from "../reducers";
-import { Database, DatabaseFields } from "../data/Database";
-import logo from "../pages/logo.svg";
-import { UserSettings } from "../models/UserSettings";
+import "./PlayPage.css";
 
 export function PlayPage2() {
     return (

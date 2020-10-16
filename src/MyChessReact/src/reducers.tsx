@@ -8,6 +8,7 @@ export const getInitialState = () => {
         logoutRequested: 0,
         gamesState: ProcessState.NotStarted,
         gamesRequested: 0,
+        gamesCreateState: ProcessState.NotStarted,
         friendsState: ProcessState.NotStarted,
         friendsRequested: 0,
         settingsState: ProcessState.NotStarted,
@@ -58,6 +59,18 @@ export default function appReducer(state: RootState = getInitialState(), action:
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 gamesRequested: state.gamesRequested ? state.gamesRequested + 1 : 1,
                 gamesFilter: action.gamesFilter
+            })
+        }
+        case EventTypes.GAMES_CREATE: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                gamesCreateState: action.gamesCreateState,
+                error: action.error,
+                errorLink: action.errorLink
+            })
+        }
+        case EventTypes.GAMES_CREATE_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                gamesCreateRequested: action.game,
             })
         }
 

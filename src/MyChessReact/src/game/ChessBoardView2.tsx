@@ -14,6 +14,9 @@ import { getAppInsights } from "../components/TelemetryService";
 import React, { useCallback, useEffect, useState } from "react";
 import { UserSettings } from "../models/UserSettings";
 import logo from "../pages/logo.svg";
+import { useTypedSelector } from "../reducers";
+import { useDispatch } from "react-redux";
+import { gamesCreateRequestedEvent, ProcessState } from "../actions";
 
 export function ChessBoardView2() {
     const [game, setGame] = useState(new MyChessGame());
@@ -33,6 +36,9 @@ export function ChessBoardView2() {
     const [start, setStart] = useState(new Date().toISOString());
 
     const me = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
+
+    const gamesCreateState = useTypedSelector(state => state.gamesCreateState);
+    const dispatch = useDispatch();
 
     let waitingForConfirmation = false;
 
@@ -445,53 +451,6 @@ export function ChessBoardView2() {
     //     this.showSpinner(false);
     // }
 
-    // public resignGame = async () => {
-    //     console.log("game resigned");
-
-    //     this.ai.trackEvent({
-    //         name: "Play-Resign"
-    //     });
-
-    //     if (this.isLocalGame) {
-    //         Database.delete(DatabaseFields.GAMES_LOCAL_GAME_STATE);
-    //         this.game = new MyChessGame();
-    //         this.board = new ChessBoard();
-    //         this.board.initialize();
-    //         this.previousAvailableMoves = [];
-    //         this.currentMoveNumber = 0;
-
-    //         this.drawBoard();
-    //     }
-    //     else {
-    //         const request: RequestInit = {
-    //             method: "DELETE",
-    //             headers: {
-    //                 "Authorization": "Bearer " + this.accessToken
-    //             }
-    //         };
-
-    //         this.showSpinner(true);
-    //         try {
-    //             const response = await fetch(this.endpoint + `/api/games/${this.game.id}`, request);
-    //             if (response.ok) {
-    //                 console.log("Game archived succesfully");
-    //                 document.location.href = "/";
-    //             }
-    //             else {
-    //                 throw new Error("Could not archive game!")
-    //             }
-    //         } catch (error) {
-    //             console.log(error);
-    //             this.ai.trackException({ exception: error });
-
-    //             const errorMessage = error.errorMessage ? error.errorMessage : "Unable to archive the game";
-    //             this.showError(errorMessage);
-    //             this.undo();
-    //         }
-    //         this.showSpinner(false);
-    //     }
-    // }
-
     const getComment = (): string => {
         if (currentMoveNumber === 0 ||
             currentMoveNumber > game.moves.length) {
@@ -568,23 +527,6 @@ export function ChessBoardView2() {
         }
         return gameStatusMessage;
     }
-
-    // public animateNextMove() {
-    //     console.log("animating next move");
-    //     this.moveHistory(1);
-
-    //     if (this.game.moves.length !== this.currentMoveNumber) {
-    //         setTimeout(() => {
-    //             this.animateNextMove();
-    //         }, 1000);
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     console.log("draw moves");
-    //     board.initialize();
-    //     makeNumberOfMoves(game, currentMoveNumber);
-    // }, [board, game, currentMoveNumber, makeNumberOfMoves]);
 
     const draw = () => {
         console.log("draw");
@@ -759,7 +701,7 @@ export function ChessBoardView2() {
             game.name = gameName;
             game.moves.push(move)
 
-            // postNewGame(game);
+            dispatch(gamesCreateRequestedEvent(game));
         }
         else {
             // postMove(move);
@@ -767,6 +709,13 @@ export function ChessBoardView2() {
 
         setGameNameDialogOpen(false);
         setCommentDialogOpen(false);
+    }
+
+    const isLoading = () => {
+        if (gamesCreateState === ProcessState.Processing) {
+            return true;
+        }
+        return false;
     }
 
     return <>
@@ -811,7 +760,7 @@ export function ChessBoardView2() {
             <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
             <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
         </div>
-        <div id="Loading" className="Play-Spinner">
+        <div id="Loading" className="Play-Spinner" style={isLoading() ? { display: "inline" } : { display: "none" }}>
             <img src={logo} className="Play-logo" alt="logo" />
                 Working on it...
         </div>

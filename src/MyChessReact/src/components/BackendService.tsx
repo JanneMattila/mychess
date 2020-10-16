@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
-import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent, settingsLoadingRequestedEvent, friendsRequestedEvent } from "../actions";
+import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent, settingsLoadingRequestedEvent, friendsRequestedEvent, gamesCreateEvent } from "../actions";
 import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { User } from "../models/User";
@@ -10,6 +10,7 @@ import { useTypedSelector } from "../reducers";
 import { UserSettings } from "../models/UserSettings";
 import { GameStateFilter } from "../models/GameStateFilter";
 import { Configuration, PublicClientApplication, AccountInfo, InteractionRequiredAuthError, SilentRequest, RedirectRequest } from "@azure/msal-browser";
+import { MyChessGame } from "../models/MyChessGame";
 
 type BackendServiceProps = {
     clientId: string;
@@ -28,6 +29,7 @@ export function BackendService(props: BackendServiceProps) {
     const friendsRequested = useTypedSelector(state => state.friendsRequested);
     const friendsUpsertRequested = useTypedSelector(state => state.friendsUpsertRequested);
     const gamesRequested = useTypedSelector(state => state.gamesRequested);
+    const gamesCreateRequested = useTypedSelector(state => state.gamesCreateRequested);
     const gamesFilter = useTypedSelector(state => state.gamesFilter);
 
     const [account, setAccount] = useState(Database.get<AccountInfo>(DatabaseFields.ACCOUNT));
@@ -35,6 +37,7 @@ export function BackendService(props: BackendServiceProps) {
     const [loginProcessed, setLoginProcessed] = useState(0);
     const [logoutProcessed, setLogoutProcessed] = useState(0);
     const [settingsLoadingProcessed, setSettingsLoadingProcessed] = useState(0);
+    const [gamesCreateProcessed, setGamesCreateProcessed] = useState<MyChessGame | undefined>(undefined);
     const [settingsUpsertProcessed, setSettingsUpsertProcessed] = useState<UserSettings | undefined>(undefined);
     const [friendsProcessed, setFriendsProcessed] = useState(0);
     const [friendsUpsertProcessed, setFriendsUpsertProcessed] = useState<User | undefined>(undefined);
@@ -436,6 +439,73 @@ export function BackendService(props: BackendServiceProps) {
             getGames(gamesFilter);
         }
     }, [gamesRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesProcessed, gamesFilter]);
+
+    useEffect(() => {
+        const createGame = async (game: MyChessGame) => {
+            dispatch(gamesCreateEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
+
+            const accessToken = await acquireTokenSilentOnly();
+            if (!accessToken) {
+                dispatch(gamesCreateEvent(ProcessState.Error, "Authentication missing"));
+                return;
+            }
+
+            const request: RequestInit = {
+                method: "POST",
+                body: JSON.stringify(game),
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
+
+            try {
+                const response = await fetch(endpoint + "/api/games", request);
+                if (response.ok) {
+                    dispatch(gamesCreateEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
+                    const gameCreated = await response.json() as MyChessGame;
+
+                    history.push(`/play/${gameCreated.id}?state=${GameStateFilter.WAITING_FOR_OPPONENT}`);
+                }
+                else if (response.status === 400 /* Bad request */) {
+                    const data = await response.json();
+                    console.log(data);
+
+                    const ex = data as ProblemDetail;
+                    if (ex.title !== undefined && ex.instance !== undefined) {
+                        console.log(ex);
+                        dispatch(gamesCreateEvent(ProcessState.Error, ex.title, ex.instance));
+                    }
+                }
+                else {
+                    ai.trackEvent({
+                        name: "Games-CreateFailed", properties: {
+                            status: response.status,
+                            statusText: response.statusText,
+                        }
+                    });
+                    dispatch(gamesCreateEvent(ProcessState.Error, "Unable to create game."));
+                }
+            }
+            catch (error) {
+                console.log(error);
+                ai.trackException({ exception: error });
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create game.";
+                dispatch(gamesCreateEvent(ProcessState.Error, errorMessage, ""));
+
+                console.log(error);
+                console.log(errorMessage);
+            }
+        }
+
+        if (gamesCreateRequested && gamesCreateRequested !== gamesCreateProcessed) {
+            setGamesCreateProcessed(gamesCreateRequested);
+            ai.trackEvent({ name: "Games-Create" });
+            createGame(gamesCreateRequested);
+        }
+    }, [gamesCreateRequested, ai, dispatch, history, endpoint, acquireTokenSilentOnly, gamesCreateProcessed]);
+
 
     useEffect(() => {
         const upsertFriend = async (player: User) => {
