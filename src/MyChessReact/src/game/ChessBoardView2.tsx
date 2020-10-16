@@ -244,19 +244,21 @@ export function ChessBoardView2() {
             return;
         }
 
-        switch (event.keyCode) {
-            case 36: // Home
+        switch (event.code) {
+            case "Home":
                 firstMove();
                 break;
-            case 37: // LeftArrow
-            case 40: // DownArrow
+            case "ArrowLeft":
+            case "ArrowDown":
+            case "PageDown":
                 previousMove();
                 break;
-            case 39: // RightArrow
-            case 38: // UpArrow
+            case "ArrowRight":
+            case "ArrowUp":
+            case "PageUp":
                 nextMove();
                 break;
-            case 35: // End
+            case "End":
                 lastMove();
                 break;
             default:
