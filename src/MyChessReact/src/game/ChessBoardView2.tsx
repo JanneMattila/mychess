@@ -363,7 +363,22 @@ export function ChessBoardView2() {
 
     const resignGame = () => {
         if (window.confirm("Do you really want to resign the current game?")) {
-            // board.resignGame();
+            console.log("game resigned");
+
+            ai.trackEvent({
+                name: "Play-Resign"
+            });
+
+            if (isLocalGame) {
+                Database.delete(DatabaseFields.GAMES_LOCAL_GAME_STATE);
+
+                setGame(new MyChessGame());
+                setBoard(new ChessBoard());
+                setPreviousAvailableMoves([]);
+                setCurrentMoveNumber(0);
+            }
+            else {
+            }
             toggleEllipse();
         }
     }
