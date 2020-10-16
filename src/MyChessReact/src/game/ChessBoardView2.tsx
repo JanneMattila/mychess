@@ -610,12 +610,15 @@ export function ChessBoardView2() {
     //     }
     // }
 
-    // public setComment(commentText: string) {
-    //     commentText = commentText !== null ? commentText : "&nbsp;";
+    const getComment = (): string => {
+        if (currentMoveNumber === 0 ||
+            currentMoveNumber > game.moves.length) {
+            return "";
+        }
 
-    //     let commentElement = document.getElementById("LastComment") as HTMLDivElement;
-    //     commentElement.innerHTML = commentText;
-    // }
+        const move = game.moves[currentMoveNumber - 1];
+        return move.comment;
+    }
 
     const getThinkTime = () => {
         if (currentMoveNumber === 0 ||
@@ -917,7 +920,7 @@ export function ChessBoardView2() {
             <button onClick={confirmPromotion}><span role="img" aria-label="OK">✅</span> Confirm</button>
             <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
         </div>
-        <div id="LastComment"></div>
+        <div id="LastComment">{getComment()}</div>
         <div id="ellipse">
             <button onClick={toggleEllipse}><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
         </div>
