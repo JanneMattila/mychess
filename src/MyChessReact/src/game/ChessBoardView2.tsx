@@ -13,6 +13,7 @@ import { GameStateFilter } from "../models/GameStateFilter";
 import { getAppInsights } from "../components/TelemetryService";
 import React, { useCallback, useEffect, useState } from "react";
 import { UserSettings } from "../models/UserSettings";
+import logo from "../pages/logo.svg";
 
 export function ChessBoardView2() {
     const [game, setGame] = useState(new MyChessGame());
@@ -22,8 +23,12 @@ export function ChessBoardView2() {
 
     const [isLocalGame, setLocalGame] = useState(true);
     const [isNewGame, setNewGame] = useState(false);
-    const [isDialogOpen, setDialogOpen] = useState(false);
+    const [isCommentDialogOpen, setCommentDialogOpen] = useState(false);
+    const [isPromotionDialogOpen, setPromotionDialogOpen] = useState(false);
+    const [isConfirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
+    const [isGameNameDialogOpen, setGameNameDialogOpen] = useState(false);
     const [isEllipseOpen, setEllipseOpen] = useState(false);
+    const [error, setError] = useState("");
     const [friendID, setFriendID] = useState("");
     const [start, setStart] = useState(new Date().toISOString());
 
@@ -51,9 +56,9 @@ export function ChessBoardView2() {
             name: "Play-Cancel"
         });
 
-        showError("");
-        showConfirmationDialog(false);
-        showPromotionDialog(false);
+        setError("");
+        setConfirmationDialogOpen(false);
+        setPromotionDialogOpen(false);
         undo();
     }
 
@@ -101,21 +106,7 @@ export function ChessBoardView2() {
                 let promotion = move.promotion !== null ? move.promotion : "";
                 makeMove(move.move, promotion);
             }
-            // setBoardStatus(count, game.moves.length);
-
-            let move = gameUpdate.moves[count - 1];
-
-            const start = Date.parse(move.start);
-            const end = Date.parse(move.end);
-
-            // setThinkTime(count, end - start);
-            // setComment(move.comment);
         }
-        else {
-            // setThinkTime(0, -1);
-            // setComment("");
-        }
-
         setBoard(board);
         setCurrentMoveNumber(count);
     }, [makeMove, board]);
@@ -168,71 +159,6 @@ export function ChessBoardView2() {
 
         moveHistory(game.moves.length);
     }, [ai, game, moveHistory]);
-
-    const showConfirmationDialog = (show: boolean) => {
-        waitingForConfirmation = show;
-        let confirmationDialogElement = document.getElementById("confirmation");
-        if (confirmationDialogElement !== null) {
-            confirmationDialogElement.style.display = show ? "inline" : "none";
-            setDialogOpen(true);
-        }
-    }
-
-    const showPromotionDialog = (show: boolean) => {
-        waitingForConfirmation = show;
-        let promotionDialogElement = document.getElementById("promotionDialog");
-        if (promotionDialogElement !== null) {
-            promotionDialogElement.style.display = show ? "inline" : "none";
-        }
-    }
-
-    const showGameNameDialog = (show: boolean) => {
-        waitingForConfirmation = show;
-        let gameNameDialogElement = document.getElementById("gameNameDialog");
-        if (gameNameDialogElement !== null) {
-            gameNameDialogElement.style.display = show ? "inline" : "none";
-            if (show) {
-                gameNameDialogElement.scrollIntoView();
-                gameNameDialogElement.focus();
-            }
-        }
-    }
-
-    const showError = (message: string) => {
-        let element = document.getElementById("error");
-        if (element !== null) {
-            const show = message.length > 0;
-            element.style.display = show ? "inline" : "none";
-            if (show) {
-                element.innerHTML = message;
-                element.scrollIntoView();
-                element.focus();
-            }
-        }
-    }
-
-    const showCommentDialog = (show: boolean) => {
-        waitingForConfirmation = show;
-        let commentDialogElement = document.getElementById("commentDialog");
-        if (commentDialogElement !== null) {
-            commentDialogElement.style.display = show ? "inline" : "none";
-            if (show) {
-                commentDialogElement.scrollIntoView();
-                commentDialogElement.focus();
-            }
-        }
-    }
-
-    const showSpinner = (show: boolean) => {
-        let element = document.getElementById("Loading");
-        if (element !== null) {
-            element.style.display = show ? "inline-flex" : "none";
-            if (show) {
-                element.scrollIntoView();
-                element.focus();
-            }
-        }
-    }
 
     const pieceSelected = (event: React.MouseEvent<HTMLTableDataCellElement> | undefined, id: string) => {
         if (waitingForConfirmation) {
@@ -295,14 +221,12 @@ export function ChessBoardView2() {
                     let queenPromotionElement = document.getElementById("promotionRadioQueen") as HTMLInputElement;
                     queenPromotionElement.checked = true;
 
-                    showError("");
-                    showPromotionDialog(true);
+                    setError("");
+                    setPromotionDialogOpen(true);
                 }
                 else {
-                    // setBoardStatus(0, 0);
-
-                    showError("");
-                    showConfirmationDialog(true);
+                    setError("");
+                    setConfirmationDialogOpen(true);
                 }
 
                 setBoard(board);
@@ -315,7 +239,8 @@ export function ChessBoardView2() {
     }
 
     const keyup = useCallback((event: KeyboardEvent) => {
-        if (isDialogOpen) {
+        if (isCommentDialogOpen || isPromotionDialogOpen || isConfirmationDialogOpen ||
+            previousAvailableMoves.length > 0) {
             return;
         }
 
@@ -338,7 +263,7 @@ export function ChessBoardView2() {
                 break;
         }
         event.preventDefault();
-    }, [isDialogOpen, firstMove, previousMove, nextMove, lastMove]);
+    }, [isCommentDialogOpen, isPromotionDialogOpen, isConfirmationDialogOpen, previousAvailableMoves, firstMove, previousMove, nextMove, lastMove]);
 
     useEffect(() => {
         const resizeHandler = () => {
@@ -501,66 +426,6 @@ export function ChessBoardView2() {
     //         this.undo();
     //     }
     //     this.showSpinner(false);
-    // }
-
-    // public confirmComment = (): void => {
-    //     console.log("comment confirmed");
-
-    //     const commentElement = document.getElementById("comment") as HTMLTextAreaElement;
-    //     const content = commentElement?.value;
-    //     const comment = content ? content : "";
-
-    //     const lastMove = this.getLastMoveAsString();
-    //     const lastPromotion = this.getLastMovePromotionAsString();
-    //     if (!lastMove) {
-    //         console.log("no last move available");
-
-    //         this.ai.trackEvent({
-    //             name: "Play-Errors", properties: {
-    //                 type: "NoLastMoveAvailable",
-    //             }
-    //         });
-
-    //         return;
-    //     }
-
-    //     const move = new MyChessGameMove()
-    //     move.move = lastMove;
-    //     move.promotion = lastPromotion;
-    //     move.comment = comment;
-    //     move.start = this.start;
-    //     move.end = new Date().toISOString();
-
-    //     console.log(this.isNewGame);
-    //     if (this.isNewGame) {
-    //         const gameNameElement = document.getElementById("gameName") as HTMLInputElement;
-    //         const gameName = gameNameElement?.value;
-    //         if (!gameName) {
-    //             console.log("no mandatory game name provided");
-
-    //             this.ai.trackEvent({
-    //                 name: "Play-Errors", properties: {
-    //                     type: "NoGameNameProvided",
-    //                 }
-    //             });
-
-    //             return;
-    //         }
-
-    //         const game = new MyChessGame()
-    //         game.players.black.id = this.friendID;
-    //         game.name = gameName;
-    //         game.moves.push(move)
-
-    //         this.postNewGame(game);
-    //     }
-    //     else {
-    //         this.postMove(move);
-    //     }
-
-    //     this.showGameNameDialog(false);
-    //     this.showCommentDialog(false);
-    //     this.isDialogOpen = false;
     // }
 
     // public resignGame = async () => {
@@ -798,9 +663,9 @@ export function ChessBoardView2() {
 
     const confirmMove = (): void => {
         console.log("move confirmed");
-        showError("");
-        showConfirmationDialog(false);
-        showPromotionDialog(false);
+        setError("");
+        setConfirmationDialogOpen(false);
+        setPromotionDialogOpen(false);
 
         if (isLocalGame) {
             const lastMove = getLastMoveAsString();
@@ -824,14 +689,11 @@ export function ChessBoardView2() {
             Database.set(DatabaseFields.GAMES_LOCAL_GAME_STATE, JSON.stringify(game));
             setStart(new Date().toISOString());
         }
-        showCommentDialog(!isLocalGame);
-        showGameNameDialog(!isLocalGame && isNewGame);
-        setDialogOpen(!isLocalGame);
+        setCommentDialogOpen(!isLocalGame);
+        setGameNameDialogOpen(!isLocalGame && isNewGame);
     }
 
-    const confirmComment = (event: MouseEvent) => {
-        event.preventDefault();
-
+    const confirmComment = () => {
         console.log("comment confirmed");
 
         const commentElement = document.getElementById("comment") as HTMLTextAreaElement;
@@ -886,20 +748,19 @@ export function ChessBoardView2() {
             // postMove(move);
         }
 
-        // showGameNameDialog(false);
-        // showCommentDialog(false);
-        setDialogOpen(false);
+        setGameNameDialogOpen(false);
+        setCommentDialogOpen(false);
     }
 
     return <>
         <div id="status">&nbsp; {getBoardStatus()} &nbsp;</div>
-        <div id="error" className="Play-Error"></div>
+        <div id="error" className="Play-Error">{error}</div>
         <table id="table-game"><tbody>{draw()}</tbody></table>
-        <div id="confirmation" className="Play-Form">
+        <div id="confirmation" className="Play-Form" style={isConfirmationDialogOpen ? { display: "inline" } : { display: "none" }}>
             <button onClick={confirmMove}><span role="img" aria-label="OK">✅</span> Confirm</button>
             <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
         </div>
-        <div id="promotionDialog" className="Play-Form">
+        <div id="promotionDialog" className="Play-Form" style={isPromotionDialogOpen ? { display: "inline" } : { display: "none" }}>
             Promote pawn to:<br />
             <label>
                 <input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} />
@@ -919,6 +780,23 @@ export function ChessBoardView2() {
                     </label><br />
             <button onClick={confirmPromotion}><span role="img" aria-label="OK">✅</span> Confirm</button>
             <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+        </div>
+        <div id="commentDialog" className="Play-Form" style={isCommentDialogOpen ? { display: "inline" } : { display: "none" }}>
+            <div id="gameNameDialog" style={isGameNameDialogOpen ? { display: "inline" } : { display: "none" }}>
+                Game name:<br />
+                <input id="gameName" type="text" name="gameName" title="Game name" placeholder="Name your game here" className="Play-GameName" />
+                <br />
+            </div>
+                    Comment:<br />
+            <label>
+                <textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows={3} cols={50} />
+            </label><br />
+            <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
+            <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+        </div>
+        <div id="Loading" className="Play-Spinner">
+            <img src={logo} className="Play-logo" alt="logo" />
+                Working on it...
         </div>
         <div id="LastComment">{getComment()}</div>
         <div id="ellipse">
