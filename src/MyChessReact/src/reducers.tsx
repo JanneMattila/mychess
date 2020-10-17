@@ -73,6 +73,18 @@ export default function appReducer(state: RootState = getInitialState(), action:
                 gamesCreateRequested: action.game,
             })
         }
+        case EventTypes.GAMES_MOVE_CREATE: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                gamesMoveCreateState: action.gamesMoveCreateState,
+                error: action.error,
+                errorLink: action.errorLink
+            })
+        }
+        case EventTypes.GAMES_MOVE_CREATE_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                gamesMoveCreateRequested: action.move,
+            })
+        }
 
         case EventTypes.ME_LOADING: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
