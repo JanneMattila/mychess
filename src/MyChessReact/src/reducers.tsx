@@ -98,7 +98,7 @@ export default function appReducer(state: RootState = getInitialState(), action:
         }
         case EventTypes.GAMES_MOVE_CREATE_REQUESTED: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
-                gamesMoveCreateRequested: action.move,
+                gamesMoveCreateRequested: action.moveSubmit,
             })
         }
 

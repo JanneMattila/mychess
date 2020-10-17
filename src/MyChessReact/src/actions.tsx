@@ -1,7 +1,7 @@
 import { AccountInfo } from "@azure/msal-browser";
 import { GameQuery } from "./models/GameQuery";
+import { MoveSubmit } from "./models/MoveSubmit";
 import { MyChessGame } from "./models/MyChessGame";
-import { MyChessGameMove } from "./models/MyChessGameMove";
 import { User } from "./models/User";
 import { UserSettings } from "./models/UserSettings";
 
@@ -72,7 +72,7 @@ type GamesSingleRequestedAction = { type: EventTypes.GAMES_SINGLE_REQUESTED, gam
 type GamesCreateAction = { type: EventTypes.GAMES_CREATE, gamesCreateState: ProcessState, error?: string, errorLink?: string }
 type GamesCreateRequestedAction = { type: EventTypes.GAMES_CREATE_REQUESTED, game: MyChessGame }
 type GamesMoveCreateAction = { type: EventTypes.GAMES_MOVE_CREATE, gamesMoveCreateState: ProcessState, error?: string, errorLink?: string }
-type GamesMoveCreateRequestedAction = { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, move: MyChessGameMove }
+type GamesMoveCreateRequestedAction = { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, moveSubmit: MoveSubmit }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: User[] }
 type FriendsRequestedAction = { type: EventTypes.FRIENDS_REQUESTED }
@@ -129,7 +129,7 @@ export interface RootState {
     readonly gamesCreateState?: ProcessState
     readonly gamesCreateRequested?: MyChessGame,
     readonly gamesMoveCreateState?: ProcessState
-    readonly gamesMoveCreateRequested?: MyChessGameMove,
+    readonly gamesMoveCreateRequested?: MoveSubmit,
 
     readonly me?: string;
     readonly meState?: ProcessState
@@ -194,8 +194,8 @@ export function gamesMoveCreateEvent(gamesMoveCreateState: ProcessState, error?:
     return { type: EventTypes.GAMES_MOVE_CREATE, gamesMoveCreateState, error, errorLink };
 }
 
-export function gamesMoveCreateRequestedEvent(move: MyChessGameMove): GamesMoveCreateRequestedAction {
-    return { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, move };
+export function gamesMoveCreateRequestedEvent(moveSubmit: MoveSubmit): GamesMoveCreateRequestedAction {
+    return { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, moveSubmit };
 }
 
 export function meLoadingEvent(meState: ProcessState, error?: string, me?: string): MeLoadingAction {

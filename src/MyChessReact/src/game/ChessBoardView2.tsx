@@ -5,22 +5,21 @@ import { ChessPiece } from "./ChessPiece";
 import { ChessBoardState } from "./ChessBoardState";
 import { MyChessGame } from "../models/MyChessGame";
 import { ChessPlayer } from "./ChessPlayer";
-import { setTimeout } from "timers";
 import { QueryStringParser } from "../helpers/QueryStringParser";
 import { MyChessGameMove } from "../models/MyChessGameMove";
 import { Database, DatabaseFields } from "../data/Database";
-import { GameStateFilter } from "../models/GameStateFilter";
 import { getAppInsights } from "../components/TelemetryService";
 import React, { useCallback, useEffect, useState } from "react";
 import { UserSettings } from "../models/UserSettings";
 import logo from "../pages/logo.svg";
 import { useTypedSelector } from "../reducers";
 import { useDispatch } from "react-redux";
-import { gamesCreateRequestedEvent, gamesSingleRequestedEvent, ProcessState } from "../actions";
+import { gamesCreateRequestedEvent, gamesMoveCreateRequestedEvent, gamesSingleRequestedEvent, ProcessState } from "../actions";
 
 export function ChessBoardView2() {
     const [game, setGame] = useState(new MyChessGame());
     const [board, setBoard] = useState(new ChessBoard());
+    const [move, setMove] = useState<MyChessGameMove | undefined>(undefined);
     const [previousAvailableMoves, setPreviousAvailableMoves] = useState<Array<ChessMove>>([]);
     const [currentMoveNumber, setCurrentMoveNumber] = useState(0);
 
@@ -39,6 +38,7 @@ export function ChessBoardView2() {
 
     const gamesSingleRequested = useTypedSelector(state => state.gamesSingleRequested);
     const gamesCreateState = useTypedSelector(state => state.gamesCreateState);
+    const gamesSingleState = useTypedSelector(state => state.gamesSingleState);
     const dispatch = useDispatch();
 
     let waitingForConfirmation = false;
@@ -374,6 +374,17 @@ export function ChessBoardView2() {
         }
     }, [game, gamesSingleRequested, ai, makeNumberOfMoves, dispatch]);
 
+    useEffect(() => {
+        if (gamesSingleState === ProcessState.Success &&
+            move) {
+            console.log("USE EFFECT SINGLE- " + new Date());
+            game.moves.push(move);
+            makeNumberOfMoves(game, game.moves.length);
+            setGame(game);
+            setMove(undefined);
+        }
+    }, [gamesSingleState, move, board, game, makeNumberOfMoves]);
+
     const toggleEllipse = () => {
         setEllipseOpen(e => !e);
     }
@@ -399,35 +410,6 @@ export function ChessBoardView2() {
             toggleEllipse();
         }
     }
-
-    // public async postNewGame(game: MyChessGame) {
-    //     const request: RequestInit = {
-    //         method: "POST",
-    //         body: JSON.stringify(game),
-    //         headers: {
-    //             "Accept": "application/json",
-    //             "Authorization": "Bearer " + this.accessToken
-    //         }
-    //     };
-
-    //     this.showSpinner(true);
-    //     try {
-
-    //         const response = await fetch(this.endpoint + "/api/games", request);
-    //         this.game = await response.json() as MyChessGame;
-    //         console.log(this.game);
-
-    //         document.location.href = `/play/${this.game.id}?state=${GameStateFilter.WAITING_FOR_OPPONENT}`;
-    //     } catch (error) {
-    //         console.log(error);
-    //         this.ai.trackException({ exception: error });
-
-    //         const errorMessage = error.errorMessage ? error.errorMessage : "Unable to create new game";
-    //         this.showError(errorMessage);
-    //         this.undo();
-    //     }
-    //     this.showSpinner(false);
-    // }
 
     // public async postMove(move: MyChessGameMove) {
     //     const request: RequestInit = {
@@ -715,7 +697,11 @@ export function ChessBoardView2() {
             dispatch(gamesCreateRequestedEvent(game));
         }
         else {
-            // postMove(move);
+            const moveSubmit = {
+                id: game.id,
+                move: move
+            };
+            dispatch(gamesMoveCreateRequestedEvent(moveSubmit));
         }
 
         setGameNameDialogOpen(false);
@@ -723,7 +709,8 @@ export function ChessBoardView2() {
     }
 
     const isLoading = () => {
-        if (gamesCreateState === ProcessState.Processing) {
+        if (gamesCreateState === ProcessState.Processing ||
+            gamesSingleState === ProcessState.Processing) {
             return true;
         }
         return false;

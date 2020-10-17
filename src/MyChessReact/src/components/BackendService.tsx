@@ -11,8 +11,8 @@ import { UserSettings } from "../models/UserSettings";
 import { GameStateFilter } from "../models/GameStateFilter";
 import { Configuration, PublicClientApplication, AccountInfo, InteractionRequiredAuthError, SilentRequest, RedirectRequest } from "@azure/msal-browser";
 import { MyChessGame } from "../models/MyChessGame";
-import { MyChessGameMove } from "../models/MyChessGameMove";
 import { GameQuery } from "../models/GameQuery";
+import { MoveSubmit } from "../models/MoveSubmit";
 
 type BackendServiceProps = {
     clientId: string;
@@ -43,7 +43,7 @@ export function BackendService(props: BackendServiceProps) {
     const [settingsLoadingProcessed, setSettingsLoadingProcessed] = useState(0);
     const [gamesSingleProcessed, setGamesSingleProcessed] = useState<GameQuery | undefined>(undefined);
     const [gamesCreateProcessed, setGamesCreateProcessed] = useState<MyChessGame | undefined>(undefined);
-    const [gamesMoveCreateProcessed, setMoveGamesCreateProcessed] = useState<MyChessGameMove | undefined>(undefined);
+    const [gamesMoveCreateProcessed, setMoveGamesCreateProcessed] = useState<MoveSubmit | undefined>(undefined);
     const [settingsUpsertProcessed, setSettingsUpsertProcessed] = useState<UserSettings | undefined>(undefined);
     const [friendsProcessed, setFriendsProcessed] = useState(0);
     const [friendsUpsertProcessed, setFriendsUpsertProcessed] = useState<User | undefined>(undefined);
@@ -564,7 +564,7 @@ export function BackendService(props: BackendServiceProps) {
     }, [gamesCreateRequested, ai, dispatch, history, endpoint, acquireTokenSilentOnly, gamesCreateProcessed]);
 
     useEffect(() => {
-        const createMove = async (move: MyChessGameMove) => {
+        const createMove = async (moveSubmit: MoveSubmit) => {
             dispatch(gamesMoveCreateEvent(ProcessState.NotStarted, "" /* Clear error message */, "" /* Clear error link*/));
 
             const accessToken = await acquireTokenSilentOnly();
@@ -575,16 +575,16 @@ export function BackendService(props: BackendServiceProps) {
 
             const request: RequestInit = {
                 method: "POST",
-                body: JSON.stringify(move),
+                body: JSON.stringify(moveSubmit.move),
                 headers: {
                     "Accept": "application/json",
                     "Authorization": "Bearer " + accessToken
                 }
             };
 
-            const id = "";
             try {
-                const response = await fetch(endpoint + `/api/games/${id}/moves`, request);
+                const response = await fetch(endpoint + `/api/games/${moveSubmit.id}/moves`, request);
+                console.log(response);
                 if (response.ok) {
                     dispatch(gamesMoveCreateEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
                 }
