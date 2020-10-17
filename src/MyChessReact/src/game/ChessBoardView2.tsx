@@ -16,7 +16,7 @@ import { UserSettings } from "../models/UserSettings";
 import logo from "../pages/logo.svg";
 import { useTypedSelector } from "../reducers";
 import { useDispatch } from "react-redux";
-import { gamesCreateRequestedEvent, ProcessState } from "../actions";
+import { gamesCreateRequestedEvent, gamesSingleRequestedEvent, ProcessState } from "../actions";
 
 export function ChessBoardView2() {
     const [game, setGame] = useState(new MyChessGame());
@@ -37,6 +37,7 @@ export function ChessBoardView2() {
 
     const me = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
 
+    const gamesSingleRequested = useTypedSelector(state => state.gamesSingleRequested);
     const gamesCreateState = useTypedSelector(state => state.gamesCreateState);
     const dispatch = useDispatch();
 
@@ -359,9 +360,19 @@ export function ChessBoardView2() {
             }
             else {
                 console.log("existing game");
+                if (!gamesSingleRequested) {
+                    const gameID = path.substring(path.lastIndexOf("/") + 1);
+                    const state = queryString.get("state") ?? "";
+
+                    dispatch(gamesSingleRequestedEvent(state, gameID));
+                }
+                else {
+                    makeNumberOfMoves(gamesSingleRequested, gamesSingleRequested.moves.length);
+                    setGame(gamesSingleRequested);
+                }
             }
         }
-    }, [game, ai, makeNumberOfMoves]);
+    }, [game, gamesSingleRequested, ai, makeNumberOfMoves, dispatch]);
 
     const toggleEllipse = () => {
         setEllipseOpen(e => !e);

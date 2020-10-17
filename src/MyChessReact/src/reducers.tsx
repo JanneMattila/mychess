@@ -8,6 +8,8 @@ export const getInitialState = () => {
         logoutRequested: 0,
         gamesState: ProcessState.NotStarted,
         gamesRequested: 0,
+        gamesSingleState: ProcessState.NotStarted,
+        gamesSingleID: "",
         gamesCreateState: ProcessState.NotStarted,
         friendsState: ProcessState.NotStarted,
         friendsRequested: 0,
@@ -59,6 +61,20 @@ export default function appReducer(state: RootState = getInitialState(), action:
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 gamesRequested: state.gamesRequested ? state.gamesRequested + 1 : 1,
                 gamesFilter: action.gamesFilter
+            })
+        }
+        case EventTypes.GAMES_SINGLE: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                gamesSingleState: action.gamesSingleState,
+                error: action.error,
+                gamesSingleRequested: action.game
+            })
+        }
+        case EventTypes.GAMES_SINGLE_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                gamesSingleQuery: {
+                    id: action.gameID, filter: action.gamesFilter
+                }
             })
         }
         case EventTypes.GAMES_CREATE: {

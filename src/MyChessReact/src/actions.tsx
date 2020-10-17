@@ -1,4 +1,5 @@
 import { AccountInfo } from "@azure/msal-browser";
+import { GameQuery } from "./models/GameQuery";
 import { MyChessGame } from "./models/MyChessGame";
 import { MyChessGameMove } from "./models/MyChessGameMove";
 import { User } from "./models/User";
@@ -32,6 +33,8 @@ export enum EventTypes {
     // Game loading related events
     GAMES_LOADING = "Games/Loading",
     GAMES_REQUESTED = "Games/Loading/Requested",
+    GAMES_SINGLE = "Games/Loading/Single",
+    GAMES_SINGLE_REQUESTED = "Games/Loading/Single/Requested",
     GAMES_CREATE = "Games/Create",
     GAMES_CREATE_REQUESTED = "Games/Create/Requested",
     GAMES_MOVE_CREATE = "Games/Move/Create",
@@ -64,6 +67,8 @@ type LogoutAction = { type: EventTypes.AUTH_LOGOUT }
 type LoginExpiredAction = { type: EventTypes.AUTH_LOGIN_EXPIRED }
 type GamesLoadingAction = { type: EventTypes.GAMES_LOADING, gamesState: ProcessState, error?: string, games?: MyChessGame[] }
 type GamesRequestedAction = { type: EventTypes.GAMES_REQUESTED, gamesFilter: string }
+type GamesLoadingSingleAction = { type: EventTypes.GAMES_SINGLE, gamesSingleState: ProcessState, error?: string, errorLink?: string, game?: MyChessGame }
+type GamesSingleRequestedAction = { type: EventTypes.GAMES_SINGLE_REQUESTED, gamesFilter: string, gameID: string }
 type GamesCreateAction = { type: EventTypes.GAMES_CREATE, gamesCreateState: ProcessState, error?: string, errorLink?: string }
 type GamesCreateRequestedAction = { type: EventTypes.GAMES_CREATE_REQUESTED, game: MyChessGame }
 type GamesMoveCreateAction = { type: EventTypes.GAMES_MOVE_CREATE, gamesMoveCreateState: ProcessState, error?: string, errorLink?: string }
@@ -88,6 +93,8 @@ export type RootAction =
     | LoginExpiredAction
     | GamesLoadingAction
     | GamesRequestedAction
+    | GamesLoadingSingleAction
+    | GamesSingleRequestedAction
     | GamesCreateAction
     | GamesCreateRequestedAction
     | GamesMoveCreateAction
@@ -116,6 +123,9 @@ export interface RootState {
     readonly gamesRequested?: number,
     readonly gamesFilter?: string,
     readonly games?: MyChessGame[]
+    readonly gamesSingleQuery?: GameQuery
+    readonly gamesSingleState?: ProcessState
+    readonly gamesSingleRequested?: MyChessGame,
     readonly gamesCreateState?: ProcessState
     readonly gamesCreateRequested?: MyChessGame,
     readonly gamesMoveCreateState?: ProcessState
@@ -162,6 +172,14 @@ export function gamesLoadingEvent(gamesState: ProcessState, error?: string, game
 
 export function gamesRequestedEvent(gamesFilter: string): GamesRequestedAction {
     return { type: EventTypes.GAMES_REQUESTED, gamesFilter: gamesFilter };
+}
+
+export function gamesLoadingSingleEvent(gamesSingleState: ProcessState, error?: string, game?: MyChessGame): GamesLoadingSingleAction {
+    return { type: EventTypes.GAMES_SINGLE, gamesSingleState, error, game };
+}
+
+export function gamesSingleRequestedEvent(gamesFilter: string, gameID: string): GamesSingleRequestedAction {
+    return { type: EventTypes.GAMES_SINGLE_REQUESTED, gamesFilter, gameID };
 }
 
 export function gamesCreateEvent(gamesCreateState: ProcessState, error?: string, errorLink?: string): GamesCreateAction {

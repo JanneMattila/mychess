@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
-import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent, settingsLoadingRequestedEvent, friendsRequestedEvent, gamesCreateEvent, gamesMoveCreateEvent } from "../actions";
+import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent, settingsLoadingRequestedEvent, friendsRequestedEvent, gamesCreateEvent, gamesMoveCreateEvent, gamesLoadingSingleEvent } from "../actions";
 import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { User } from "../models/User";
@@ -12,6 +12,7 @@ import { GameStateFilter } from "../models/GameStateFilter";
 import { Configuration, PublicClientApplication, AccountInfo, InteractionRequiredAuthError, SilentRequest, RedirectRequest } from "@azure/msal-browser";
 import { MyChessGame } from "../models/MyChessGame";
 import { MyChessGameMove } from "../models/MyChessGameMove";
+import { GameQuery } from "../models/GameQuery";
 
 type BackendServiceProps = {
     clientId: string;
@@ -30,6 +31,7 @@ export function BackendService(props: BackendServiceProps) {
     const friendsRequested = useTypedSelector(state => state.friendsRequested);
     const friendsUpsertRequested = useTypedSelector(state => state.friendsUpsertRequested);
     const gamesRequested = useTypedSelector(state => state.gamesRequested);
+    const gamesSingleQuery = useTypedSelector(state => state.gamesSingleQuery);
     const gamesCreateRequested = useTypedSelector(state => state.gamesCreateRequested);
     const gamesMoveCreateRequested = useTypedSelector(state => state.gamesMoveCreateRequested);
     const gamesFilter = useTypedSelector(state => state.gamesFilter);
@@ -39,6 +41,7 @@ export function BackendService(props: BackendServiceProps) {
     const [loginProcessed, setLoginProcessed] = useState(0);
     const [logoutProcessed, setLogoutProcessed] = useState(0);
     const [settingsLoadingProcessed, setSettingsLoadingProcessed] = useState(0);
+    const [gamesSingleProcessed, setGamesSingleProcessed] = useState<GameQuery | undefined>(undefined);
     const [gamesCreateProcessed, setGamesCreateProcessed] = useState<MyChessGame | undefined>(undefined);
     const [gamesMoveCreateProcessed, setMoveGamesCreateProcessed] = useState<MyChessGameMove | undefined>(undefined);
     const [settingsUpsertProcessed, setSettingsUpsertProcessed] = useState<UserSettings | undefined>(undefined);
@@ -442,6 +445,57 @@ export function BackendService(props: BackendServiceProps) {
             getGames(gamesFilter);
         }
     }, [gamesRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesProcessed, gamesFilter]);
+
+    useEffect(() => {
+        const getGame = async (query: GameQuery) => {
+            dispatch(gamesLoadingSingleEvent(ProcessState.NotStarted, "" /* Clear error message */));
+
+            const accessToken = await acquireTokenSilentOnly();
+            if (!accessToken) {
+                dispatch(gamesLoadingSingleEvent(ProcessState.Error, "Authentication missing"));
+                return;
+            }
+
+            const request: RequestInit = {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
+
+            try {
+                const response = await fetch(endpoint + `/api/games/${query.id}?state=${query.filter}`, request);
+                if (response.ok) {
+                    const data = await response.json() as MyChessGame;
+
+                    dispatch(gamesLoadingSingleEvent(ProcessState.Success, "" /* Clear error message */, data));
+                }
+                else {
+                    ai.trackEvent({
+                        name: "Games-Single-LoadFailed", properties: {
+                            status: response.status,
+                            statusText: response.statusText,
+                        }
+                    });
+                    dispatch(gamesLoadingSingleEvent(ProcessState.Error, "Unable to retrieve game."));
+                }
+            }
+            catch (error) {
+                console.log(error);
+                ai.trackException({ exception: error });
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to retrieve game.";
+                dispatch(gamesLoadingSingleEvent(ProcessState.Error, errorMessage));
+            }
+        }
+
+        if (gamesSingleQuery && gamesSingleQuery !== gamesSingleProcessed) {
+            setGamesSingleProcessed(gamesSingleQuery);
+            ai.trackEvent({ name: "Games-Single-Load" });
+            getGame(gamesSingleQuery);
+        }
+    }, [gamesSingleQuery, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesSingleProcessed]);
 
     useEffect(() => {
         const createGame = async (game: MyChessGame) => {
