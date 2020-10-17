@@ -396,6 +396,7 @@ export function BackendService(props: BackendServiceProps) {
                 return;
             }
 
+            dispatch(gamesLoadingEvent(ProcessState.Processing, "" /* Clear error message */));
             const request: RequestInit = {
                 method: "GET",
                 headers: {
@@ -456,6 +457,7 @@ export function BackendService(props: BackendServiceProps) {
                 return;
             }
 
+            dispatch(gamesLoadingSingleEvent(ProcessState.Processing, "" /* Clear error message */));
             const request: RequestInit = {
                 method: "GET",
                 headers: {
@@ -573,6 +575,7 @@ export function BackendService(props: BackendServiceProps) {
                 return;
             }
 
+            dispatch(gamesMoveCreateEvent(ProcessState.Processing, "" /* Clear error message */, "" /* Clear error link*/));
             const request: RequestInit = {
                 method: "POST",
                 body: JSON.stringify(moveSubmit.move),

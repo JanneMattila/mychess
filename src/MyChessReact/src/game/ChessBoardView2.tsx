@@ -39,6 +39,7 @@ export function ChessBoardView2() {
     const gamesSingleRequested = useTypedSelector(state => state.gamesSingleRequested);
     const gamesCreateState = useTypedSelector(state => state.gamesCreateState);
     const gamesSingleState = useTypedSelector(state => state.gamesSingleState);
+    const gamesMoveCreateState = useTypedSelector(state => state.gamesMoveCreateState);
     const dispatch = useDispatch();
 
     let waitingForConfirmation = false;
@@ -375,13 +376,17 @@ export function ChessBoardView2() {
     }, [game, gamesSingleRequested, ai, makeNumberOfMoves, dispatch]);
 
     useEffect(() => {
-        if (gamesSingleState === ProcessState.Success &&
-            move) {
-            console.log("USE EFFECT SINGLE- " + new Date());
-            game.moves.push(move);
-            makeNumberOfMoves(game, game.moves.length);
-            setGame(game);
-            setMove(undefined);
+        if (move) {
+            if (gamesSingleState === ProcessState.Success) {
+                console.log("USE EFFECT SINGLE- " + new Date());
+                game.moves.push(move);
+                makeNumberOfMoves(game, game.moves.length);
+                setGame(game);
+                setMove(undefined);
+            }
+            else {
+                board.undo();
+            }
         }
     }, [gamesSingleState, move, board, game, makeNumberOfMoves]);
 
@@ -410,39 +415,6 @@ export function ChessBoardView2() {
             toggleEllipse();
         }
     }
-
-    // public async postMove(move: MyChessGameMove) {
-    //     const request: RequestInit = {
-    //         method: "POST",
-    //         body: JSON.stringify(move),
-    //         headers: {
-    //             "Accept": "application/json",
-    //             "Authorization": "Bearer " + this.accessToken
-    //         }
-    //     };
-
-    //     this.showSpinner(true);
-    //     try {
-    //         const response = await fetch(this.endpoint + `/api/games/${this.game.id}/moves`, request);
-    //         if (response.ok) {
-    //             console.log("Move submitted successfully");
-    //             this.game.moves.push(move);
-    //             this.currentMoveNumber++;
-    //             this.makeNumberOfMoves(this.game, this.game.moves.length);
-    //         }
-    //         else {
-    //             throw new Error("Could not make move submit!")
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //         this.ai.trackException({ exception: error });
-
-    //         const errorMessage = error.errorMessage ? error.errorMessage : "Unable to post your move";
-    //         this.showError(errorMessage);
-    //         this.undo();
-    //     }
-    //     this.showSpinner(false);
-    // }
 
     const getComment = (): string => {
         if (currentMoveNumber === 0 ||
@@ -710,7 +682,8 @@ export function ChessBoardView2() {
 
     const isLoading = () => {
         if (gamesCreateState === ProcessState.Processing ||
-            gamesSingleState === ProcessState.Processing) {
+            gamesSingleState === ProcessState.Processing ||
+            gamesMoveCreateState === ProcessState.Processing) {
             return true;
         }
         return false;
@@ -758,9 +731,8 @@ export function ChessBoardView2() {
             <button onClick={confirmComment}><span role="img" aria-label="OK">✅</span> Confirm</button>
             <button onClick={cancel}><span role="img" aria-label="Cancel">❌</span> Cancel</button>
         </div>
-        <div id="Loading" className="Play-Spinner" style={isLoading() ? { display: "inline" } : { display: "none" }}>
-            <img src={logo} className="Play-logo" alt="logo" />
-                Working on it...
+        <div id="Loading" className="Play-Spinner" style={isLoading() ? { display: "inline-flex" } : { display: "none" }}>
+            <img src={logo} className="Play-logo" alt="logo" /> Working on it...
         </div>
         <div id="LastComment">{getComment()}</div>
         <div id="ellipse">
