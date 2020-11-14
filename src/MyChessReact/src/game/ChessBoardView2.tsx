@@ -280,7 +280,7 @@ export function ChessBoardView2() {
             const table = document.getElementById("table-game") as HTMLTableElement;
             if (table) {
                 const width = Math.floor(window.innerWidth * 0.95);
-                const height = Math.floor(window.innerHeight * 0.75);
+                const height = Math.floor(window.innerHeight * 0.6);
                 const size = Math.min(width, height);
                 table.style.width = size + "px";
                 table.style.height = size + "px";
