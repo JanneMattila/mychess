@@ -16,6 +16,7 @@ import CookieConsent from "react-cookie-consent";
 import { BackendService } from "./components/BackendService";
 import { ProfileLoader } from "./components/ProfileLoader";
 import { AboutPage } from "./pages/AboutPage";
+import { SignalRService } from "./components/SignalRService";
 
 let configuration = GetConfiguration();
 
@@ -58,6 +59,7 @@ function App() {
           </CookieConsent>
           <ProfileLoader />
           <BackendService clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
+          <SignalRService endpoint={configuration.endpoint} />
         </div>
       </TelemetryProvider>
     </Router >

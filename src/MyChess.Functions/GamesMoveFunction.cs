@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Microsoft.Extensions.Logging;
 using MyChess.Handlers;
 using MyChess.Interfaces;
@@ -27,6 +28,7 @@ namespace MyChess.Functions
         [FunctionName("GamesMove")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{id}/moves")] HttpRequest req,
+            [SignalR(HubName = "game")] IAsyncCollector<SignalRMessage> signalRMessages,
             string id,
             ILogger log)
         {
