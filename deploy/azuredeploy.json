@@ -43,6 +43,32 @@
         "description": "Alert email address."
       }
     },
+    "signalRServicePricingTier": {
+      "type": "string",
+      "allowedValues": [
+        "Free_F1",
+        "Standard_S1"
+      ],
+      "metadata": {
+        "description": "SignalR Service Pricing tier. Check details at https://azure.microsoft.com/en-us/pricing/details/signalr-service/"
+      }
+    },
+    "signalRServiceUnits": {
+      "type": "int",
+      "minValue": 1,
+      "allowedValues": [
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100
+      ],
+      "metadata": {
+        "description": "SignalR Service unit count"
+      }
+    },
     "webPushPublicKey": {
       "type": "string",
       "metadata": {
@@ -68,6 +94,7 @@
     "webStorageName": "[concat('mychessweb', uniqueString(resourceGroup().id))]",
     "spaHostname": "[concat(variables('webStorageName'),'.z16.web.core.windows.net')]",
     "appInsightsName": "[concat('ai-',variables('appName'))]",
+    "appSignalRName": "[concat('mychess', uniqueString(resourceGroup().id))]",
     "appStorageName": "[concat('mychess', uniqueString(resourceGroup().id))]",
     "appServiceName": "[concat('azfun-',variables('appName'),'-',uniqueString(resourceGroup().id))]",
     "appServicePlanName": "[concat('azappplan-', variables('appName'))]",
@@ -282,6 +309,25 @@
       }
     },
     {
+      "name": "[variables('appSignalRName')]",
+      "type": "Microsoft.SignalRService/SignalR",
+      "location": "[parameters('location')]",
+      "apiVersion": "2018-10-01",
+      "sku": {
+        "name": "[parameters('signalRServicePricingTier')]",
+        "capacity": "[parameters('signalRServiceUnits')]"
+      },
+      "properties": {
+        "hostNamePrefix": "[variables('appSignalRName')]",
+        "features": [
+          {
+            "flag": "ServiceMode",
+            "value": "Serverless"
+          }
+        ]
+      }
+    },
+    {
       "name": "[variables('appServicePlanName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[parameters('location')]",
@@ -360,6 +406,8 @@
       "properties": {
         "AzureWebJobsDisableHomepage": "true",
         "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('appStorageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('appStorageName')), '2018-02-01').keys[0].value)]",
+        "AzureSignalRConnectionString": "[listKeys(resourceId('Microsoft.SignalRService/SignalR', variables('appSignalRName')),'2018-10-01').primaryConnectionString]",
+
         "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('appStorageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('appStorageName')), '2018-02-01').keys[0].value)]",
         "WEBSITE_CONTENTSHARE": "mychess",
 

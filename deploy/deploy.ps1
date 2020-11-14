@@ -17,6 +17,14 @@ Param (
     [Parameter(Mandatory = $true, HelpMessage = "Alert email address")]
     [string] $AlertEmailAddress,
 
+    [Parameter(HelpMessage="SignalR Pricing tier. Check details at https://azure.microsoft.com/en-us/pricing/details/signalr-service/")] 
+    [ValidateSet("Free_F1", "Standard_S1")]
+    [string] $SignalRServicePricingTier = "Free_F1",
+
+    [Parameter(HelpMessage="SignalR Service unit count")] 
+    [ValidateSet(1, 2, 5, 10, 20, 50, 100)]
+    [int] $SignalRServiceUnits = 1,
+
     [Parameter(Mandatory = $true, HelpMessage = "WebPush Public Key")]
     [string] $WebPushPublicKey,
     
@@ -61,6 +69,8 @@ $additionalParameters['customDomain'] = $CustomDomain
 $additionalParameters['clientId'] = $azureADdeployment.ApiApp
 $additionalParameters['applicationIdURI'] = $azureADdeployment.ApplicationIdURI
 $additionalParameters['alertEmailAddress'] = $AlertEmailAddress
+$additionalParameters['signalRServicePricingTier'] = $SignalRServicePricingTier
+$additionalParameters['signalRServiceUnits'] = $SignalRServiceUnits
 $additionalParameters['webPushPublicKey'] = $WebPushPublicKey
 $additionalParameters['webPushPrivateKey'] = $WebPushPrivateKey
 
