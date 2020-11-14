@@ -11,6 +11,7 @@ export const getInitialState = () => {
         gamesSingleState: ProcessState.NotStarted,
         gamesSingleID: "",
         gamesCreateState: ProcessState.NotStarted,
+        gamesDeleteState: ProcessState.NotStarted,
         friendsState: ProcessState.NotStarted,
         friendsRequested: 0,
         settingsState: ProcessState.NotStarted,
@@ -99,6 +100,18 @@ export default function appReducer(state: RootState = getInitialState(), action:
         case EventTypes.GAMES_MOVE_CREATE_REQUESTED: {
             return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
                 gamesMoveCreateRequested: action.moveSubmit,
+            })
+        }
+        case EventTypes.GAMES_DELETE: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                gamesDeleteState: action.gamesDeleteState,
+                error: action.error,
+                errorLink: action.errorLink
+            })
+        }
+        case EventTypes.GAMES_DELETE_REQUESTED: {
+            return Object.assign<RootState, RootState, RootState>(getInitialState(), state, {
+                gamesDeleteRequested: action.gameId,
             })
         }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
-import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent, settingsLoadingRequestedEvent, friendsRequestedEvent, gamesCreateEvent, gamesMoveCreateEvent, gamesLoadingSingleEvent } from "../actions";
+import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent, settingsLoadingRequestedEvent, friendsRequestedEvent, gamesCreateEvent, gamesMoveCreateEvent, gamesLoadingSingleEvent, gamesDeleteEvent } from "../actions";
 import { DatabaseFields, Database } from "../data/Database";
 import { ProblemDetail } from "../models/ProblemDetail";
 import { User } from "../models/User";
@@ -34,6 +34,7 @@ export function BackendService(props: BackendServiceProps) {
     const gamesSingleQuery = useTypedSelector(state => state.gamesSingleQuery);
     const gamesCreateRequested = useTypedSelector(state => state.gamesCreateRequested);
     const gamesMoveCreateRequested = useTypedSelector(state => state.gamesMoveCreateRequested);
+    const gamesDeleteRequested = useTypedSelector(state => state.gamesDeleteRequested);
     const gamesFilter = useTypedSelector(state => state.gamesFilter);
 
     const [account, setAccount] = useState(Database.get<AccountInfo>(DatabaseFields.ACCOUNT));
@@ -44,6 +45,8 @@ export function BackendService(props: BackendServiceProps) {
     const [gamesSingleProcessed, setGamesSingleProcessed] = useState<GameQuery | undefined>(undefined);
     const [gamesCreateProcessed, setGamesCreateProcessed] = useState<MyChessGame | undefined>(undefined);
     const [gamesMoveCreateProcessed, setMoveGamesCreateProcessed] = useState<MoveSubmit | undefined>(undefined);
+    const [gamesDeleteProcessed, setGamesDeleteProcessed] = useState<string>("");
+
     const [settingsUpsertProcessed, setSettingsUpsertProcessed] = useState<UserSettings | undefined>(undefined);
     const [friendsProcessed, setFriendsProcessed] = useState(0);
     const [friendsUpsertProcessed, setFriendsUpsertProcessed] = useState<User | undefined>(undefined);
@@ -498,6 +501,56 @@ export function BackendService(props: BackendServiceProps) {
             getGame(gamesSingleQuery);
         }
     }, [gamesSingleQuery, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesSingleProcessed]);
+
+    useEffect(() => {
+        const deleteGame = async (id: string) => {
+            dispatch(gamesDeleteEvent(ProcessState.NotStarted, "" /* Clear error message */));
+
+            const accessToken = await acquireTokenSilentOnly();
+            if (!accessToken) {
+                dispatch(gamesDeleteEvent(ProcessState.Error, "Authentication missing"));
+                return;
+            }
+
+            dispatch(gamesDeleteEvent(ProcessState.Processing, "" /* Clear error message */));
+            const request: RequestInit = {
+                method: "DELETE",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
+
+            try {
+                const response = await fetch(endpoint + `/api/games/${id}`, request);
+                if (response.ok) {
+                    dispatch(gamesDeleteEvent(ProcessState.Success, "" /* Clear error message */));
+                }
+                else {
+                    ai.trackEvent({
+                        name: "Games-DeleteFailed", properties: {
+                            status: response.status,
+                            statusText: response.statusText,
+                        }
+                    });
+                    dispatch(gamesDeleteEvent(ProcessState.Error, "Unable to delete game."));
+                }
+            }
+            catch (error) {
+                console.log(error);
+                ai.trackException({ exception: error });
+
+                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to delete game.";
+                dispatch(gamesDeleteEvent(ProcessState.Error, errorMessage));
+            }
+        }
+
+        if (gamesDeleteRequested && gamesDeleteRequested !== gamesDeleteProcessed) {
+            setGamesDeleteProcessed(gamesDeleteRequested);
+            ai.trackEvent({ name: "Games-Delete" });
+            deleteGame(gamesDeleteRequested);
+        }
+    }, [gamesDeleteRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesDeleteProcessed]);
 
     useEffect(() => {
         const createGame = async (game: MyChessGame) => {

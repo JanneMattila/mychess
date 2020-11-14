@@ -39,6 +39,8 @@ export enum EventTypes {
     GAMES_CREATE_REQUESTED = "Games/Create/Requested",
     GAMES_MOVE_CREATE = "Games/Move/Create",
     GAMES_MOVE_CREATE_REQUESTED = "Games/Move/Create/Requested",
+    GAMES_DELETE = "Games/Delete",
+    GAMES_DELETE_REQUESTED = "Games/Delete/Requested",
 
     // Me loading related events
     ME_LOADING = "Me/Loading",
@@ -73,6 +75,8 @@ type GamesCreateAction = { type: EventTypes.GAMES_CREATE, gamesCreateState: Proc
 type GamesCreateRequestedAction = { type: EventTypes.GAMES_CREATE_REQUESTED, game: MyChessGame }
 type GamesMoveCreateAction = { type: EventTypes.GAMES_MOVE_CREATE, gamesMoveCreateState: ProcessState, error?: string, errorLink?: string }
 type GamesMoveCreateRequestedAction = { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, moveSubmit: MoveSubmit }
+type GamesDeleteAction = { type: EventTypes.GAMES_DELETE, gamesDeleteState: ProcessState, error?: string, errorLink?: string }
+type GamesDeleteRequestedAction = { type: EventTypes.GAMES_DELETE_REQUESTED, gameId: string }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
 type FriendsLoadingAction = { type: EventTypes.FRIENDS_LOADING, friendsState: ProcessState, error?: string, friends?: User[] }
 type FriendsRequestedAction = { type: EventTypes.FRIENDS_REQUESTED }
@@ -99,6 +103,11 @@ export type RootAction =
     | GamesCreateRequestedAction
     | GamesMoveCreateAction
     | GamesMoveCreateRequestedAction
+    | GamesRequestedAction
+    | GamesLoadingSingleAction
+    | GamesSingleRequestedAction
+    | GamesDeleteAction
+    | GamesDeleteRequestedAction
     | MeLoadingAction
     | FriendsLoadingAction
     | FriendsRequestedAction
@@ -130,6 +139,8 @@ export interface RootState {
     readonly gamesCreateRequested?: MyChessGame,
     readonly gamesMoveCreateState?: ProcessState
     readonly gamesMoveCreateRequested?: MoveSubmit,
+    readonly gamesDeleteState?: ProcessState
+    readonly gamesDeleteRequested?: string,
 
     readonly me?: string;
     readonly meState?: ProcessState
@@ -196,6 +207,14 @@ export function gamesMoveCreateEvent(gamesMoveCreateState: ProcessState, error?:
 
 export function gamesMoveCreateRequestedEvent(moveSubmit: MoveSubmit): GamesMoveCreateRequestedAction {
     return { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, moveSubmit };
+}
+
+export function gamesDeleteEvent(gamesDeleteState: ProcessState, error?: string, errorLink?: string): GamesDeleteAction {
+    return { type: EventTypes.GAMES_DELETE, gamesDeleteState, error, errorLink };
+}
+
+export function gamesDeleteRequestedEvent(gameId: string): GamesDeleteRequestedAction {
+    return { type: EventTypes.GAMES_DELETE_REQUESTED, gameId };
 }
 
 export function meLoadingEvent(meState: ProcessState, error?: string, me?: string): MeLoadingAction {
