@@ -525,6 +525,7 @@ export function BackendService(props: BackendServiceProps) {
                 const response = await fetch(endpoint + `/api/games/${id}`, request);
                 if (response.ok) {
                     dispatch(gamesDeleteEvent(ProcessState.Success, "" /* Clear error message */));
+                    history.push("/");
                 }
                 else {
                     ai.trackEvent({
@@ -550,7 +551,7 @@ export function BackendService(props: BackendServiceProps) {
             ai.trackEvent({ name: "Games-Delete" });
             deleteGame(gamesDeleteRequested);
         }
-    }, [gamesDeleteRequested, ai, dispatch, endpoint, acquireTokenSilentOnly, gamesDeleteProcessed]);
+    }, [gamesDeleteRequested, ai, dispatch, history, endpoint, acquireTokenSilentOnly, gamesDeleteProcessed]);
 
     useEffect(() => {
         const createGame = async (game: MyChessGame) => {

@@ -14,7 +14,7 @@ import { UserSettings } from "../models/UserSettings";
 import logo from "../pages/logo.svg";
 import { useTypedSelector } from "../reducers";
 import { useDispatch } from "react-redux";
-import { gamesCreateRequestedEvent, gamesMoveCreateRequestedEvent, gamesSingleRequestedEvent, ProcessState } from "../actions";
+import { gamesCreateRequestedEvent, gamesDeleteRequestedEvent, gamesMoveCreateRequestedEvent, gamesSingleRequestedEvent, ProcessState } from "../actions";
 
 export function ChessBoardView2() {
     const [game, setGame] = useState(new MyChessGame());
@@ -411,6 +411,7 @@ export function ChessBoardView2() {
                 setCurrentMoveNumber(0);
             }
             else {
+                dispatch(gamesDeleteRequestedEvent(game.id));
             }
             toggleEllipse();
         }
