@@ -352,8 +352,6 @@ export function BackendService(props: BackendServiceProps) {
         const getGames = async (filter?: string) => {
             dispatch(gamesLoadingEvent(ProcessState.NotStarted, "" /* Clear error message */));
 
-            console.log("DEBUG: getGames");
-
             const accessToken = await acquireToken();
             if (!accessToken) {
                 dispatch(gamesLoadingEvent(ProcessState.Error, "Authentication missing"));
@@ -405,8 +403,6 @@ export function BackendService(props: BackendServiceProps) {
         }
 
         if (gamesRequested && gamesRequested > gamesProcessed) {
-            console.log("DEBUG: gamesRequested: " + gamesRequested + ", gamesProcessed: " + gamesProcessed);
-
             setGamesProcessed(gamesRequested);
             ai.trackEvent({ name: "Games-Load" });
             getGames(gamesFilter);
