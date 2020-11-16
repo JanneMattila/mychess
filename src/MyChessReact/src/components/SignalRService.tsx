@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "./TelemetryService";
 import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
-import { ProcessState } from "../actions";
+import { gamesMoveUpdateEvent, ProcessState } from "../actions";
 import { MyChessGameMove } from "../models/MyChessGameMove";
 
 type SignalRServiceProps = {
@@ -50,8 +50,11 @@ export function SignalRService(props: SignalRServiceProps) {
                     if (hubConnection) {
                         hubConnection.on("MoveUpdate", (data) => {
                             console.log("Incoming signalr message - MoveUpdate:");
-                            const json = JSON.parse(data) as MyChessGameMove;
-                            console.log(json);
+                            const move = JSON.parse(data) as MyChessGameMove;
+                            console.log(move);
+
+                            // Post move update
+                            dispatch(gamesMoveUpdateEvent(move));
                         });
                         hubConnection.start()
                             .then(() => console.log('connected!'))
@@ -66,7 +69,7 @@ export function SignalRService(props: SignalRServiceProps) {
                     ai.trackException({ exception: error });
                 });
         }
-    }, [loginState, connection, endpoint, accessToken, ai]);
+    }, [loginState, connection, endpoint, accessToken, ai, dispatch]);
 
     return (
         <>

@@ -40,6 +40,7 @@ export function ChessBoardView2() {
     const gamesCreateState = useTypedSelector(state => state.gamesCreateState);
     const gamesSingleState = useTypedSelector(state => state.gamesSingleState);
     const gamesMoveCreateState = useTypedSelector(state => state.gamesMoveCreateState);
+    const gamesMoveUpdate = useTypedSelector(state => state.gamesMoveUpdate);
     const dispatch = useDispatch();
 
     let waitingForConfirmation = false;
@@ -274,6 +275,13 @@ export function ChessBoardView2() {
         }
         event.preventDefault();
     }, [isCommentDialogOpen, isPromotionDialogOpen, isConfirmationDialogOpen, previousAvailableMoves, firstMove, previousMove, nextMove, lastMove]);
+
+    useEffect(() => {
+        if (gamesMoveUpdate !== undefined) {
+            game.moves.push(gamesMoveUpdate);
+            lastMove();
+        }
+    }, [gamesMoveUpdate, game, lastMove]);
 
     useEffect(() => {
         const resizeHandler = () => {
