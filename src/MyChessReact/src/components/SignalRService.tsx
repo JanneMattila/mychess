@@ -47,6 +47,10 @@ export function SignalRService(props: SignalRServiceProps) {
 
                     setConnection(hubConnection);
                     if (hubConnection) {
+                        hubConnection.on("MoveUpdate", (data) => {
+                            console.log("Incoming signalr message - MoveUpdate:");
+                            console.log(data);
+                        });
                         hubConnection.start()
                             .then(() => console.log('connected!'))
                             .catch(console.error);
