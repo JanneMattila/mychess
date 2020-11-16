@@ -277,9 +277,16 @@ export function ChessBoardView() {
     }, [isCommentDialogOpen, isPromotionDialogOpen, isConfirmationDialogOpen, previousAvailableMoves, firstMove, previousMove, nextMove, lastMove]);
 
     useEffect(() => {
-        if (gamesMoveUpdate !== undefined) {
-            game.moves.push(gamesMoveUpdate);
-            lastMove();
+        if (gamesMoveUpdate !== undefined &&
+            gamesMoveUpdate.id === game.id &&
+            gamesMoveUpdate.move !== undefined) {
+            const previousMove = game.moves[game.moves.length - 1];
+            if (previousMove.move !== gamesMoveUpdate.move.move) {
+                // Only use move from signalr *if*
+                // last move is not already same move
+                game.moves.push(gamesMoveUpdate.move);
+                lastMove();
+            }
 
             // Clear received move from queue
             dispatch(gamesMoveUpdateEvent(undefined));

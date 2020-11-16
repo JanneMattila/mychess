@@ -48,13 +48,15 @@ export function SignalRService(props: SignalRServiceProps) {
 
                     setConnection(hubConnection);
                     if (hubConnection) {
-                        hubConnection.on("MoveUpdate", (data) => {
+                        hubConnection.on("MoveUpdate", (id, data) => {
                             console.log("Incoming signalr message - MoveUpdate:");
+                            console.log(data);
                             const move = JSON.parse(data) as MyChessGameMove;
-                            console.log(move);
 
                             // Post move update
-                            dispatch(gamesMoveUpdateEvent(move));
+                            dispatch(gamesMoveUpdateEvent({
+                                id, move
+                            }));
                         });
                         hubConnection.start()
                             .then(() => console.log('connected!'))

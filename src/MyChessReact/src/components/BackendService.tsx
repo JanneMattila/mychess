@@ -600,7 +600,6 @@ export function BackendService(props: BackendServiceProps) {
 
             try {
                 const response = await fetch(endpoint + `/api/games/${moveSubmit.id}/moves`, request);
-                console.log(response);
                 if (response.ok) {
                     dispatch(gamesMoveCreateEvent(ProcessState.Success, "" /* Clear error message */, "" /* Clear error link*/));
                 }

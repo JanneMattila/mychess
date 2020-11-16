@@ -62,7 +62,7 @@ namespace MyChess.Functions
                 {
                     GroupName = id,
                     Target = "MoveUpdate",
-                    Arguments = new[] { payload }
+                    Arguments = new[] { id, payload }
                 });
                 return new OkResult();
             }

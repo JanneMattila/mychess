@@ -2,7 +2,6 @@ import { AccountInfo } from "@azure/msal-browser";
 import { GameQuery } from "./models/GameQuery";
 import { MoveSubmit } from "./models/MoveSubmit";
 import { MyChessGame } from "./models/MyChessGame";
-import { MyChessGameMove } from "./models/MyChessGameMove";
 import { User } from "./models/User";
 import { UserSettings } from "./models/UserSettings";
 
@@ -77,7 +76,7 @@ type GamesCreateAction = { type: EventTypes.GAMES_CREATE, gamesCreateState: Proc
 type GamesCreateRequestedAction = { type: EventTypes.GAMES_CREATE_REQUESTED, game: MyChessGame }
 type GamesMoveCreateAction = { type: EventTypes.GAMES_MOVE_CREATE, gamesMoveCreateState: ProcessState, error?: string, errorLink?: string }
 type GamesMoveCreateRequestedAction = { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, moveSubmit: MoveSubmit }
-type GamesMoveUpdateAction = { type: EventTypes.GAMES_MOVE_UPDATE, move?: MyChessGameMove }
+type GamesMoveUpdateAction = { type: EventTypes.GAMES_MOVE_UPDATE, move?: MoveSubmit }
 type GamesDeleteAction = { type: EventTypes.GAMES_DELETE, gamesDeleteState: ProcessState, error?: string, errorLink?: string }
 type GamesDeleteRequestedAction = { type: EventTypes.GAMES_DELETE_REQUESTED, gameId: string }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
@@ -143,7 +142,7 @@ export interface RootState {
     readonly gamesCreateRequested?: MyChessGame,
     readonly gamesMoveCreateState?: ProcessState
     readonly gamesMoveCreateRequested?: MoveSubmit,
-    readonly gamesMoveUpdate?: MyChessGameMove,
+    readonly gamesMoveUpdate?: MoveSubmit,
     readonly gamesDeleteState?: ProcessState
     readonly gamesDeleteRequested?: string,
 
@@ -214,7 +213,7 @@ export function gamesMoveCreateRequestedEvent(moveSubmit: MoveSubmit): GamesMove
     return { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, moveSubmit };
 }
 
-export function gamesMoveUpdateEvent(move?: MyChessGameMove): GamesMoveUpdateAction {
+export function gamesMoveUpdateEvent(move?: MoveSubmit): GamesMoveUpdateAction {
     return { type: EventTypes.GAMES_MOVE_UPDATE, move };
 }
 
