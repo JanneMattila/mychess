@@ -377,8 +377,8 @@ export function ChessBoardView() {
             }
             else {
                 console.log("existing game");
-                if (!gamesSingleRequested) {
-                    const gameID = path.substring(path.lastIndexOf("/") + 1);
+                const gameID = path.substring(path.lastIndexOf("/") + 1);
+                if (!gamesSingleRequested || gameID !== gamesSingleRequested?.id) {
                     const state = queryString.get("state") ?? "";
 
                     dispatch(gamesSingleRequestedEvent(state, gameID));
