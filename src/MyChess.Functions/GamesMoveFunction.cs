@@ -28,7 +28,7 @@ namespace MyChess.Functions
         [FunctionName("GamesMove")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{id}/moves")] HttpRequest req,
-            [SignalR(HubName = "game")] IAsyncCollector<SignalRMessage> signalRMessages,
+            [SignalR(HubName = "GameHub")] IAsyncCollector<SignalRMessage> signalRMessages,
             string id,
             ILogger log)
         {

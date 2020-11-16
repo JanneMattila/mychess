@@ -32,7 +32,7 @@ namespace MyChess.Functions
         [FunctionName("Games")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "delete", Route = "games/{id?}")] HttpRequest req,
-            [SignalR(HubName = "game")] IAsyncCollector<SignalRGroupAction> signalRGroupActions,
+            [SignalR(HubName = "GameHub")] IAsyncCollector<SignalRGroupAction> signalRGroupActions,
             string id)
         {
             using var _ = _log.FuncGamesScope();
