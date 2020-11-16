@@ -4,6 +4,7 @@ import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "./TelemetryService";
 import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import { ProcessState } from "../actions";
+import { MyChessGameMove } from "../models/MyChessGameMove";
 
 type SignalRServiceProps = {
     endpoint: string;
@@ -49,18 +50,23 @@ export function SignalRService(props: SignalRServiceProps) {
                     if (hubConnection) {
                         hubConnection.on("MoveUpdate", (data) => {
                             console.log("Incoming signalr message - MoveUpdate:");
-                            console.log(data);
+                            const json = JSON.parse(data) as MyChessGameMove;
+                            console.log(json);
                         });
                         hubConnection.start()
                             .then(() => console.log('connected!'))
-                            .catch(console.error);
+                            .catch(error => {
+                                console.error(error);
+                                ai.trackException({ exception: error });
+                            });
                     }
                 })
                 .catch(error => {
                     console.log(error);
+                    ai.trackException({ exception: error });
                 });
         }
-    }, [loginState, connection, endpoint, accessToken]);
+    }, [loginState, connection, endpoint, accessToken, ai]);
 
     return (
         <>

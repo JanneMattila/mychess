@@ -57,11 +57,12 @@ namespace MyChess.Functions
             var error = await _gamesHandler.AddMoveAsync(authenticatedUser, id, moveToAdd);
             if (error == null)
             {
+                var payload = JsonSerializer.Serialize(moveToAdd);
                 await signalRMessages.AddAsync(new SignalRMessage()
                 {
                     GroupName = id,
                     Target = "MoveUpdate",
-                    Arguments = new[] { moveToAdd }
+                    Arguments = new[] { payload }
                 });
                 return new OkResult();
             }
