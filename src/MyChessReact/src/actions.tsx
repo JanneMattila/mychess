@@ -77,7 +77,7 @@ type GamesCreateAction = { type: EventTypes.GAMES_CREATE, gamesCreateState: Proc
 type GamesCreateRequestedAction = { type: EventTypes.GAMES_CREATE_REQUESTED, game: MyChessGame }
 type GamesMoveCreateAction = { type: EventTypes.GAMES_MOVE_CREATE, gamesMoveCreateState: ProcessState, error?: string, errorLink?: string }
 type GamesMoveCreateRequestedAction = { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, moveSubmit: MoveSubmit }
-type GamesMoveUpdateAction = { type: EventTypes.GAMES_MOVE_UPDATE, move: MyChessGameMove }
+type GamesMoveUpdateAction = { type: EventTypes.GAMES_MOVE_UPDATE, move?: MyChessGameMove }
 type GamesDeleteAction = { type: EventTypes.GAMES_DELETE, gamesDeleteState: ProcessState, error?: string, errorLink?: string }
 type GamesDeleteRequestedAction = { type: EventTypes.GAMES_DELETE_REQUESTED, gameId: string }
 type MeLoadingAction = { type: EventTypes.ME_LOADING, meState: ProcessState, error?: string, me?: string }
@@ -214,7 +214,7 @@ export function gamesMoveCreateRequestedEvent(moveSubmit: MoveSubmit): GamesMove
     return { type: EventTypes.GAMES_MOVE_CREATE_REQUESTED, moveSubmit };
 }
 
-export function gamesMoveUpdateEvent(move: MyChessGameMove): GamesMoveUpdateAction {
+export function gamesMoveUpdateEvent(move?: MyChessGameMove): GamesMoveUpdateAction {
     return { type: EventTypes.GAMES_MOVE_UPDATE, move };
 }
 

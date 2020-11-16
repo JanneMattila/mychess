@@ -14,7 +14,7 @@ import { UserSettings } from "../models/UserSettings";
 import logo from "../pages/logo.svg";
 import { useTypedSelector } from "../reducers";
 import { useDispatch } from "react-redux";
-import { gamesCreateRequestedEvent, gamesDeleteRequestedEvent, gamesMoveCreateRequestedEvent, gamesSingleRequestedEvent, ProcessState } from "../actions";
+import { gamesCreateRequestedEvent, gamesDeleteRequestedEvent, gamesMoveCreateRequestedEvent, gamesMoveUpdateEvent, gamesSingleRequestedEvent, ProcessState } from "../actions";
 
 export function ChessBoardView() {
     const [game, setGame] = useState(new MyChessGame());
@@ -280,8 +280,16 @@ export function ChessBoardView() {
         if (gamesMoveUpdate !== undefined) {
             game.moves.push(gamesMoveUpdate);
             lastMove();
+
+            // Clear received move from queue
+            dispatch(gamesMoveUpdateEvent(undefined));
+
+            const commentElement = document.getElementById("comment") as HTMLTextAreaElement;
+            if (commentElement) {
+                commentElement.value = "";
+            }
         }
-    }, [gamesMoveUpdate, game, lastMove]);
+    }, [gamesMoveUpdate, game, lastMove, dispatch]);
 
     useEffect(() => {
         const resizeHandler = () => {
