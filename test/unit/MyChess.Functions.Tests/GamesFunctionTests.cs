@@ -31,7 +31,7 @@ namespace MyChess.Functions.Tests
             var expected = typeof(UnauthorizedResult);
 
             // Act
-            var actual = await _gamesFunction.Run(null, null);
+            var actual = await _gamesFunction.Run(null, null, null);
 
             // Assert
             Assert.IsType(expected, actual);
@@ -45,7 +45,7 @@ namespace MyChess.Functions.Tests
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
 
             // Act
-            var actual = await _gamesFunction.Run(null, null);
+            var actual = await _gamesFunction.Run(null, null, null);
 
             // Assert
             Assert.IsType(expected, actual);
@@ -71,7 +71,7 @@ namespace MyChess.Functions.Tests
             });
 
             // Act
-            var actual = await _gamesFunction.Run(req, null);
+            var actual = await _gamesFunction.Run(req, SignalRHelper.Create(), null);
 
             // Assert
             Assert.IsType(expected, actual);
@@ -102,7 +102,7 @@ namespace MyChess.Functions.Tests
             });
 
             // Act
-            var actual = await _gamesFunction.Run(req, "abc");
+            var actual = await _gamesFunction.Run(req, SignalRHelper.Create(), "abc");
 
             // Assert
             Assert.IsType(expected, actual);
@@ -144,7 +144,7 @@ namespace MyChess.Functions.Tests
             var req = HttpRequestHelper.Create("POST", body: game, query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
 
             // Act
-            var actual = await _gamesFunction.Run(req, "abc");
+            var actual = await _gamesFunction.Run(req, SignalRHelper.Create(), "abc");
 
             // Assert
             Assert.IsType(expected, actual);
@@ -187,7 +187,7 @@ namespace MyChess.Functions.Tests
             var req = HttpRequestHelper.Create("POST", body: game, query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
 
             // Act
-            var actual = await _gamesFunction.Run(req, "abc");
+            var actual = await _gamesFunction.Run(req, SignalRHelper.Create(), "abc");
 
             // Assert
             Assert.IsType(expected, actual);
