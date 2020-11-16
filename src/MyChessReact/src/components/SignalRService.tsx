@@ -11,6 +11,7 @@ type SignalRServiceProps = {
 
 export function SignalRService(props: SignalRServiceProps) {
     const loginState = useTypedSelector(state => state.loginState);
+    const accessToken = useTypedSelector(state => state.accessToken);
     const [connection, setConnection] = useState<HubConnection | undefined>(undefined);
 
     const dispatch = useDispatch();
@@ -19,9 +20,18 @@ export function SignalRService(props: SignalRServiceProps) {
 
     useEffect(() => {
         if (loginState === ProcessState.Success &&
-            connection === undefined) {
+            connection === undefined &&
+            accessToken !== undefined) {
 
-            fetch(`${endpoint}/api/negotiate`, { method: "POST" })
+            const request: RequestInit = {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Authorization": "Bearer " + accessToken
+                }
+            };
+
+            fetch(`${endpoint}/api/negotiate`, request)
                 .then(response => {
                     return response.json();
                 })
@@ -46,7 +56,7 @@ export function SignalRService(props: SignalRServiceProps) {
                     console.log(error);
                 });
         }
-    }, [loginState, connection, endpoint]);
+    }, [loginState, connection, endpoint, accessToken]);
 
     return (
         <>

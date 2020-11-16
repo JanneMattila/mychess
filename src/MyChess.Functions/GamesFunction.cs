@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Microsoft.Extensions.Logging;
 using MyChess.Handlers;
 using MyChess.Interfaces;
@@ -31,6 +32,7 @@ namespace MyChess.Functions
         [FunctionName("Games")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "delete", Route = "games/{id?}")] HttpRequest req,
+            [SignalR(HubName = "game")] IAsyncCollector<SignalRGroupAction> signalRGroupActions,
             string id)
         {
             using var _ = _log.FuncGamesScope();
@@ -60,14 +62,14 @@ namespace MyChess.Functions
             _log.FuncGamesProcessingMethod(req.Method);
             return req.Method switch
             {
-                "GET" => await GetAsync(authenticatedUser, id, state),
+                "GET" => await GetAsync(authenticatedUser, id, state, signalRGroupActions),
                 "POST" => await PostAsync(authenticatedUser, req, id),
                 "DELETE" => await DeleteAsync(authenticatedUser, id),
                 _ => new StatusCodeResult((int)HttpStatusCode.NotImplemented)
             };
         }
 
-        private async Task<IActionResult> GetAsync(AuthenticatedUser authenticatedUser, string id, string state)
+        private async Task<IActionResult> GetAsync(AuthenticatedUser authenticatedUser, string id, string state, IAsyncCollector<SignalRGroupAction> signalRGroupActions)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -83,6 +85,13 @@ namespace MyChess.Functions
                 {
                     return new NotFoundResult();
                 }
+                await signalRGroupActions.AddAsync(
+                    new SignalRGroupAction
+                    {
+                        UserId = authenticatedUser.UserIdentifier,
+                        GroupName = id,
+                        Action = GroupAction.Add
+                    });
                 return new OkObjectResult(game);
             }
         }

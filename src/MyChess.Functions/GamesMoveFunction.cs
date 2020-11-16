@@ -57,6 +57,12 @@ namespace MyChess.Functions
             var error = await _gamesHandler.AddMoveAsync(authenticatedUser, id, moveToAdd);
             if (error == null)
             {
+                await signalRMessages.AddAsync(new SignalRMessage()
+                {
+                    GroupName = id,
+                    Target = "MoveUpdate",
+                    Arguments = new[] { moveToAdd }
+                });
                 return new OkResult();
             }
             else
