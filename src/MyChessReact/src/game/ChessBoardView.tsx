@@ -16,7 +16,7 @@ import { useTypedSelector } from "../reducers";
 import { useDispatch } from "react-redux";
 import { gamesCreateRequestedEvent, gamesDeleteRequestedEvent, gamesMoveCreateRequestedEvent, gamesSingleRequestedEvent, ProcessState } from "../actions";
 
-export function ChessBoardView2() {
+export function ChessBoardView() {
     const [game, setGame] = useState(new MyChessGame());
     const [board, setBoard] = useState(new ChessBoard());
     const [move, setMove] = useState<MyChessGameMove | undefined>(undefined);

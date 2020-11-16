@@ -12,7 +12,7 @@ import { Database, DatabaseFields } from "../data/Database";
 import { GameStateFilter } from "../models/GameStateFilter";
 import { getAppInsights } from "../components/TelemetryService";
 
-export class ChessBoardView {
+export class ChessBoardView2 {
     private board: ChessBoard = new ChessBoard();
     private previousAvailableMoves: ChessMove[] = []
     private game: MyChessGame = new MyChessGame();
