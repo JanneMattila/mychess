@@ -4,9 +4,14 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: white;
+  background: rgba(64,64,64,0.6);
+  backdrop-filter: blur(6px);
   text-align: center;
   display: table;
+}
+
+.ProfileLoader-Text {
+  color: white;
 }
 
 .ProfileLoader-Spinner {

@@ -12,7 +12,9 @@ export function ProfileLoader() {
             <div className="ProfileLoader">
                 <div id="Loading" className="ProfileLoader-Spinner">
                     <img src={logo} className="ProfileLoader-logo" alt="logo" /><br />
-                    Loading...
+                    <div className="ProfileLoader-Text">
+                        Loading...
+                    </div>
                 </div>
             </div>
         );
