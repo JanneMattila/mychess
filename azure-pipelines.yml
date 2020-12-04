@@ -29,6 +29,11 @@ stages:
             inputs:
               restoreSolution: '**\*.sln'
 
+          - task: UseDotNet@2
+            inputs:
+              packageType: 'sdk'
+              version: '3.x'
+
           - task: VSBuild@1
             displayName: "Build solution"
             inputs:
