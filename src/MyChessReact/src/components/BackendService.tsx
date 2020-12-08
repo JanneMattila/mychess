@@ -134,10 +134,7 @@ export function BackendService(props: BackendServiceProps) {
     }, [dispatch, postAuthEvent]);
 
     const acquireToken = useCallback(async () => {
-
-
         if (!publicClientApplication) {
-
             publicClientApplication = new PublicClientApplication(config);
 
             publicClientApplication.handleRedirectPromise().then((response) => {
@@ -184,6 +181,10 @@ export function BackendService(props: BackendServiceProps) {
             if (error instanceof InteractionRequiredAuthError) {
                 console.log("Auth-AcquireToken -> Interaction required");
 
+                if (location.pathname !== "/") {
+                    Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
+                }
+
                 const accessTokenRequestRedirect: RedirectRequest = {
                     ...accessTokenRequest,
                     loginHint: account.username
@@ -201,11 +202,10 @@ export function BackendService(props: BackendServiceProps) {
                 return undefined;
             }
         }
-    }, [accessTokenRequest, loginState, ai, authEvent, account, dispatch, config]);
+    }, [accessTokenRequest, loginState, ai, authEvent, account, dispatch, config, location]);
 
     useEffect(() => {
         if (!publicClientApplication) {
-
             acquireToken();
         }
     });
