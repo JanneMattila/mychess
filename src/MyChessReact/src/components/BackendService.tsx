@@ -195,13 +195,13 @@ export function BackendService(props: BackendServiceProps) {
             setLoginProcessed(loginRequested);
             ai.trackEvent({ name: "Auth-SignIn" });
 
-            const accessTokenRequestSilent = {
+            const redirectRequest = {
                 ...accessTokenRequest,
                 account: account2
             } as SilentRequest;
 
             preAuthEvent();
-            instance.acquireTokenSilent(accessTokenRequestSilent);
+            instance.loginRedirect(redirectRequest);
         }
     }, [loginRequested, ai, preAuthEvent, accessTokenRequest, loginProcessed, account2, instance]);
 

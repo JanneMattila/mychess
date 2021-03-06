@@ -10,9 +10,10 @@ import { User } from "../models/User";
 import { GameStateFilter } from "../models/GameStateFilter";
 import { UserSettings } from "../models/UserSettings";
 import { useDispatch } from "react-redux";
+import { useIsAuthenticated } from "@azure/msal-react";
 
 export function GameList() {
-    const loginState = useTypedSelector(state => state.loginState);
+    const isAuthenticated = useIsAuthenticated();
     const gamesState = useTypedSelector(state => state.gamesState);
     const games = useTypedSelector(state => state.games);
     const friends = useTypedSelector(state => state.friends);
@@ -32,7 +33,7 @@ export function GameList() {
     const [title, setTitle] = useState("Games waiting for you");
 
     useEffect(() => {
-        if (loginState !== ProcessState.Success) {
+        if (!isAuthenticated) {
             console.log("Not logged in");
             return;
         }
@@ -40,7 +41,7 @@ export function GameList() {
         ai.trackEvent({ name: "GameList-Load" });
 
         dispatch(gamesRequestedEvent(gameStateFilter));
-    }, [dispatch, loginState, ai, gameStateFilter]);
+    }, [dispatch, isAuthenticated, ai, gameStateFilter]);
 
     useEffect(() => {
         const filterOpenElement = document.getElementById("filterOpen");
@@ -178,7 +179,7 @@ export function GameList() {
         });
     }
 
-    if (loginState === ProcessState.Success) {
+    if (isAuthenticated) {
 
         let contents: JSX.Element;
         switch (gamesState) {
