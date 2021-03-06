@@ -62,7 +62,7 @@ function App() {
           <SignalRService endpoint={configuration.endpoint} />
         </div>
       </TelemetryProvider>
-    </Router >
+    </Router>
   );
 }
 
