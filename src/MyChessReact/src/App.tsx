@@ -58,7 +58,7 @@ function App() {
             This website uses cookies to enhance the user experience.
           </CookieConsent>
           <ProfileLoader />
-          <BackendService clientId={configuration.clientId} applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
+          <BackendService applicationIdURI={configuration.applicationIdURI} endpoint={configuration.endpoint} />
           <SignalRService endpoint={configuration.endpoint} />
         </div>
       </TelemetryProvider>

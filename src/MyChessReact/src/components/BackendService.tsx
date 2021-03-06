@@ -9,18 +9,16 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useTypedSelector } from "../reducers";
 import { UserSettings } from "../models/UserSettings";
 import { GameStateFilter } from "../models/GameStateFilter";
-import { Configuration, PublicClientApplication, AccountInfo, InteractionRequiredAuthError, SilentRequest, RedirectRequest } from "@azure/msal-browser";
+import { InteractionRequiredAuthError, SilentRequest, RedirectRequest } from "@azure/msal-browser";
 import { MyChessGame } from "../models/MyChessGame";
 import { GameQuery } from "../models/GameQuery";
 import { MoveSubmit } from "../models/MoveSubmit";
+import { useAccount, useMsal } from "@azure/msal-react";
 
 type BackendServiceProps = {
-    clientId: string;
     applicationIdURI: string;
     endpoint: string;
 };
-
-let publicClientApplication: PublicClientApplication;
 
 export function BackendService(props: BackendServiceProps) {
 
@@ -38,7 +36,10 @@ export function BackendService(props: BackendServiceProps) {
     const gamesDeleteRequested = useTypedSelector(state => state.gamesDeleteRequested);
     const gamesFilter = useTypedSelector(state => state.gamesFilter);
 
-    const account = Database.get<AccountInfo>(DatabaseFields.ACCOUNT);
+    // const account = Database.get<AccountInfo>(DatabaseFields.ACCOUNT);
+
+    const { instance, accounts } = useMsal();
+    const account2 = useAccount(accounts[0] || {});
 
     const [loginProcessed, setLoginProcessed] = useState(0);
     const [logoutProcessed, setLogoutProcessed] = useState(0);
@@ -69,23 +70,6 @@ export function BackendService(props: BackendServiceProps) {
         ]
     };
 
-    const config: Configuration = {
-        auth: {
-            clientId: props.clientId,
-            authority: "https://login.microsoftonline.com/common",
-            navigateToLoginRequestUrl: false,
-            redirectUri: window.location.origin,
-            postLogoutRedirectUri: window.location.origin
-        },
-        cache: {
-            cacheLocation: "localStorage",
-            storeAuthStateInCookie: false
-        },
-        system: {
-
-        }
-    };
-
     const preAuthEvent = useCallback(() => {
         ai.trackEvent({
             name: "Auth-PreEvent", properties: {
@@ -94,14 +78,14 @@ export function BackendService(props: BackendServiceProps) {
         });
 
         Database.clear();
-        if (account) {
-            Database.set(DatabaseFields.ACCOUNT, account);
-        }
+        // if (account) {
+        //     Database.set(DatabaseFields.ACCOUNT, account);
+        // }
 
         if (location.pathname !== "/") {
             Database.set(DatabaseFields.AUTH_REDIRECT, location.pathname);
         }
-    }, [ai, location.pathname, account]);
+    }, [ai, location.pathname]);
 
     const postAuthEvent = useCallback(() => {
         const redirectUrl = Database.get<string>(DatabaseFields.AUTH_REDIRECT);
@@ -120,7 +104,7 @@ export function BackendService(props: BackendServiceProps) {
 
     const authEvent = useCallback((accessToken: string, processRedirect: boolean) => {
 
-        const accounts = publicClientApplication.getAllAccounts();
+        const accounts = instance.getAllAccounts();
         if (accounts) {
             // TODO: Support account switcher
             const loggedInAccount = accounts[0];
@@ -131,26 +115,22 @@ export function BackendService(props: BackendServiceProps) {
                 postAuthEvent();
             }
         }
-    }, [dispatch, postAuthEvent]);
+    }, [dispatch, postAuthEvent, instance]);
 
     const acquireToken = useCallback(async () => {
-        if (!publicClientApplication) {
-            publicClientApplication = new PublicClientApplication(config);
+        instance.handleRedirectPromise().then((response) => {
+            if (response) {
+                // Acquire token after login
+                authEvent(response.accessToken, true);
+            }
+        }).catch((error) => {
+            console.log("Auth error");
+            console.log(error);
+            const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
+            dispatch(loginEvent(ProcessState.Error, errorMessage));
+        });
 
-            publicClientApplication.handleRedirectPromise().then((response) => {
-                if (response) {
-                    // Acquire token after login
-                    authEvent(response.accessToken, true);
-                }
-            }).catch((error) => {
-                console.log("Auth error");
-                console.log(error);
-                const errorMessage = error.errorMessage ? error.errorMessage : "Unable to acquire access token.";
-                dispatch(loginEvent(ProcessState.Error, errorMessage));
-            });
-        }
-
-        if (!account) {
+        if (!account2) {
             return undefined;
         }
 
@@ -162,9 +142,9 @@ export function BackendService(props: BackendServiceProps) {
         try {
             const accessTokenRequestSilent: SilentRequest = {
                 ...accessTokenRequest,
-                account: account
+                account: account2
             };
-            const accessTokenResponse = await publicClientApplication.acquireTokenSilent(accessTokenRequestSilent);
+            const accessTokenResponse = await instance.acquireTokenSilent(accessTokenRequestSilent);
 
             ai.trackEvent({
                 name: "Auth-AcquireToken", properties: {
@@ -187,9 +167,9 @@ export function BackendService(props: BackendServiceProps) {
 
                 const accessTokenRequestRedirect: RedirectRequest = {
                     ...accessTokenRequest,
-                    loginHint: account.username
+                    loginHint: account2.username
                 };
-                await publicClientApplication.acquireTokenRedirect(accessTokenRequestRedirect);
+                await instance.acquireTokenRedirect(accessTokenRequestRedirect);
             }
             else {
                 ai.trackEvent({
@@ -202,13 +182,13 @@ export function BackendService(props: BackendServiceProps) {
                 return undefined;
             }
         }
-    }, [accessTokenRequest, loginState, ai, authEvent, account, dispatch, config, location]);
+    }, [accessTokenRequest, loginState, ai, authEvent, dispatch, location, instance, account2]);
 
     useEffect(() => {
-        if (!publicClientApplication) {
+        if (account2) {
             acquireToken();
         }
-    });
+    }, [account2, acquireToken]);
 
     useEffect(() => {
         if (loginRequested && loginRequested >= loginProcessed) {
@@ -217,13 +197,13 @@ export function BackendService(props: BackendServiceProps) {
 
             const accessTokenRequestSilent = {
                 ...accessTokenRequest,
-                account: account
-            };
+                account: account2
+            } as SilentRequest;
 
             preAuthEvent();
-            publicClientApplication.loginRedirect(accessTokenRequestSilent);
+            instance.acquireTokenSilent(accessTokenRequestSilent);
         }
-    }, [loginRequested, ai, preAuthEvent, accessTokenRequest, loginProcessed, account]);
+    }, [loginRequested, ai, preAuthEvent, accessTokenRequest, loginProcessed, account2, instance]);
 
     useEffect(() => {
         if (logoutRequested && logoutRequested >= logoutProcessed) {
@@ -231,9 +211,9 @@ export function BackendService(props: BackendServiceProps) {
             ai.trackEvent({ name: "Auth-SignOut" });
 
             Database.clear();
-            publicClientApplication.logout();
+            instance.logout();
         }
-    }, [logoutRequested, ai, logoutProcessed]);
+    }, [logoutRequested, ai, logoutProcessed, instance]);
 
 
     useEffect(() => {
