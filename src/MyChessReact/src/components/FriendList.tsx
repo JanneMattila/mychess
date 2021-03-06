@@ -6,6 +6,7 @@ import { Link, useHistory } from "react-router-dom";
 import "./FriendList.css";
 import { User } from "../models/User";
 import { useDispatch } from "react-redux";
+import { useIsAuthenticated } from "@azure/msal-react";
 
 type FriendListProps = {
     title: string;
@@ -13,9 +14,9 @@ type FriendListProps = {
 };
 
 export function FriendList(props: FriendListProps) {
+    const isAuthenticated = useIsAuthenticated();
     const history = useHistory();
 
-    const loginState = useTypedSelector(state => state.loginState);
     const friendsState = useTypedSelector(state => state.friendsState);
     const friends = useTypedSelector(state => state.friends);
 
@@ -24,14 +25,14 @@ export function FriendList(props: FriendListProps) {
     const ai = getAppInsights();
 
     useEffect(() => {
-        if (loginState !== ProcessState.Success) {
+        if (!isAuthenticated) {
             console.log("Not logged in");
             return;
         }
 
         console.log("fetch friends");
         dispatch(friendsRequestedEvent());
-    }, [dispatch, loginState]);
+    }, [dispatch, isAuthenticated]);
 
     const renderFriends = (friends?: User[]) => {
         return (
@@ -73,7 +74,7 @@ export function FriendList(props: FriendListProps) {
         history.push("/friends/add");
     }
 
-    if (loginState === ProcessState.Success) {
+    if (isAuthenticated) {
         let contents: JSX.Element;
         switch (friendsState) {
             case ProcessState.Success:

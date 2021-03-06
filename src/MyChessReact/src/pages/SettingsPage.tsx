@@ -3,12 +3,13 @@ import { useDispatch } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
 import Switch from "react-switch";
 import "./SettingsPage.css";
-import { ProcessState, settingsLoadingRequestedEvent, settingsUpsertRequestedEvent, logoutRequestedEvent } from "../actions";
+import { settingsLoadingRequestedEvent, settingsUpsertRequestedEvent, logoutRequestedEvent } from "../actions";
 import { useTypedSelector } from "../reducers";
 import { getAppInsights } from "../components/TelemetryService";
 import { Database, DatabaseFields } from "../data/Database";
 import { UserSettings } from "../models/UserSettings";
 import { UserNotifications } from "../models/UserNotifications";
+import { useIsAuthenticated } from "@azure/msal-react";
 
 type SettingsProps = {
     endpoint: string;
@@ -16,8 +17,8 @@ type SettingsProps = {
 };
 
 export function SettingsPage(props: SettingsProps) {
+    const isAuthenticated = useIsAuthenticated();
     const history = useHistory();
-    const loginState = useTypedSelector(state => state.loginState);
     const userSettings = useTypedSelector(state => state.userSettings);
     const storedUserSettings = Database.get<UserSettings>(DatabaseFields.ME_SETTINGS);
 
@@ -32,7 +33,7 @@ export function SettingsPage(props: SettingsProps) {
     const ai = getAppInsights();
 
     useEffect(() => {
-        if (loginState !== ProcessState.Success) {
+        if (!isAuthenticated) {
             console.log("Not logged in");
             return;
         }
@@ -85,7 +86,7 @@ export function SettingsPage(props: SettingsProps) {
             console.log("remove event beforeinstallprompt");
             window.removeEventListener('beforeinstallprompt', setPrompt);
         }
-    }, [userSettings, storedUserSettings, ai, dispatch, playerIdentifier, loginState]);
+    }, [userSettings, storedUserSettings, ai, dispatch, playerIdentifier, isAuthenticated]);
 
     const save = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -214,7 +215,7 @@ export function SettingsPage(props: SettingsProps) {
         display: "none",
     }
 
-    if (loginState === ProcessState.Success) {
+    if (isAuthenticated) {
         return (
             <div>
                 <div className="title">Profile</div>
