@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useState, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { getAppInsights } from "./TelemetryService";
 import { gamesLoadingEvent, ProcessState, friendsLoadingEvent, friendUpsertEvent, settingsLoadingEvent, settingsUpsertEvent, loginEvent, settingsLoadingRequestedEvent, friendsRequestedEvent, gamesCreateEvent, gamesMoveCreateEvent, gamesLoadingSingleEvent, gamesDeleteEvent } from "../actions";
@@ -61,14 +61,16 @@ export function BackendService(props: BackendServiceProps) {
 
     const endpoint = props.endpoint;
 
-    const accessTokenRequest = {
-        scopes: [
-            "openid",
-            "profile",
-            props.applicationIdURI + "/User.ReadWrite",
-            props.applicationIdURI + "/Games.ReadWrite"
-        ]
-    };
+    const accessTokenRequest = useMemo(() => {
+        return {
+            scopes: [
+                "openid",
+                "profile",
+                props.applicationIdURI + "/User.ReadWrite",
+                props.applicationIdURI + "/Games.ReadWrite"
+            ]
+        }
+    }, [props]);
 
     const preAuthEvent = useCallback(() => {
         ai.trackEvent({
