@@ -21,5 +21,5 @@ React implementation will be replaced with Blazor implementation.
 To test Blazor client using [Azure Static Web Apps CLI](https://github.com/Azure/static-web-apps-cli):
 
 ```powershell
-
+swa start https://localhost:5000 --run "cd ./src/MyChess.Client/ && dotnet watch run" --api-location ./src/MyChess.Functions --api-port=3000
 ```
