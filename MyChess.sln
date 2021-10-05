@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.352
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31717.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E74445DD-28F2-4920-961A-C3778DA73664}"
 EndProject
@@ -58,6 +58,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Functions", "src\My
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Functions.Tests", "test\unit\MyChess.Functions.Tests\MyChess.Functions.Tests.csproj", "{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Client", "src\MyChess.Client\MyChess.Client.csproj", "{19C66D96-2691-44AC-A161-798026859576}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Backend", "src\MyChess.Backend\MyChess.Backend.csproj", "{EB8045D0-4F8F-49F5-83A1-2EE953C124A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChess.Backend.Tests", "test\unit\MyChess.Backend.Tests\MyChess.Backend.Tests.csproj", "{A200180F-4BE5-47B2-BBD0-D0410E238FBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +86,18 @@ Global
 		{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19C66D96-2691-44AC-A161-798026859576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19C66D96-2691-44AC-A161-798026859576}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19C66D96-2691-44AC-A161-798026859576}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19C66D96-2691-44AC-A161-798026859576}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB8045D0-4F8F-49F5-83A1-2EE953C124A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB8045D0-4F8F-49F5-83A1-2EE953C124A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB8045D0-4F8F-49F5-83A1-2EE953C124A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB8045D0-4F8F-49F5-83A1-2EE953C124A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A200180F-4BE5-47B2-BBD0-D0410E238FBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A200180F-4BE5-47B2-BBD0-D0410E238FBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A200180F-4BE5-47B2-BBD0-D0410E238FBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A200180F-4BE5-47B2-BBD0-D0410E238FBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -96,6 +114,9 @@ Global
 		{3928C475-8F6C-4E34-BE3A-E69CF5B43538} = {7F48B88A-6EC7-4AA2-84C5-CAC112F80102}
 		{77AEC0AA-ACFF-4464-9400-44C50CB06DD5} = {E74445DD-28F2-4920-961A-C3778DA73664}
 		{DCB0885A-41EC-4514-8C6C-DD8D39DBE59E} = {7F48B88A-6EC7-4AA2-84C5-CAC112F80102}
+		{19C66D96-2691-44AC-A161-798026859576} = {E74445DD-28F2-4920-961A-C3778DA73664}
+		{EB8045D0-4F8F-49F5-83A1-2EE953C124A6} = {E74445DD-28F2-4920-961A-C3778DA73664}
+		{A200180F-4BE5-47B2-BBD0-D0410E238FBC} = {7F48B88A-6EC7-4AA2-84C5-CAC112F80102}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F99521D6-99C8-41D7-83DC-3D5523498EE7}

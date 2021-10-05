@@ -2,8 +2,9 @@
 #nullable disable
 using System;
 using Microsoft.Extensions.Logging;
+using MyChess.Backend;
 
-namespace MyChess.Internal
+namespace MyChess.Functions.Internal
 {
     public static class SecurityValidatorLoggerExtensions
     {

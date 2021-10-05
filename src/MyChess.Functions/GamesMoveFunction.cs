@@ -7,7 +7,8 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Microsoft.Extensions.Logging;
-using MyChess.Handlers;
+using MyChess.Backend;
+using MyChess.Backend.Handlers;
 using MyChess.Interfaces;
 
 namespace MyChess.Functions

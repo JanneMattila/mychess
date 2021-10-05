@@ -57,10 +57,10 @@ namespace MyChess.Functions.Tests
             // Arrange
             var expected = typeof(OkObjectResult);
             var expectedFriends = 2;
-            
+
             _friendsHandlerStub.Friends.Add(new User());
             _friendsHandlerStub.Friends.Add(new User());
-            
+
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
@@ -150,7 +150,7 @@ namespace MyChess.Functions.Tests
                 Name = "John Doe"
             };
 
-            _friendsHandlerStub.Error = new Models.HandlerError()
+            _friendsHandlerStub.Error = new HandlerError()
             {
                 Instance = "some text/1234"
             };

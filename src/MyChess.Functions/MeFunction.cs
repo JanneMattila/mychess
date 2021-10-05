@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using MyChess.Handlers;
+using MyChess.Backend.Handlers;
+using MyChess.Backend.Models;
+using MyChess.Functions.Internal;
 using MyChess.Interfaces;
-using MyChess.Internal;
 
 namespace MyChess.Functions
 {

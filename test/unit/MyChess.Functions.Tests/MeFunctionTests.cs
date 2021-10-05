@@ -57,7 +57,7 @@ namespace MyChess.Functions.Tests
             var expectedUserID = "abc";
 
             _meHandlerStub.User.ID = "abc";
-            
+
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);

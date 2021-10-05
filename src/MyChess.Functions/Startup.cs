@@ -1,9 +1,9 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MyChess.Data;
+using MyChess.Backend.Data;
+using MyChess.Backend.Handlers;
 using MyChess.Functions;
-using MyChess.Handlers;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 

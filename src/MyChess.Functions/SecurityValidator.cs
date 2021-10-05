@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
-using MyChess.Internal;
+using MyChess.Functions.Internal;
 
 namespace MyChess.Functions
 {
