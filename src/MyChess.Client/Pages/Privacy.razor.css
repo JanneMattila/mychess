@@ -1,0 +1,15 @@
+﻿.lastUpdatedText {
+    font-size: calc(6px + 2vmin);
+    text-align: center;
+}
+
+.privacyText-Container {
+    text-align: center;
+    padding: 20px;
+}
+
+.privacyText {
+    font-size: calc(6px + 2vmin);
+    display: inline-block;
+    text-align: left;
+}

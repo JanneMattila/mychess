@@ -62,7 +62,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Client", "src\MyChe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Backend", "src\MyChess.Backend\MyChess.Backend.csproj", "{EB8045D0-4F8F-49F5-83A1-2EE953C124A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyChess.Backend.Tests", "test\unit\MyChess.Backend.Tests\MyChess.Backend.Tests.csproj", "{A200180F-4BE5-47B2-BBD0-D0410E238FBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyChess.Backend.Tests", "test\unit\MyChess.Backend.Tests\MyChess.Backend.Tests.csproj", "{A200180F-4BE5-47B2-BBD0-D0410E238FBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
