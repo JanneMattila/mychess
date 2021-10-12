@@ -351,3 +351,4 @@ MigrationBackup/
 
 # Exclude local configuration file
 src/MyChessReact/public/configuration.js
+src/MyChess.Client/wwwroot/appsettings.json

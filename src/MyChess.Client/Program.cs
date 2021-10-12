@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components.Web;
+﻿using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MyChess.Client;
 
@@ -11,6 +11,10 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+
+    options.ProviderOptions.LoginMode = "redirect";
+
+    // options.ProviderOptions.DefaultAccessTokenScopes.Add("{SCOPE URI}");
 });
 
 await builder.Build().RunAsync();
