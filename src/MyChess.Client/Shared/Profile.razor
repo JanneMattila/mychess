@@ -1,10 +1,8 @@
 ﻿<div className="Profile">
-    Want to play? Please
-    <button className="Profile-button">sign In</button>
+	<a href="/settings" className="Profile-link"><img src="images/profile.svg" alt="Profile" /></a>
 </div>
 
-@code {
-    // Demonstrates how a parent component can supply parameters
-    [Parameter]
-    public string? Title { get; set; }
-}
+<div className="Profile">
+	Want to play? Please
+	<button className="Profile-button" @onclick="SignIn">sign In</button>
+</div>
