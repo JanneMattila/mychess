@@ -1,0 +1,17 @@
+.Profile {
+  padding: 5px;
+  margin-right: 15px;
+}
+
+.Profile-link {
+  color: #ffffff;
+  text-decoration: none;
+  line-height: 45px;
+  display: block;
+  text-align: center;
+}
+
+.Profile-button {
+  margin-left: 10px;
+  margin: 5px;
+}

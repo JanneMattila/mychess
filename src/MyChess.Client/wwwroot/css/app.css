@@ -1,37 +1,36 @@
 ﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
-html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #353535;
+    /* Prevent pull to refresh */
+    touch-action: manipulation;
+    overscroll-behavior-y: contain;
 }
 
-h1:focus {
-    outline: none;
+.welcome {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(64,64,64,0.6);
+    backdrop-filter: blur(6px);
+    display: table;
+    vertical-align: middle;
+    text-align: center;
 }
 
-a, .btn-link {
-    color: #0077cc;
-}
-
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}
-
-.content {
-    padding-top: 1.1rem;
-}
-
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
-}
-
-.invalid {
-    outline: 1px solid red;
-}
-
-.validation-message {
-    color: red;
+.welcome-Text {
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    display: table-cell;
+    color: white;
 }
 
 #blazor-error-ui {
@@ -59,6 +58,6 @@ a, .btn-link {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}

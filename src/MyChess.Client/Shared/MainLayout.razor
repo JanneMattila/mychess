@@ -1,18 +1,20 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<div className="App">
+	<div className="App-header-container">
+	<a href="/"><img src="/images/logo.svg" alt="My Chess" className="App-logo" /></a>
+	<div className="App-auth">
+		<Profile />
+	</div>
+	</div>
 
-    <main>
-        <div class="top-row px-4 auth">
-            <LoginDisplay />
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+	@Body
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+	<footer className="App-footer-container">
+		<a href="/About" className="App-footer-link">About </a>
+		<span className="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+		<a href="/privacy" className="App-footer-link">Privacy</a>
+		<span className="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+		<a href="/play/local" className="App-footer-link">Play locally</a>
+	</footer>
 </div>

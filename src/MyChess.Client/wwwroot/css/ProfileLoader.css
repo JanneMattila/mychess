@@ -1,0 +1,42 @@
+.ProfileLoader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(64,64,64,0.6);
+  backdrop-filter: blur(6px);
+  text-align: center;
+  display: table;
+}
+
+.ProfileLoader-Text {
+  color: white;
+}
+
+.ProfileLoader-Spinner {
+  vertical-align: middle;
+  color: black;
+  font-size: larger;
+  display: table-cell;
+}
+
+@keyframes ProfileLoader-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ProfileLoader-logo {
+  pointer-events: none;
+  padding: 10px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ProfileLoader-logo {
+    animation: Play-logo-spin infinite 2s linear;
+  }
+}

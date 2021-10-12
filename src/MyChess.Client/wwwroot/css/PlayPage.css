@@ -1,0 +1,115 @@
+.Play-container {
+  padding: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: calc(12px + 2vmin);
+}
+
+.Play-Error {
+  display: none;
+  padding: 10px;
+  text-align: left;
+  font-size: calc(10px + 2vmin);
+  color: red;
+}
+
+.Play-Form {
+  display: none;
+  padding: 10px;
+  text-align: left;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.Play-GameName { 
+  font-size: calc(12px + 2vmin);
+  padding: 5px;
+  margin: 10px;
+  width: 80%;
+}
+
+.Play-Spinner {
+   display: none;
+   align-items: center;
+}
+
+@keyframes Play-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.Play-logo {
+  pointer-events: none;
+  padding: 10px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .Play-logo {
+    animation: Play-logo-spin infinite 2s linear;
+  }
+}
+
+#table-game {
+  margin-left: auto;
+  margin-right: auto;
+  border-spacing: 0;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+}
+
+#table-game .lightCell {
+  background-color: #FFFFFF;
+  padding: 0;
+}
+
+#table-game .darkCell {
+  background-color: #A9A9A9;
+  padding: 0;
+}
+
+#table-game .darkCell.highlightSelected {
+  background: #f00;
+}
+
+#table-game .lightCell.highlightSelected {
+  background: #f00;
+}
+
+#table-game .darkCell.highlightCapture {
+  background: #ffd800;
+}
+
+#table-game .lightCell.highlightCapture {
+  background: #ffd800;
+}
+
+#table-game .darkCell.highlightPreviousFrom {
+  background: rgb(195, 140, 140);
+}
+
+#table-game .lightCell.highlightPreviousFrom {
+  background: rgb(195, 140, 140);
+}
+
+#table-game .darkCell.highlightPreviousTo {
+  background: rgb(140, 195, 140);
+}
+
+#table-game .lightCell.highlightPreviousTo {
+    background: rgb(140, 195, 140);
+}
+
+#table-game .darkCell.highlightMoveAvailable {
+    background: rgb(0, 150, 0);
+}
+
+#table-game .lightCell.highlightMoveAvailable {
+    background: rgb(0, 250, 0);
+}

@@ -1,0 +1,31 @@
+.Settings-header {
+  min-height: 10vh;
+  font-size: calc(10px + 2vmin);
+}
+
+.Settings-link {
+  text-decoration: none;
+  color: white;
+  margin-top: 25px;
+  font-size: calc(12px + 2vmin);
+}
+
+.Settings-Text { 
+  font-size: 18pt;
+}
+
+.Settings-SubText { 
+  font-size: 12pt;
+}
+
+.Settings-Identifier { 
+  font-size: 10pt;
+  width: 300px;
+  background-color: lightgray;
+}
+
+.Settings-Container {
+  padding: 10px;
+  width: 100%;
+  text-align: center;
+}
