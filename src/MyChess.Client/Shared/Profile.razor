@@ -1,8 +1,15 @@
-﻿<div className="Profile">
-	<a href="/settings" className="Profile-link"><img src="images/profile.svg" alt="Profile" /></a>
-</div>
+﻿@inherits ProfileBase
 
-<div className="Profile">
-	Want to play? Please
-	<button className="Profile-button" @onclick="SignIn">sign In</button>
-</div>
+<AuthorizeView>
+    <Authorized>
+		<div className="Profile">
+			<a href="/settings" className="Profile-link"><img src="images/profile.svg" alt="Profile" /></a>
+		</div>
+    </Authorized>
+    <NotAuthorized>
+		<div className="Profile">
+			Want to play? Please
+			<button className="Profile-button" @onclick="NavigateToLogin">sign In</button>
+		</div>
+    </NotAuthorized>
+</AuthorizeView>

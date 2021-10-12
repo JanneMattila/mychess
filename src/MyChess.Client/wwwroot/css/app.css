@@ -33,6 +33,77 @@ body {
     color: white;
 }
 
+.App {
+    color: white;
+}
+
+.App-header-container {
+    width: 100%;
+    height: 85px;
+}
+
+.App-logo {
+    padding: 5px;
+}
+
+.App-auth {
+    float: right;
+}
+
+.title {
+    height: 10vmin;
+    font-size: calc(14px + 2vmin);
+    text-align: center;
+    margin: 10px;
+}
+
+.subtitle {
+    height: 8vmin;
+    font-size: calc(10px + 2vmin);
+    text-align: center;
+}
+
+.App-footer-container {
+    width: 100%;
+    color: white;
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 10px;
+}
+
+.App-footer-link {
+    color: white;
+    text-decoration: none;
+    margin-bottom: 25px;
+}
+
+.App-footer-link-separator {
+    color: gray;
+    margin-bottom: 25px;
+}
+
+button {
+    color: white;
+    background-color: gray;
+    font-size: medium;
+    padding: 5px;
+    margin: 10px;
+}
+
+input,
+select {
+    font-size: medium;
+    padding: 5px;
+    margin: 10px;
+}
+
+textarea {
+    font-size: calc(12px + 2vmin);
+    padding: 5px;
+    margin: 10px;
+    width: 80%;
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
