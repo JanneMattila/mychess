@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
-using MyChess.Client.Shared;
+﻿using MyChess.Client.Shared;
 
 namespace MyChess.Client.Pages;
 
