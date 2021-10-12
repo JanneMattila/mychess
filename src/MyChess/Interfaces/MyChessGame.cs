@@ -12,7 +12,7 @@ namespace MyChess.Interfaces
         [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
 
-        [JsonPropertyName("create")]
+        [JsonPropertyName("created")]
         public DateTimeOffset Created { get; set; }
 
         [JsonPropertyName("updated")]

@@ -1,0 +1,43 @@
+﻿@inherits GameListBase
+@using MyChess.Client.Extensions
+
+<div>
+	@if (Games == null)
+	{
+		<p><em>Loading...</em></p>
+	}
+	else
+	{
+		<div class="row">
+			@foreach (var game in Games)
+			{
+				<a href="/play/@game?.ID?state=" class="GameList-link">
+					<div class="gameTemplate">
+						<div class="nameTemplate">
+							@game?.Name
+						</div>
+						<div class="commentTemplate">
+							@if (game?.Moves.Count > 0)
+							{
+								@game?.Moves[game.Moves.Count - 1].Comment
+							}
+						</div>
+						<div class="opponentTemplate">
+							@game?.GetOpponent()
+						</div>
+						<div class="dateTemplate">
+							@game?.GetDate()
+						</div>
+						<div class="statusTemplate">
+							@game?.GetStatus()
+						</div>
+					</div>
+				</a>
+
+			}
+		</div>
+		<div class="subtitle">
+			Or <button @onClick="AddNewGame">add new</button> game.
+		</div>
+	}
+</div>

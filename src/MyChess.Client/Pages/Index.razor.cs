@@ -7,8 +7,4 @@ namespace MyChess.Client.Pages;
 
 public class IndexBase : MyChessComponentBase
 {
-    public void SignIn()
-    {
-
-    }
 }

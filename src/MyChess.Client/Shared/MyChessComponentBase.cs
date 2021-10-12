@@ -9,6 +9,10 @@ namespace MyChess.Client.Shared
 
         [AllowNull]
         [Inject]
+        protected BackendClient Client { get; set; }
+
+        [AllowNull]
+        [Inject]
         protected NavigationManager NavigationManager { get; set; }
 
         protected void NavigateToLogin()
