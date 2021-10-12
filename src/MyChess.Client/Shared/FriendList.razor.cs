@@ -4,26 +4,29 @@ using MyChess.Interfaces;
 namespace MyChess.Client.Shared;
 
 [Authorize]
-public class GameListBase : MyChessComponentBase
+public class FriendListBase: MyChessComponentBase
 {
-    protected List<MyChessGame> Games { get; set; }
+    protected List<User> Friends { get; set; }
 
     protected bool IsLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        await RefreshGames();
+        await RefreshFriends();
     }
 
-    protected async Task RefreshGames()
+    protected async Task RefreshFriends()
     {
         IsLoading = true;
-        Games = await Client.GetGamesAsync();
+        Friends = await Client.GetFriendsAsync();
         IsLoading = false;
     }
 
-    protected void AddNewGame()
+    protected void ManageFriend()
     {
-        NavigationManager.NavigateTo("/friends");
+    }
+
+    protected void AddNewFriend()
+    {
     }
 }

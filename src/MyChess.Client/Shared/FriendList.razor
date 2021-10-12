@@ -1,0 +1,31 @@
+﻿@inherits FriendListBase
+@using MyChess.Client.Extensions
+
+<div>
+	@if (Friends == null)
+	{
+		<p><em>Loading...</em></p>
+	}
+	else
+	{
+		<div class="row">
+			@foreach (var friend in Friends)
+			{
+				<a href="/play/new?friendID=@friend?.ID" class="FriendList-link">
+					<div class="friendTemplate">
+						<div class="nameTemplate">
+							@friend?.Name
+						</div>
+
+						<button type="button" class="manageTemplate" aria-label="Close" @onclick="ManageFriend">
+							<span aria-hidden="true">Manage friend</span>
+						</button>
+					</div>
+				</a>
+			}
+		</div>
+		<div class="subtitle">
+			Or <button @onClick="AddNewFriend">add new</button> friend.
+		</div>
+	}
+</div>
