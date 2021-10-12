@@ -14,7 +14,9 @@ builder.Services.AddMsalAuthentication(options =>
 
     options.ProviderOptions.LoginMode = "redirect";
 
-    // options.ProviderOptions.DefaultAccessTokenScopes.Add("{SCOPE URI}");
+    var applicationIdURI = builder.Configuration.GetValue<string>("applicationIdURI");
+    options.ProviderOptions.DefaultAccessTokenScopes.Add(applicationIdURI + "/User.ReadWrite");
+    options.ProviderOptions.DefaultAccessTokenScopes.Add(applicationIdURI + "/Games.ReadWrite");
 });
 
 await builder.Build().RunAsync();
