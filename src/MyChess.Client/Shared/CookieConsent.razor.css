@@ -1,0 +1,21 @@
+﻿.cookieConsent-Container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #181616;
+    color: #4e503b;
+    backdrop-filter: blur(6px);
+    display: table;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.cookieConsent-Text {
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    display: table-cell;
+    color: white;
+}
