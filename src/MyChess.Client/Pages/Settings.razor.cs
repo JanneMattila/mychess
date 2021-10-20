@@ -11,8 +11,8 @@ namespace MyChess.Client.Pages;
 [Authorize]
 public class SettingsBase : MyChessComponentBase
 {
-    protected bool _playAlwaysUp;
     protected bool _isNotificationsEnabled;
+    protected string _notificationEnabledText;
 
     protected UserSettings Settings { get; set; } = new();
 
@@ -29,6 +29,10 @@ public class SettingsBase : MyChessComponentBase
     {
         AppState.IsLoading = true;
         Settings = await Client.GetSettingsAsync();
+
+        _isNotificationsEnabled = false;
+        _notificationEnabledText = "Cannot enable notifications due to browser settings.";
+
         AppState.IsLoading = false;
     }
 
@@ -41,10 +45,6 @@ public class SettingsBase : MyChessComponentBase
     {
         var uri = $"{NavigationManager.BaseUri}friends/add/{Settings.ID}";
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", uri);
-    }
-
-    protected void HandlePlayAlwaysUpChange(ChangeEventArgs changeEventArgs)
-    {
     }
 
     protected void HandleNotificationChange(ChangeEventArgs changeEventArgs)

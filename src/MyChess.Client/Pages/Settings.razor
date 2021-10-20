@@ -16,25 +16,23 @@
 			</label>
 
 			<div class="subtitle">Settings</div>
-			<label>
-				Play always up<br />
-				<InputCheckbox @onchange="HandlePlayAlwaysUpChange" @bind-Value="_playAlwaysUp" />
-			</label>
-			<br />
-			<br />
-			<label>
-				Notifications<br />
+
+			Notifications<br />
+			<label class="toggle-switch-wrapper">
 				<InputCheckbox @onchange="HandleNotificationChange" @bind-Value="_isNotificationsEnabled" />
+				<span class="toggle-switch"></span>
 			</label>
+			<br />
+			@_notificationEnabledText
 
 			<div class="title">
 				<button @onclick="Save"><span role="img" aria-label="OK">✅</span> Save</button>
 				<button @onclick="Cancel"><span role="img" aria-label="Cancel">❌</span> Cancel</button>
 			</div>
 
-			<div id="installAsApp" class="title" style={hidden}>
+@*			<div id="installAsApp" class="title" style={hidden}>
 				<button onClick={installAsApp}><span role="img" aria-label="Install as App">📦</span> Install as App</button>
-			</div>
+			</div>*@
 
 			<br />
 			<hr />
