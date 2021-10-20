@@ -8,8 +8,6 @@ public class GameListBase : MyChessComponentBase
 {
     protected List<MyChessGame> Games { get; set; }
 
-    protected bool IsLoading = false;
-
     protected override async Task OnInitializedAsync()
     {
         await RefreshGames();
@@ -17,9 +15,9 @@ public class GameListBase : MyChessComponentBase
 
     protected async Task RefreshGames()
     {
-        IsLoading = true;
+        AppState.IsLoading = true;
         Games = await Client.GetGamesAsync();
-        IsLoading = false;
+        AppState.IsLoading = false;
     }
 
     protected void AddNewGame()

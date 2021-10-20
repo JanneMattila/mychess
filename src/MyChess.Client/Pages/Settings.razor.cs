@@ -14,8 +14,6 @@ public class SettingsBase : MyChessComponentBase
     protected bool _playAlwaysUp;
     protected bool _isNotificationsEnabled;
 
-    protected bool IsLoading { get; set; } = false;
-
     protected UserSettings Settings { get; set; } = new();
 
     [AllowNull]
@@ -29,9 +27,9 @@ public class SettingsBase : MyChessComponentBase
 
     protected async Task RefreshSettings()
     {
-        IsLoading = true;
+        AppState.IsLoading = true;
         Settings = await Client.GetSettingsAsync();
-        IsLoading = false;
+        AppState.IsLoading = false;
     }
 
     protected async Task CopyIdentifierToClipboard()

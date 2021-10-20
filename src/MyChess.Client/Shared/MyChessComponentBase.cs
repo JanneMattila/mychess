@@ -10,6 +10,10 @@ namespace MyChess.Client.Shared
 
         [AllowNull]
         [Inject]
+        protected AppState AppState { get; set; }
+
+        [AllowNull]
+        [Inject]
         protected BackendClient Client { get; set; }
 
         [AllowNull]
