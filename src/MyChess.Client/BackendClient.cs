@@ -44,4 +44,19 @@ public class BackendClient
         ArgumentNullException.ThrowIfNull(list);
         return list;
     }
+
+    public async Task<UserSettings> GetSettingsAsync()
+    {
+        var settings = new UserSettings();
+        try
+        {
+            settings = await _client.GetFromJsonAsync<UserSettings>("/api/users/me/settings");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        ArgumentNullException.ThrowIfNull(settings);
+        return settings;
+    }
 }
