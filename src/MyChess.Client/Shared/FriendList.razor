@@ -2,23 +2,34 @@
 @using MyChess.Client.Extensions
 
 <div>
-	<div class="row">
-		@foreach (var friend in Friends)
-		{
-			<a href="/play/new?friendID=@friend?.ID" class="FriendList-link">
-				<div class="friendTemplate">
-					<div class="nameTemplate">
-						@friend?.Name
-					</div>
+	@if (Friends.Any())
+	{
+		<div class="row">
+			@foreach (var friend in Friends)
+			{
+				<a href="/play/new?friendID=@friend?.ID" class="FriendList-link">
+					<div class="friendTemplate">
+						<div class="nameTemplate">
+							@friend?.Name
+						</div>
 
-					<button type="button" class="manageTemplate" aria-label="Close" @onclick="ManageFriend">
-						<span aria-hidden="true">Manage friend</span>
-					</button>
-				</div>
-			</a>
-		}
-	</div>
-	<div class="subtitle">
-		Or <button @onClick="AddNewFriend">add new</button> friend.
-	</div>
+						<button type="button" class="manageTemplate" aria-label="Close" @onclick:preventDefault=true @onclick:stopPropagation=true @onclick="() => ManageFriend(friend?.ID)">
+							<span aria-hidden="true">Manage friend</span>
+						</button>
+					</div>
+				</a>
+			}
+		</div>
+		<div class="subtitle">
+			Or <button @onclick="AddNewFriend">add new</button> friend.
+		</div>
+	}
+	else
+	{
+		<div class="subtitle">
+			No friends found. Click to
+			<button @onclick="Refresh">refresh</button> or
+			<button @onclick="AddNewFriend">add new</button> friend.
+		</div>
+	}
 </div>

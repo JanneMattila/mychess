@@ -20,11 +20,18 @@ public class FriendListBase: MyChessComponentBase
         AppState.IsLoading = false;
     }
 
-    protected void ManageFriend()
+    protected async Task Refresh()
     {
+        await RefreshFriends();
+    }
+
+    protected void ManageFriend(string id)
+    {
+        NavigationManager.NavigateTo($"/friends/{id}");
     }
 
     protected void AddNewFriend()
     {
+        NavigationManager.NavigateTo("/friends/add");
     }
 }
