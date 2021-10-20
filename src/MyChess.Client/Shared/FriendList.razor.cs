@@ -6,9 +6,7 @@ namespace MyChess.Client.Shared;
 [Authorize]
 public class FriendListBase: MyChessComponentBase
 {
-    protected List<User> Friends { get; set; }
-
-    protected bool IsLoading = false;
+    protected List<User> Friends { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -17,9 +15,9 @@ public class FriendListBase: MyChessComponentBase
 
     protected async Task RefreshFriends()
     {
-        IsLoading = true;
+        AppState.IsLoading = true;
         Friends = await Client.GetFriendsAsync();
-        IsLoading = false;
+        AppState.IsLoading = false;
     }
 
     protected void ManageFriend()
