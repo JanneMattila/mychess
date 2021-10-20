@@ -11,8 +11,8 @@ namespace MyChess.Client.Pages;
 [Authorize]
 public class SettingsBase : MyChessComponentBase
 {
-    protected bool _isNotificationsEnabled;
-    protected string _notificationEnabledText;
+    protected bool IsNotificationsEnabled { get; set; } = false;
+    protected string NotificationText { get; set; } = string.Empty;
 
     protected UserSettings Settings { get; set; } = new();
 
@@ -30,9 +30,7 @@ public class SettingsBase : MyChessComponentBase
         AppState.IsLoading = true;
         Settings = await Client.GetSettingsAsync();
 
-        _isNotificationsEnabled = false;
-        _notificationEnabledText = "Cannot enable notifications due to browser settings.";
-
+        IsNotificationsEnabled = Settings.Notifications.Any();
         AppState.IsLoading = false;
     }
 
@@ -47,8 +45,23 @@ public class SettingsBase : MyChessComponentBase
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", uri);
     }
 
-    protected void HandleNotificationChange(ChangeEventArgs changeEventArgs)
+    protected async Task HandleNotificationChange(ChangeEventArgs changeEventArgs)
     {
+        NotificationText = String.Empty;
+        Settings.Notifications.Clear();
+
+        if (IsNotificationsEnabled)
+        {
+            try
+            {
+                var notificationSettings = await JS.InvokeAsync<UserSettings>("MyChessSettings.enableNotifications", "");
+            }
+            catch (JSException ex)
+            {
+                IsNotificationsEnabled = false;
+                NotificationText = ex.Message;
+            }
+        }
     }
 
     protected void Save()
