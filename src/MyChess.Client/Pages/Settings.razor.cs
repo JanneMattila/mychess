@@ -45,28 +45,36 @@ public class SettingsBase : MyChessComponentBase
         await JS.InvokeVoidAsync("navigator.clipboard.writeText", uri);
     }
 
-    protected async Task HandleNotificationChange(ChangeEventArgs changeEventArgs)
+    protected async Task Save()
     {
         NotificationText = String.Empty;
         Settings.Notifications.Clear();
 
-        if (IsNotificationsEnabled)
+        try
         {
-            try
+            var settings = new UserSettings();
+            if (IsNotificationsEnabled)
             {
-                var notificationSettings = await JS.InvokeAsync<UserSettings>("MyChessSettings.enableNotifications", "");
+                var notificationSettings = await JS.InvokeAsync<UserNotifications>("MyChessSettings.enableNotifications", "");
+                settings.Notifications.Add(new UserNotifications()
+                {
+                    Enabled = true,
+                    Name = "browser1",
+                    Endpoint = notificationSettings.Endpoint,
+                    Auth = notificationSettings.Auth,
+                    P256dh = notificationSettings.P256dh
+                });
             }
-            catch (JSException ex)
-            {
-                IsNotificationsEnabled = false;
-                NotificationText = ex.Message;
-            }
-        }
-    }
 
-    protected void Save()
-    {
-        NavigationManager.NavigateTo("/");
+            await Client.UpsertSettingsAsync(settings);
+
+            NavigationManager.NavigateTo("/");
+        }
+        catch (JSException ex)
+        {
+            IsNotificationsEnabled = false;
+            NotificationText = ex.Message;
+        }
     }
 
     protected void Cancel()

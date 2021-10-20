@@ -59,4 +59,16 @@ public class BackendClient
         ArgumentNullException.ThrowIfNull(settings);
         return settings;
     }
+
+    public async Task UpsertSettingsAsync(UserSettings userSettings)
+    {
+        try
+        {
+            await _client.PostAsJsonAsync<UserSettings>("/api/users/me/settings", userSettings);
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+    }
 }
