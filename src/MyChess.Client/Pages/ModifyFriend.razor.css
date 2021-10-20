@@ -2,8 +2,10 @@
     box-sizing: border-box;
 }
 
-.FriendList-link {
-    color: #ffffff;
+.Friends-Container {
+    padding: 10px;
+    width: 100%;
+    text-align: center;
 }
 
 .FriendList-AddFriend {
