@@ -64,11 +64,29 @@ public class BackendClient
     {
         try
         {
-            await _client.PostAsJsonAsync<UserSettings>("/api/users/me/settings", userSettings);
+            await _client.PostAsJsonAsync("/api/users/me/settings", userSettings);
         }
         catch (AccessTokenNotAvailableException exception)
         {
             exception.Redirect();
         }
+    }
+
+    public async Task<HandlerError?> UpsertFriendAsync(User friend)
+    {
+        try
+        {
+            var response = await _client.PostAsJsonAsync($"/api/users/me/friends/{friend.ID}", friend);
+            if (!response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<HandlerError?>();
+            }
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+
+        return null;
     }
 }

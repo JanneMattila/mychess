@@ -81,6 +81,7 @@ public class SettingsBase : MyChessComponentBase
     {
         NavigationManager.NavigateTo("/");
     }
+
     protected async Task SignOut()
     {
         await SignOutManager.SetSignOutState();
