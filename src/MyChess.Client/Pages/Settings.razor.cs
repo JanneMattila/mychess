@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.JSInterop;
 using MyChess.Client.Shared;
 using MyChess.Interfaces;
-using System.Diagnostics.CodeAnalysis;
 
 namespace MyChess.Client.Pages;
 
@@ -13,7 +14,7 @@ public class SettingsBase : MyChessComponentBase
     protected bool _playAlwaysUp;
     protected bool _isNotificationsEnabled;
 
-    protected bool IsLoading = false;
+    protected bool IsLoading { get; set; } = false;
 
     protected UserSettings Settings { get; set; } = new();
 
@@ -31,6 +32,17 @@ public class SettingsBase : MyChessComponentBase
         IsLoading = true;
         Settings = await Client.GetSettingsAsync();
         IsLoading = false;
+    }
+
+    protected async Task CopyIdentifierToClipboard()
+    {
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", Settings.ID);
+    }
+
+    protected async Task CopyAddFriendLinkToClipboard()
+    {
+        var uri = $"{NavigationManager.BaseUri}friends/add/{Settings.ID}";
+        await JS.InvokeVoidAsync("navigator.clipboard.writeText", uri);
     }
 
     protected void HandlePlayAlwaysUpChange(ChangeEventArgs changeEventArgs)

@@ -11,8 +11,8 @@
                 Share this to your friend so that they can connect to you
             </div>
             <input type="text" value="@Settings.ID" readonly class="Settings-Identifier" /><br />
-            <button onClick={copy}><span role="img" aria-label="Copy">&#128203;</span> Copy your identifier</button>
-            <button onClick={share}><span role="img" aria-label="Share">&#128203;</span> Copy "Add as friend" link</button>
+            <button @onclick="CopyIdentifierToClipboard"><span role="img" aria-label="Copy">&#128203;</span> Copy your identifier</button>
+            <button @onclick="CopyAddFriendLinkToClipboard"><span role="img" aria-label="Share">&#128203;</span> Copy "Add as friend" link</button>
         </label>
 
         <div class="subtitle">Settings</div>

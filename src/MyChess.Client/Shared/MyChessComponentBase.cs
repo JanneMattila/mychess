@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace MyChess.Client.Shared
 {
@@ -14,6 +15,10 @@ namespace MyChess.Client.Shared
         [AllowNull]
         [Inject]
         protected NavigationManager NavigationManager { get; set; }
+
+        [AllowNull]
+        [Inject]
+        protected IJSRuntime JS { get; set; }
 
         protected void NavigateToLogin()
         {
