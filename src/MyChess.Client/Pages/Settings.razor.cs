@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components;
 using MyChess.Client.Shared;
 using MyChess.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MyChess.Client.Pages;
 
@@ -13,7 +15,11 @@ public class SettingsBase : MyChessComponentBase
 
     protected bool IsLoading = false;
 
-    protected UserSettings Settings { get; set; }
+    protected UserSettings Settings { get; set; } = new();
+
+    [AllowNull]
+    [Inject]
+    protected SignOutSessionStateManager SignOutManager { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,8 +50,9 @@ public class SettingsBase : MyChessComponentBase
     {
         NavigationManager.NavigateTo("/");
     }
-    protected void SignOut()
+    protected async Task SignOut()
     {
-        NavigationManager.NavigateTo("/");
+        await SignOutManager.SetSignOutState();
+        NavigationManager.NavigateTo("authentication/logout");
     }
 }
