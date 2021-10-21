@@ -13,13 +13,29 @@ public class BackendClient
         _client = client;
     }
 
-    public async Task<List<MyChessGame>> GetGamesAsync()
+    public async Task<MyChessGame> GetGameAsync(string id, string state = "")
+    {
+        var game = new MyChessGame();
+
+        try
+        {
+            game = await _client.GetFromJsonAsync<MyChessGame>($"/api/games/{id}?state={state}");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        ArgumentNullException.ThrowIfNull(game);
+        return game;
+    }
+
+    public async Task<List<MyChessGame>> GetGamesAsync(string state = "")
     {
         var list = new List<MyChessGame>();
 
         try
         {
-            list = await _client.GetFromJsonAsync<List<MyChessGame>>("/api/games?state=");
+            list = await _client.GetFromJsonAsync<List<MyChessGame>>($"/api/games?state={state}");
         }
         catch (AccessTokenNotAvailableException exception)
         {
