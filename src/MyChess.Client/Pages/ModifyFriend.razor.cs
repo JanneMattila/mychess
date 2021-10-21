@@ -9,6 +9,9 @@ namespace MyChess.Client.Pages;
 public class ModifyFriendBase : MyChessComponentBase
 {
     [Parameter]
+    public string Verb { get; set; }
+
+    [Parameter]
     public string ID { get; set; }
 
     public string Title { get; set; } = "Modify friend";
@@ -21,7 +24,12 @@ public class ModifyFriendBase : MyChessComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        if (ID == "add")
+        if (Verb == "add")
+        {
+            Title = "Add friend";
+            Friend.ID = ID;
+        }
+        else if (ID == "add")
         {
             Title = "Add friend";
         }
