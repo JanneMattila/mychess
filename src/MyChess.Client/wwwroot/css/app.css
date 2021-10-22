@@ -23,6 +23,7 @@ body {
     display: table;
     vertical-align: middle;
     text-align: center;
+    z-index: 100;
 }
 
 .welcome-Text {
@@ -31,6 +32,7 @@ body {
     width: 100%;
     display: table-cell;
     color: white;
+    z-index: 100;
 }
 
 .App {
