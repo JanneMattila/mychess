@@ -30,3 +30,7 @@
     text-align: center;
 }
 
+.Settings-Error {
+    font-size: 12pt;
+    color: red;
+}

@@ -10,6 +10,7 @@ body {
     /* Prevent pull to refresh */
     touch-action: manipulation;
     overscroll-behavior-y: contain;
+    color: white;
 }
 
 .welcome {

@@ -5,7 +5,7 @@ using MyChess.Client;
 using MyChess.Client.Shared;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<App>("#App");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddHttpClient<BackendClient>(
