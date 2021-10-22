@@ -2,6 +2,29 @@
 @using MyChess.Client.Extensions
 
 <div>
+	<div class="GameList-titleWrapper">
+		<button class="GameList-title" @onclick="ToggleFilterVisibility">@Title
+
+			@if (ShowFilters)
+			{
+				<span role="img" aria-label="Close filter">&#9652;</span>
+			}
+			else
+			{
+				<span role="img" aria-label="Open filter">&#9662;</span>
+			}
+		</button>
+		@if (ShowFilters)
+		{
+			<div class="GameList-filterList">
+				Show games:<br />
+				<button class="GameList-childtitle" @onclick="WaitingForYou">Waiting for you</button>
+				<button class="GameList-childtitle" @onclick="WaitingForOpponent">Waiting for opponent</button>
+				<button class="GameList-childtitle" @onclick="Archive">Archive</button>
+			</div>
+		}
+	</div>
+
 	@if (Games == null)
 	{
 		<p><em>Loading...</em></p>
