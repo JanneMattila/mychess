@@ -1,6 +1,83 @@
 ﻿@inherits ChessBoardViewBase
 @using MyChess.Client.Extensions
 
-<div>
+<div id="status">&nbsp; @Status </div>
+<div id="error" class="Play-Error">@Error</div>
+<table id="table-game"><tbody></tbody></table>
 
+@if (ShowConfirmationDialog)
+{
+	<div id="confirmation" class="Play-Form">
+		<button @onclick="ConfirmMove"><span role="img" aria-label="OK">✅</span> Confirm</button>
+		<button @onclick="Cancel"><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+	</div>
+}
+
+@if (ShowPromotionDialog)
+{
+	<div id="promotionDialog" class="Play-Form">
+		Promote pawn to:<br />
+		<label>
+			<input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} />
+			Queen
+		</label><br />
+		<label>
+			<input id="promotionRadioKnight" type="radio" name="Promotion" value="Knight" title="Knight" />
+			Knight
+		</label><br />
+		<label>
+			<input id="promotionRadioRook" type="radio" name="Promotion" value="Rook" title="Rook" />
+			Rook
+		</label><br />
+		<label>
+			<input id="promotionRadioBishop" type="radio" name="Promotion" value="Bishop" title="Bishop" />
+			Bishop
+		</label><br />
+		<button @onclick="ConfirmPromotion"><span role="img" aria-label="OK">✅</span> Confirm</button>
+		<button @onclick="Cancel"><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+	</div>
+}
+
+@if (ShowCommentDialog)
+{
+	<div id="commentDialog" class="Play-Form">
+		@if (ShowGameNameDialog)
+		{
+			<div id="gameNameDialog">
+				Game name:<br />
+				<input id="gameName" type="text" name="gameName" title="Game name" placeholder="Name your game here" class="Play-GameName" />
+				<br />
+			</div>
+		}
+
+		Comment:<br />
+		<label>
+			<textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows="3" cols="50" />
+		</label><br />
+		<button @onclick="ConfirmComment"><span role="img" aria-label="OK">✅</span> Confirm</button>
+		<button @onclick="Cancel"><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+	</div>
+}
+
+<div id="LastComment">@LastComment</div>
+<div id="ellipse">
+	<button @onclick="ToggleEllipseMenu"><span role="img" aria-label="Ellipse">&nbsp; &hellip; &nbsp;</span></button>
 </div>
+
+@if(ShowEllipse)
+{
+	<div id="ellipseContent">
+		<button @onclick="FirstMove"><span role="img" aria-label="Move to first move">&nbsp; &#9664; &#9664; &nbsp;</span></button>
+		<button @onclick="PreviousMove"><span role="img" aria-label="Move to previous move">&nbsp; &#9664; &nbsp;</span></button>
+		<button @onclick="NextMove"><span role="img" aria-label="Move to next move">&nbsp; &#9654; &nbsp;</span></button>
+		<button @onclick="LastMove"><span role="img" aria-label="Move to last move">&nbsp; &#9654; &#9654; &nbsp;</span></button>
+
+		<div id="ThinkTime">@ThinkTime</div>
+
+		<br />
+		<hr />
+		<br />
+
+		<button @onclick="ResignGame"><span role="img" aria-label="Resign">🛑</span> Resign game</button>
+	</div>
+}

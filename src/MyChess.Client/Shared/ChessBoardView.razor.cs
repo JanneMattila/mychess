@@ -17,6 +17,18 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     protected MyChessGame Game { get; set; } = new();
 
+    public string Status { get; set; }
+    public string Error { get; set; }
+    public string LastComment { get; set; }
+    public string ThinkTime { get; set; }
+
+    protected bool ShowConfirmationDialog { get; set; }
+    protected bool ShowPromotionDialog { get; set; }
+    protected bool ShowCommentDialog { get; set; }
+    protected bool ShowGameNameDialog { get; set; }
+    protected bool ShowEllipse { get; set; }
+
+
     protected override async Task OnInitializedAsync()
     {
         if (ID == "local")
@@ -44,5 +56,46 @@ public class ChessBoardViewBase : MyChessComponentBase
         AppState.IsLoading = true;
         Game = await Client.GetGameAsync(id);
         AppState.IsLoading = false;
+    }
+
+    protected void ToggleEllipseMenu()
+    {
+        ShowEllipse = !ShowEllipse;
+    }
+
+    protected void ConfirmMove()
+    {
+    }
+
+    protected void Cancel()
+    {
+    }
+
+    protected void ConfirmPromotion()
+    {
+    }
+
+    protected void ConfirmComment()
+    {
+    }
+
+    protected void FirstMove()
+    {
+    }
+
+    protected void PreviousMove()
+    {
+    }
+
+    protected void NextMove()
+    {
+    }
+
+    protected void LastMove()
+    {
+    }
+
+    protected void ResignGame()
+    {
     }
 }
