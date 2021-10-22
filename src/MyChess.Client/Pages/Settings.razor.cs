@@ -73,7 +73,9 @@ public class SettingsBase : MyChessComponentBase
         catch (JSException ex)
         {
             IsNotificationsEnabled = false;
-            NotificationText = ex.Message;
+            var message = ex.Message.ReplaceLineEndings();
+            var lines = message.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            NotificationText = lines[0];
         }
     }
 
