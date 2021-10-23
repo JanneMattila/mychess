@@ -16,6 +16,7 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected bool IsNew { get; set; } = false;
 
     protected MyChessGame Game { get; set; } = new();
+    protected ChessBoard Board { get; set; } = new();
 
     public string Status { get; set; }
     public string Error { get; set; }
@@ -81,6 +82,45 @@ public class ChessBoardViewBase : MyChessComponentBase
             return $"Move {CurrentMoveNumber} think time was {minutes} minutes and {seconds} seconds.";
         }
         return $"Move {CurrentMoveNumber} think time was {seconds} seconds.";
+    }
+
+    protected string GetBoardStatus()
+    {
+        var status = Board.GetBoardState();
+        var gameStatusMessage = "";
+
+        if (CurrentMoveNumber != Game.Moves.Count)
+        {
+            gameStatusMessage = "Move ";
+            gameStatusMessage += CurrentMoveNumber;
+        }
+
+        switch (status)
+        {
+            case ChessBoardState.StaleMate:
+                gameStatusMessage = "Stalemate";
+                break;
+
+            case ChessBoardState.Check:
+                if (gameStatusMessage.Length > 0)
+                {
+                    gameStatusMessage += " - Check";
+                }
+                else
+                {
+                    gameStatusMessage = "Check";
+                }
+                break;
+
+            case ChessBoardState.CheckMate:
+                gameStatusMessage = "Checkmate!";
+                break;
+
+            default:
+                gameStatusMessage += "";
+                break;
+        }
+        return gameStatusMessage;
     }
 
     protected void ToggleEllipseMenu()
