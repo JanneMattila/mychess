@@ -59,6 +59,18 @@ public class ChessBoardViewBase : MyChessComponentBase
         AppState.IsLoading = false;
     }
 
+    protected string GetComment()
+    {
+        if (CurrentMoveNumber == 0 ||
+            CurrentMoveNumber > Game.Moves.Count)
+        {
+            return "";
+        }
+
+        var move = Game.Moves[CurrentMoveNumber - 1];
+        return move.Comment;
+    }
+
     protected string GetThinkTime()
     {
         if (CurrentMoveNumber == 0 ||
