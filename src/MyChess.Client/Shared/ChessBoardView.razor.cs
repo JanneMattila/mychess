@@ -21,13 +21,13 @@ public class ChessBoardViewBase : MyChessComponentBase
     public string Error { get; set; }
     public string LastComment { get; set; }
     public string ThinkTime { get; set; }
+    public int CurrentMoveNumber { get; set; }
 
     protected bool ShowConfirmationDialog { get; set; }
     protected bool ShowPromotionDialog { get; set; }
     protected bool ShowCommentDialog { get; set; }
     protected bool ShowGameNameDialog { get; set; }
     protected bool ShowEllipse { get; set; }
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,6 +56,31 @@ public class ChessBoardViewBase : MyChessComponentBase
         AppState.IsLoading = true;
         Game = await Client.GetGameAsync(id);
         AppState.IsLoading = false;
+    }
+
+    protected string GetThinkTime()
+    {
+        if (CurrentMoveNumber == 0 ||
+            CurrentMoveNumber > Game.Moves.Count)
+        {
+            return "";
+        }
+
+        var move = Game.Moves[CurrentMoveNumber - 1];
+        var thinkTime = (move.End - move.Start).TotalSeconds;
+        var minutes = 0;
+        var seconds = (int)Math.Floor(thinkTime);
+        if (thinkTime > 60)
+        {
+            minutes = (int)Math.Floor(thinkTime / 60);
+            seconds = (int)Math.Floor(thinkTime % 60);
+        }
+
+        if (minutes > 0)
+        {
+            return $"Move {CurrentMoveNumber} think time was {minutes} minutes and {seconds} seconds.";
+        }
+        return $"Move {CurrentMoveNumber} think time was {seconds} seconds.";
     }
 
     protected void ToggleEllipseMenu()
