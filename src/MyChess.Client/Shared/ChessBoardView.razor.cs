@@ -210,9 +210,11 @@ public class ChessBoardViewBase : MyChessComponentBase
         return gameStatusMessage;
     }
 
-    protected void ToggleEllipseMenu()
+    protected async Task ToggleEllipseMenu()
     {
         ShowEllipse = !ShowEllipse;
+
+        await DrawAsync();
     }
 
     protected void ConfirmMove()
