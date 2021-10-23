@@ -1,4 +1,5 @@
 var MyChessPlay = MyChessPlay || {};
-MyChessPlay.draw = (game) => {
+MyChessPlay.draw = (board) => {
+    console.log(board);
 };
 //# sourceMappingURL=play.js.map

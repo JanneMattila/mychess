@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.JSInterop;
+using MyChess.Client.Models;
 using MyChess.Interfaces;
 
 namespace MyChess.Client.Shared;
@@ -16,12 +19,15 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected bool IsNew { get; set; } = false;
 
     protected MyChessGame Game { get; set; } = new();
-    protected ChessBoard Board { get; set; } = new();
+
+    [Inject]
+    protected ChessBoard Board { get; set; }
 
     public string Status { get; set; }
     public string Error { get; set; }
     public string LastComment { get; set; }
     public string ThinkTime { get; set; }
+    public List<ChessMove> PreviousAvailableMoves { get; set; } = new();
     public int CurrentMoveNumber { get; set; }
 
     protected bool ShowConfirmationDialog { get; set; }
@@ -50,6 +56,9 @@ public class ChessBoardViewBase : MyChessComponentBase
         {
             await RefreshGame(ID);
         }
+
+        Board.Initialize();
+        await DrawAsync();
     }
 
     protected async Task RefreshGame(string id)
@@ -69,6 +78,72 @@ public class ChessBoardViewBase : MyChessComponentBase
 
         var move = Game.Moves[CurrentMoveNumber - 1];
         return move.Comment;
+    }
+
+    protected async Task DrawAsync()
+    {
+        var lastMove = Board.LastMove;
+        var lastMoveCapture = Board.LastMoveCapture;
+
+        var rows = new List<List<ChessBoardGraphics>>();
+        for (var row = 0; row < ChessBoard.BOARD_SIZE; row++)
+        {
+            var cells = new List<ChessBoardGraphics>();
+            for (var column = 0; column < ChessBoard.BOARD_SIZE; column++)
+            {
+                var piece = Board.GetPiece(column, row);
+
+                var className = (row + column) % 2 == 0 ?
+                    "lightCell" :
+                    "darkCell";
+
+                for (var i = 0; i < PreviousAvailableMoves.Count; i++)
+                {
+                    var move = PreviousAvailableMoves[i];
+                    if (row == move.To.VerticalLocation &&
+                        column == move.To.HorizontalLocation)
+                    {
+                        className += " highlightMoveAvailable";
+                    }
+                }
+
+                if (lastMove != null)
+                {
+                    if (lastMove.From.HorizontalLocation == column &&
+                        lastMove.From.VerticalLocation == row)
+                    {
+                        className += " highlightPreviousFrom";
+                    }
+                    else if (lastMoveCapture != null &&
+                        lastMoveCapture.From.HorizontalLocation == column &&
+                        lastMoveCapture.From.VerticalLocation == row)
+                    {
+                        className += " highlightCapture";
+                    }
+                    else if (lastMove.To.HorizontalLocation == column &&
+                        lastMove.To.VerticalLocation == row)
+                    {
+                        className += " highlightPreviousTo";
+                    }
+                }
+
+                var key = "" + row + "-" + column;
+                var image = piece.Player == PiecePlayer.None ?
+                    "/images/empty.svg" :
+                    "/images/" + piece.Rank.ToString().ToLower() + "_" +
+                    piece.Player.ToString().ToLower() + ".svg";
+
+                cells.Add(new ChessBoardGraphics()
+                {
+                    Key = key,
+                    Background = className,
+                    Image = image
+                });
+            }
+            rows.Add(cells);
+        }
+
+        await JS.InvokeVoidAsync("MyChessPlay.draw", rows);
     }
 
     protected string GetThinkTime()

@@ -1,4 +1,5 @@
 ﻿var MyChessPlay = MyChessPlay || {};
 
-MyChessPlay.draw = (game: any) => {
+MyChessPlay.draw = (board: any) => {
+    console.log(board);
 }
