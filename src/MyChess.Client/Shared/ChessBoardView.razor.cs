@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.JSInterop;
 using MyChess.Client.Models;
 using MyChess.Interfaces;
@@ -11,6 +10,10 @@ public class ChessBoardViewBase : MyChessComponentBase
 {
     [Parameter]
     public string ID { get; set; }
+
+    protected ElementReference _canvas;
+
+    private DotNetObjectReference<ChessBoardViewBase> _selfRef;
 
     protected bool IsLocal { get; set; } = false;
 
@@ -35,6 +38,17 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected bool ShowCommentDialog { get; set; }
     protected bool ShowGameNameDialog { get; set; }
     protected bool ShowEllipse { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            _selfRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("MyChessPlay.initialize", _canvas, _selfRef);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -129,9 +143,8 @@ public class ChessBoardViewBase : MyChessComponentBase
 
                 var key = "" + row + "-" + column;
                 var image = piece.Player == PiecePlayer.None ?
-                    "/images/empty.svg" :
-                    "/images/" + piece.Rank.ToString().ToLower() + "_" +
-                    piece.Player.ToString().ToLower() + ".svg";
+                    "empty" :
+                    piece.Rank.ToString().ToLower() + "_" + piece.Player.ToString().ToLower();
 
                 cells.Add(new ChessBoardGraphics()
                 {
