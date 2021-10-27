@@ -3,8 +3,9 @@
 
 <div id="status">&nbsp; @Status </div>
 <div id="error" class="Play-Error">@Error</div>
-
-<canvas id="canvas" @ref="_canvas"></canvas>
+<div id="game">
+    <canvas id="canvas" @ref="_canvas" class="game"></canvas>
+</div>
 
 @if (ShowConfirmationDialog)
 {

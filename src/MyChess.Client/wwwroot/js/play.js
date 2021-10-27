@@ -1,7 +1,9 @@
 var MyChessPlay = MyChessPlay || {};
-let _pieceSize = 40;
+let _pieceSizeMin = 20;
+let _pieceSize = _pieceSizeMin;
 let _canvasElement;
 let _context;
+let _game;
 let _dotnetRef;
 let _imagesLoaded = 0;
 let _imagesToLoad = -1;
@@ -39,40 +41,64 @@ const resizeCanvas = () => {
         const element = document.getElementById("game");
         const maxWidth = document.documentElement.clientWidth;
         const maxHeight = document.documentElement.clientHeight;
+        const availableWidth = maxWidth * 0.85;
+        const availableHeight = maxHeight * 0.70;
+        let size = availableWidth;
+        if (availableHeight < availableWidth) {
+            size = availableHeight;
+        }
+        _pieceSize = Math.max(Math.floor(size / 8), _pieceSizeMin);
         _canvasElement.width = _pieceSize * 8;
         _canvasElement.height = _pieceSize * 8;
-        const aspectRatio = _canvasElement.width / _canvasElement.height;
-        const availableWidth = maxWidth * 0.9;
-        const availableHeight = maxHeight * 0.9;
-        let resizeWidth = availableWidth;
-        let resizeHeight = availableWidth / aspectRatio;
-        if (availableHeight < resizeHeight) {
-            console.log(`Height resized to ${resizeHeight} but space only for ${availableHeight}`);
-            resizeHeight = availableHeight;
-            resizeWidth = availableHeight * aspectRatio;
-            if (availableWidth < resizeWidth) {
-                console.log(`Width resized to ${resizeWidth} but space only for ${availableWidth}`);
-            }
-        }
-        element.style.width = `${Math.round(resizeWidth)}px`;
-        element.style.height = `${Math.round(resizeHeight)}px`;
-        const marginTop = (maxHeight - resizeHeight) / 2;
-        const marginLeft = (maxWidth - resizeWidth) / 2;
-        element.style.marginTop = `${Math.round(marginTop)}px`;
-        element.style.marginLeft = `${Math.round(marginLeft)}px`;
+        element.style.width = `${Math.round(size)}px`;
+        element.style.height = `${Math.round(size)}px`;
+        MyChessPlay.draw(_game);
     }
 };
 window.addEventListener('resize', () => {
     console.log("resize");
     resizeCanvas();
 });
-const drawImage = (image, row, column) => {
+const drawImage = (item, row, column) => {
     const x = Math.floor(column * _pieceSize);
     const y = Math.floor(row * _pieceSize);
-    const img = _images[image];
-    _context.drawImage(img, x, y);
+    _context.save();
+    if ((row + column) % 2 == 0) {
+        _context.fillStyle = "#A9A9A9";
+    }
+    else {
+        _context.fillStyle = "#FFFFFF";
+    }
+    _context.fillRect(x, y, _pieceSize, _pieceSize);
+    _context.fill();
+    _context.restore();
+    if (item.previousMove !== undefined) {
+        _context.save();
+        _context.fillStyle = "rgba(0, 250, 0, 0.5)";
+        _context.fillRect(x, y, _pieceSize, _pieceSize);
+        _context.fill();
+        _context.restore();
+    }
+    if (item.moveAvailable !== "") {
+        _context.save();
+        _context.fillStyle = "rgba(0, 255, 0, 0.5)";
+        _context.fillRect(x, y, _pieceSize, _pieceSize);
+        _context.fill();
+        _context.restore();
+    }
+    const img = _images[item.image];
+    _context.drawImage(img, x, y, _pieceSize, _pieceSize);
+    _context.restore();
 };
 const setTouchHandlers = (canvas) => {
+    canvas.addEventListener('click', (event) => {
+        event.preventDefault();
+        let x = Math.floor(event.offsetX / _pieceSize);
+        let y = Math.floor(event.offsetY / _pieceSize);
+        if (_dotnetRef !== undefined) {
+            _dotnetRef.invokeMethod("CanvasOnClick", x, y);
+        }
+    }, false);
 };
 MyChessPlay.initialize = (canvasElement, dotnetRef) => {
     console.log("=> initialize");
@@ -83,22 +109,18 @@ MyChessPlay.initialize = (canvasElement, dotnetRef) => {
     resizeCanvas();
     MyChessPlay.draw(undefined);
 };
-MyChessPlay.draw = (board) => {
-    console.log(board);
-    if (_context === undefined || _imagesLoaded !== _imagesToLoad || board === undefined) {
+MyChessPlay.draw = (game) => {
+    console.log(game);
+    if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined) {
         console.log("Not yet ready to draw");
         return;
     }
-    _context.save();
-    _context.imageSmoothingEnabled = true;
-    _context.fillStyle = "gray";
-    _context.fillRect(0, 0, _canvasElement.width, _canvasElement.height);
-    _context.fill();
-    for (let row = 0; row < board.length; row++) {
-        const r = board[row];
+    _game = game;
+    for (let row = 0; row < game.length; row++) {
+        const r = game[row];
         for (let column = 0; column < r.length; column++) {
             const item = r[column];
-            drawImage(item.image, row, column);
+            drawImage(item, row, column);
         }
     }
     _context.restore();

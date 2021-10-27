@@ -3,7 +3,8 @@
     public class ChessBoardGraphics
     {
         public string Key { get; set; }
-        public string Background { get; set; }
+        public string MoveAvailable { get; set; }
+        public string LastMove { get; set; }
         public string Image { get; set; }
     }
 }

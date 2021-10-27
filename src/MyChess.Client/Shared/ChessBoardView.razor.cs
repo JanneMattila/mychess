@@ -106,38 +106,35 @@ public class ChessBoardViewBase : MyChessComponentBase
             for (var column = 0; column < ChessBoard.BOARD_SIZE; column++)
             {
                 var piece = Board.GetPiece(column, row);
-
-                var className = (row + column) % 2 == 0 ?
-                    "lightCell" :
-                    "darkCell";
-
+                var moveAvailable = "";
                 for (var i = 0; i < PreviousAvailableMoves.Count; i++)
                 {
                     var move = PreviousAvailableMoves[i];
                     if (row == move.To.VerticalLocation &&
                         column == move.To.HorizontalLocation)
                     {
-                        className += " highlightMoveAvailable";
+                        moveAvailable = " highlightMoveAvailable";
                     }
                 }
 
+                var lastMoveHighlight = "";
                 if (lastMove != null)
                 {
                     if (lastMove.From.HorizontalLocation == column &&
                         lastMove.From.VerticalLocation == row)
                     {
-                        className += " highlightPreviousFrom";
+                        lastMoveHighlight = " highlightPreviousFrom";
                     }
                     else if (lastMoveCapture != null &&
                         lastMoveCapture.From.HorizontalLocation == column &&
                         lastMoveCapture.From.VerticalLocation == row)
                     {
-                        className += " highlightCapture";
+                        lastMoveHighlight = " highlightCapture";
                     }
                     else if (lastMove.To.HorizontalLocation == column &&
                         lastMove.To.VerticalLocation == row)
                     {
-                        className += " highlightPreviousTo";
+                        lastMoveHighlight = " highlightPreviousTo";
                     }
                 }
 
@@ -149,7 +146,8 @@ public class ChessBoardViewBase : MyChessComponentBase
                 cells.Add(new ChessBoardGraphics()
                 {
                     Key = key,
-                    Background = className,
+                    MoveAvailable = moveAvailable,
+                    LastMove = lastMoveHighlight,
                     Image = image
                 });
             }
@@ -227,6 +225,15 @@ public class ChessBoardViewBase : MyChessComponentBase
     {
         ShowEllipse = !ShowEllipse;
 
+        await DrawAsync();
+    }
+
+    [JSInvokable]
+    public async Task CanvasOnClick(int x, int y)
+    {
+        Console.WriteLine($"CanvasOnClick: {x} - {y}");
+
+        PreviousAvailableMoves = Board.GetAvailableMoves(x, y).ToList();
         await DrawAsync();
     }
 
