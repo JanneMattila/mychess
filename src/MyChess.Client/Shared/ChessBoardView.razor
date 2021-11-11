@@ -20,19 +20,19 @@
 	<div id="promotionDialog" class="Play-Form">
 		Promote pawn to:<br />
 		<label>
-			<input id="promotionRadioQueen" type="radio" name="Promotion" value="Queen" title="Queen" defaultChecked={true} />
+			<input id="promotionRadioQueen" type="radio" name="Promotion" @onchange="ChangePromotion" value="Queen" title="Queen" defaultChecked={true} />
 			Queen
 		</label><br />
 		<label>
-			<input id="promotionRadioKnight" type="radio" name="Promotion" value="Knight" title="Knight" />
+			<input id="promotionRadioKnight" type="radio" name="Promotion" @onchange="ChangePromotion" value="Knight" title="Knight" />
 			Knight
 		</label><br />
 		<label>
-			<input id="promotionRadioRook" type="radio" name="Promotion" value="Rook" title="Rook" />
+			<input id="promotionRadioRook" type="radio" name="Promotion" @onchange="ChangePromotion" value="Rook" title="Rook" />
 			Rook
 		</label><br />
 		<label>
-			<input id="promotionRadioBishop" type="radio" name="Promotion" value="Bishop" title="Bishop" />
+			<input id="promotionRadioBishop" type="radio" name="Promotion" @onchange="ChangePromotion" value="Bishop" title="Bishop" />
 			Bishop
 		</label><br />
 		<button @onclick="ConfirmPromotion"><span role="img" aria-label="OK">✅</span> Confirm</button>

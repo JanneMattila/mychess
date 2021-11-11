@@ -14,6 +14,7 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     protected ElementReference _canvas;
 
+    private string _promotion = "";
     private int _pieceSize = 20;
 
     private DotNetObjectReference<ChessBoardViewBase> _selfRef;
@@ -254,6 +255,7 @@ public class ChessBoardViewBase : MyChessComponentBase
                 Board.MakeMove(selectedMove);
                 if (Board.LastMovePromotion != null)
                 {
+                    _promotion = "";
                     ShowPromotionDialog = true;
                 }
                 else
@@ -277,13 +279,46 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     protected async Task Cancel()
     {
+        ShowPromotionDialog = false;
+        ShowCommentDialog = false;
         ShowConfirmationDialog = false;
         Board.Undo();
         await DrawAsync();
     }
 
+    protected async Task ChangePromotion(ChangeEventArgs changeEventArgs)
+    {
+        var value = changeEventArgs.Value?.ToString();
+        if (value != null)
+        {
+            _promotion = value;
+        }
+
+        if (_promotion == "Knight")
+        {
+            Board.ChangePromotion(PieceRank.Knight);
+        }
+        else if (_promotion == "Rook")
+        {
+            Board.ChangePromotion(PieceRank.Rook);
+        }
+        else if (_promotion == "Bishop")
+        {
+            Board.ChangePromotion(PieceRank.Bishop);
+        }
+        else
+        {
+            Board.ChangePromotion(PieceRank.Queen);
+        }
+
+        Console.WriteLine($"Changing promotion to {_promotion}");
+        await DrawAsync();
+    }
+
     protected void ConfirmPromotion()
     {
+        ShowPromotionDialog = false;
+        ShowConfirmationDialog = true;
     }
 
     protected void ConfirmComment()
