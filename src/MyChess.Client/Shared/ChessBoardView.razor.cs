@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
 using MyChess.Client.Models;
@@ -12,6 +13,8 @@ public class ChessBoardViewBase : MyChessComponentBase
     public string ID { get; set; }
 
     protected ElementReference _canvas;
+
+    private int _pieceSize = 20;
 
     private DotNetObjectReference<ChessBoardViewBase> _selfRef;
 
@@ -222,6 +225,24 @@ public class ChessBoardViewBase : MyChessComponentBase
     [JSInvokable]
     public async Task CanvasOnClick(int x, int y)
     {
+        Console.WriteLine($"CanvasOnClick: {x} - {y}");
+
+        PreviousAvailableMoves = Board.GetAvailableMoves(x, y).ToList();
+        await DrawAsync();
+    }
+
+    [JSInvokable]
+    public async Task UpdateSize(int pieceSize)
+    {
+        Console.WriteLine($"UpdateSize: {pieceSize}");
+        _pieceSize = pieceSize;
+        await Task.CompletedTask;
+    }
+
+    public async Task CanvasOnClick(MouseEventArgs mouseEventArgs)
+    {
+        var x = (int) Math.Floor(mouseEventArgs.OffsetX / _pieceSize);
+        var y = (int) Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
         Console.WriteLine($"CanvasOnClick: {x} - {y}");
 
         PreviousAvailableMoves = Board.GetAvailableMoves(x, y).ToList();

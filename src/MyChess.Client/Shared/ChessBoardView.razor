@@ -4,7 +4,7 @@
 <div id="status">&nbsp; @Status </div>
 <div id="error" class="Play-Error">@Error</div>
 <div id="game">
-    <canvas id="canvas" @ref="_canvas" class="game"></canvas>
+    <canvas id="canvas" @ref="_canvas" class="game" @onclick="CanvasOnClick"></canvas>
 </div>
 
 @if (ShowConfirmationDialog)

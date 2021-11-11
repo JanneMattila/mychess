@@ -48,6 +48,9 @@ const resizeCanvas = () => {
             size = availableHeight;
         }
         _pieceSize = Math.max(Math.floor(size / 8), _pieceSizeMin);
+        if (_dotnetRef !== undefined) {
+            _dotnetRef.invokeMethod("UpdateSize", _pieceSize);
+        }
         _canvasElement.width = _pieceSize * 8;
         _canvasElement.height = _pieceSize * 8;
         element.style.width = `${Math.round(size)}px`;
@@ -99,14 +102,14 @@ const drawImage = (item, row, column) => {
     _context.restore();
 };
 const setTouchHandlers = (canvas) => {
-    canvas.addEventListener('click', (event) => {
-        event.preventDefault();
-        let x = Math.floor(event.offsetX / _pieceSize);
-        let y = Math.floor(event.offsetY / _pieceSize);
-        if (_dotnetRef !== undefined) {
-            _dotnetRef.invokeMethod("CanvasOnClick", x, y);
-        }
-    }, false);
+    //canvas.addEventListener('click', (event: MouseEvent) => {
+    //    event.preventDefault();
+    //    let x = Math.floor(event.offsetX / _pieceSize);
+    //    let y = Math.floor(event.offsetY / _pieceSize);
+    //    if (_dotnetRef !== undefined) {
+    //        _dotnetRef.invokeMethod("CanvasOnClick", x, y);
+    //    }
+    //}, false);
 };
 MyChessPlay.initialize = (canvasElement, dotnetRef) => {
     console.log("=> initialize");
