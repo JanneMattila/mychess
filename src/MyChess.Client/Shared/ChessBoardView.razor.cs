@@ -241,20 +241,45 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     public async Task CanvasOnClick(MouseEventArgs mouseEventArgs)
     {
-        var x = (int) Math.Floor(mouseEventArgs.OffsetX / _pieceSize);
-        var y = (int) Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
-        Console.WriteLine($"CanvasOnClick: {x} - {y}");
+        var column = (int) Math.Floor(mouseEventArgs.OffsetX / _pieceSize);
+        var row = (int) Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
+        Console.WriteLine($"CanvasOnClick: {column} - {row}");
 
-        PreviousAvailableMoves = Board.GetAvailableMoves(x, y).ToList();
+        if (PreviousAvailableMoves.Count > 0)
+        {
+            var selectedMove = PreviousAvailableMoves
+                    .FirstOrDefault(p => p.To.VerticalLocation == row && p.To.HorizontalLocation == column);
+            if (selectedMove != null)
+            {
+                Board.MakeMove(selectedMove);
+                if (Board.LastMovePromotion != null)
+                {
+                    ShowPromotionDialog = true;
+                }
+                else
+                {
+                    ShowConfirmationDialog = true;
+                }
+            }
+            PreviousAvailableMoves.Clear();
+        }
+        else
+        {
+            PreviousAvailableMoves = Board.GetAvailableMoves(column, row).ToList();
+        }
         await DrawAsync();
     }
 
     protected void ConfirmMove()
     {
+        ShowConfirmationDialog = false;
     }
 
-    protected void Cancel()
+    protected async Task Cancel()
     {
+        ShowConfirmationDialog = false;
+        Board.Undo();
+        await DrawAsync();
     }
 
     protected void ConfirmPromotion()
