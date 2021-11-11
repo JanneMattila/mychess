@@ -106,35 +106,26 @@ public class ChessBoardViewBase : MyChessComponentBase
             for (var column = 0; column < ChessBoard.BOARD_SIZE; column++)
             {
                 var piece = Board.GetPiece(column, row);
-                var moveAvailable = "";
-                for (var i = 0; i < PreviousAvailableMoves.Count; i++)
-                {
-                    var move = PreviousAvailableMoves[i];
-                    if (row == move.To.VerticalLocation &&
-                        column == move.To.HorizontalLocation)
-                    {
-                        moveAvailable = " highlightMoveAvailable";
-                    }
-                }
-
+                var moveAvailable = PreviousAvailableMoves
+                    .Any(p => p.To.VerticalLocation == row && p.To.HorizontalLocation == column);
                 var lastMoveHighlight = "";
                 if (lastMove != null)
                 {
                     if (lastMove.From.HorizontalLocation == column &&
                         lastMove.From.VerticalLocation == row)
                     {
-                        lastMoveHighlight = " highlightPreviousFrom";
+                        lastMoveHighlight = "HighlightPreviousFrom";
                     }
                     else if (lastMoveCapture != null &&
                         lastMoveCapture.From.HorizontalLocation == column &&
                         lastMoveCapture.From.VerticalLocation == row)
                     {
-                        lastMoveHighlight = " highlightCapture";
+                        lastMoveHighlight = "HighlightCapture";
                     }
                     else if (lastMove.To.HorizontalLocation == column &&
                         lastMove.To.VerticalLocation == row)
                     {
-                        lastMoveHighlight = " highlightPreviousTo";
+                        lastMoveHighlight = "HighlightPreviousTo";
                     }
                 }
 

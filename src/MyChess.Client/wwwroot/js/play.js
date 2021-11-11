@@ -74,12 +74,20 @@ const drawImage = (item, row, column) => {
     _context.restore();
     if (item.previousMove !== undefined) {
         _context.save();
-        _context.fillStyle = "rgba(0, 250, 0, 0.5)";
+        if (item.previousMove === "HighlightPreviousFrom") {
+            _context.fillStyle = "rgba(195, 140, 140, 0.5)";
+        }
+        else if (item.previousMove === "HighlightCapture") {
+            _context.fillStyle = "rgba(255, 216, 0, 0.5)";
+        }
+        else if (item.previousMove === "HighlightPreviousTo") {
+            _context.fillStyle = "rgba(140, 195, 140, 0.5)";
+        }
         _context.fillRect(x, y, _pieceSize, _pieceSize);
         _context.fill();
         _context.restore();
     }
-    if (item.moveAvailable !== "") {
+    if (item.moveAvailable) {
         _context.save();
         _context.fillStyle = "rgba(0, 255, 0, 0.5)";
         _context.fillRect(x, y, _pieceSize, _pieceSize);
