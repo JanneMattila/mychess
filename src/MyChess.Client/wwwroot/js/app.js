@@ -5,5 +5,5 @@ MyChess.isCookieConsentAccepted = () => {
 }
 
 MyChess.acceptCookieConsent = () => {
-    document.cookie = `MyChessCookieConsent=true; secure; samesite=strict`;
+    document.cookie = `MyChessCookieConsent=true; secure; samesite=strict; max-age=315360000`;
 }

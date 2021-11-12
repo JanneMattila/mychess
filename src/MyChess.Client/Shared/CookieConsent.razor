@@ -14,12 +14,12 @@
 }
 
 @code {
-	private bool _isCookieConsentAccepted;
+    private bool _isCookieConsentAccepted;
 
-	protected override async Task OnInitializedAsync()
-	{
-		_isCookieConsentAccepted = await JSRuntime.InvokeAsync<bool>("MyChess.isCookieConsentAccepted");
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        _isCookieConsentAccepted = await JSRuntime.InvokeAsync<bool>("MyChess.isCookieConsentAccepted");
+    }
 
 	private void AcceptCookieConsent()
 	{
