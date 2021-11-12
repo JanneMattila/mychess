@@ -43,17 +43,6 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected bool ShowGameNameDialog { get; set; }
     protected bool ShowEllipse { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-
-        if (firstRender)
-        {
-            _selfRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("MyChessPlay.initialize", _canvas, _selfRef);
-        }
-    }
-
     protected override async Task OnInitializedAsync()
     {
         if (ID == "local")
@@ -76,7 +65,18 @@ public class ChessBoardViewBase : MyChessComponentBase
         }
 
         Board.Initialize();
-        await DrawAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            _selfRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("MyChessPlay.initialize", _canvas, _selfRef);
+            await DrawAsync();
+        }
     }
 
     protected async Task RefreshGame(string id)

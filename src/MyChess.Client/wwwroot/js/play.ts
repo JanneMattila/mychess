@@ -34,6 +34,10 @@ const loadImages = () => {
         const img = new Image();
         img.onload = function () {
             _imagesLoaded++;
+
+            if (_imagesLoaded === _imagesToLoad) {
+                MyChessPlay.draw(_game);
+            }
         };
         img.src = `/images/${file}.svg`;
         _images[file] = img;
@@ -151,12 +155,12 @@ MyChessPlay.initialize = (canvasElement: HTMLCanvasElement, dotnetRef: any): voi
 MyChessPlay.draw = (game: any) => {
     console.log(game);
 
+    _game = game;
+
     if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined) {
         console.log("Not yet ready to draw");
         return;
     }
-
-    _game = game;
 
     for (let row = 0; row < game.length; row++) {
         const r = game[row];
