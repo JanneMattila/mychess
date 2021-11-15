@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.JSInterop;
+using MyChess.Client.Extensions;
 using MyChess.Client.Models;
 using MyChess.Interfaces;
 
@@ -14,6 +15,7 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     protected ElementReference _canvas;
 
+    private DateTimeOffset _start = DateTimeOffset.UtcNow;
     private string _promotion = "";
     private int _pieceSize = 20;
 
@@ -65,6 +67,51 @@ public class ChessBoardViewBase : MyChessComponentBase
         }
 
         Board.Initialize();
+
+        if (IsLocal)
+        {
+            try
+            {
+                Console.WriteLine($"Loading local game from storage");
+                var game = await JS.GetLocalStorage().Get<MyChessGame>("LocalGame");
+                if (game != null)
+                {
+                    MakeMoves(game);
+                }
+            }
+            catch (Exception)
+            {
+                // Reset the loading due to failure
+                Board.Initialize();
+            }
+        }
+    }
+
+    private void MakeMoves(MyChessGame game)
+    {
+        Board.Initialize();
+
+        foreach (var gameMove in game.Moves)
+        {
+            Console.WriteLine($"Make move {gameMove.Move}");
+
+            Board.MakeMove(gameMove.Move);
+            if (gameMove.SpecialMove != null)
+            {
+                switch (gameMove.SpecialMove)
+                {
+                    case MyChessGameSpecialMove.PromotionToRook:
+                        Board.ChangePromotion(PieceRank.Rook);
+                        break;
+                    case MyChessGameSpecialMove.PromotionToKnight:
+                        Board.ChangePromotion(PieceRank.Knight);
+                        break;
+                    case MyChessGameSpecialMove.PromotionToBishop:
+                        Board.ChangePromotion(PieceRank.Bishop);
+                        break;
+                }
+            }
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -133,14 +180,12 @@ public class ChessBoardViewBase : MyChessComponentBase
                     }
                 }
 
-                var key = "" + row + "-" + column;
                 var image = piece.Player == PiecePlayer.None ?
                     "empty" :
                     piece.Rank.ToString().ToLower() + "_" + piece.Player.ToString().ToLower();
 
                 cells.Add(new ChessBoardGraphics()
                 {
-                    Key = key,
                     MoveAvailable = moveAvailable,
                     LastMove = lastMoveHighlight,
                     Image = image
@@ -242,8 +287,8 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     public async Task CanvasOnClick(MouseEventArgs mouseEventArgs)
     {
-        var column = (int) Math.Floor(mouseEventArgs.OffsetX / _pieceSize);
-        var row = (int) Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
+        var column = (int)Math.Floor(mouseEventArgs.OffsetX / _pieceSize);
+        var row = (int)Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
         Console.WriteLine($"CanvasOnClick: {column} - {row}");
 
         if (PreviousAvailableMoves.Count > 0)
@@ -272,9 +317,44 @@ public class ChessBoardViewBase : MyChessComponentBase
         await DrawAsync();
     }
 
-    protected void ConfirmMove()
+    protected async Task ConfirmMove()
     {
         ShowConfirmationDialog = false;
+
+        if (IsLocal)
+        {
+            var lastMove = Board.LastMove;
+            var lastPromotion = Board.LastMovePromotion;
+            if (lastMove == null)
+            {
+                Console.WriteLine("No last move available");
+                return;
+            }
+
+            var move = new MyChessGameMove
+            {
+                Move = lastMove.ToString(),
+                Comment = "",
+                Start = _start,
+                End = DateTimeOffset.UtcNow
+            };
+            if (lastPromotion != null)
+            {
+                move.SpecialMove = lastPromotion.Rank switch
+                {
+                    PieceRank.Bishop => MyChessGameSpecialMove.PromotionToBishop,
+                    PieceRank.Knight => MyChessGameSpecialMove.PromotionToKnight,
+                    PieceRank.Rook => MyChessGameSpecialMove.PromotionToRook,
+                    PieceRank.Queen => MyChessGameSpecialMove.PromotionToQueen,
+                    _ => throw new Exception($"Invalid rank: {lastPromotion.Rank}")
+                };
+            }
+
+            Game.Moves.Add(move);
+            CurrentMoveNumber++;
+
+            await SaveState();
+        }
     }
 
     protected async Task Cancel()
@@ -315,14 +395,21 @@ public class ChessBoardViewBase : MyChessComponentBase
         await DrawAsync();
     }
 
-    protected void ConfirmPromotion()
+    protected async Task ConfirmPromotion()
     {
         ShowPromotionDialog = false;
-        ShowConfirmationDialog = true;
+        ShowConfirmationDialog = false;
+        ShowCommentDialog = !IsLocal;
+
+        if (IsLocal)
+        {
+            await SaveState();
+        }
     }
 
     protected void ConfirmComment()
     {
+        ShowCommentDialog = false;
     }
 
     protected void FirstMove()
@@ -341,7 +428,25 @@ public class ChessBoardViewBase : MyChessComponentBase
     {
     }
 
-    protected void ResignGame()
+    private async Task SaveState()
     {
+        await JS.GetLocalStorage().Set("LocalGame", Game);
+    }
+
+    protected async void ResignGame()
+    {
+        if (IsLocal)
+        {
+            await JS.GetLocalStorage().Delete("LocalGame");
+
+            CurrentMoveNumber = 1;
+            ShowEllipse = false;
+            ShowPromotionDialog = false;
+            ShowConfirmationDialog = false;
+            ShowCommentDialog = false;
+            Board.Initialize();
+            PreviousAvailableMoves.Clear();
+            await DrawAsync();
+        }
     }
 }
