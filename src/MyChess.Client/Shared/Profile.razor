@@ -2,14 +2,14 @@
 
 <AuthorizeView>
     <Authorized>
-		<div className="Profile">
-			<a href="/settings" className="Profile-link"><img src="images/profile.svg" alt="Profile" /></a>
+		<div class="Profile">
+			<a href="/settings" class="Profile-link"><img src="images/profile.svg" alt="Profile" /></a>
 		</div>
     </Authorized>
     <NotAuthorized>
-		<div className="Profile">
+		<div class="Profile">
 			Want to play? Please
-			<button className="Profile-button" @onclick="NavigateToLogin">sign In</button>
+			<button class="Profile-button" @onclick="NavigateToLogin">sign In</button>
 		</div>
     </NotAuthorized>
 </AuthorizeView>

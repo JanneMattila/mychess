@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@azure/static-web-apps-cli@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@azure/static-web-apps-cli/-/static-web-apps-cli-0.8.0.tgz#9a8d3c7a7c6d0b47fafde976242cdd306e372061"
-  integrity sha512-CSNE9wyHQVVyHmnyOxTW89WNyswpzupKNKvL8ZJzgKaATX7WFAuu9sLc3/MbxmF4SOD17mUPoTJctq+JAQah9w==
+"@azure/static-web-apps-cli@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@azure/static-web-apps-cli/-/static-web-apps-cli-0.8.1.tgz#fdddfe565e6c720691785a733ae6a8037bb71cc0"
+  integrity sha512-cNgIx+saGwl4bWlsCrHaHbBJ57neRDjfyKDBp3JU/5VvOkga4bj1p0zrUf9sUGPxEb4q9lUY5GLlZRkwudgC4w==
   dependencies:
     "@types/globalyzer" "^0.1.1"
     "@types/globrex" "^0.1.0"

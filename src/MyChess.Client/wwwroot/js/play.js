@@ -56,8 +56,8 @@ const resizeCanvas = () => {
         }
         _canvasElement.width = _pieceSize * 8;
         _canvasElement.height = _pieceSize * 8;
-        element.style.width = `${Math.round(size)}px`;
-        element.style.height = `${Math.round(size)}px`;
+        //element.style.width = `${Math.round(size)}px`;
+        //element.style.height = `${Math.round(size)}px`;
         MyChessPlay.draw(_game);
     }
 };
