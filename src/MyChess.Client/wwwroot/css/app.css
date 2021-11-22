@@ -36,6 +36,27 @@ body {
     z-index: 100;
 }
 
+@keyframes Logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.Load-logo {
+    pointer-events: none;
+    padding: 10px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .Load-logo {
+        animation: Logo-spin infinite 2s linear;
+    }
+}
+
 .App {
     color: white;
 }
