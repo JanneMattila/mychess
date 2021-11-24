@@ -47,6 +47,8 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     protected override async Task OnInitializedAsync()
     {
+        Board.Initialize();
+
         if (ID == "local")
         {
             IsLocal = true;
@@ -66,8 +68,6 @@ public class ChessBoardViewBase : MyChessComponentBase
             await RefreshGame(ID);
         }
 
-        Board.Initialize();
-
         if (IsLocal)
         {
             try
@@ -76,7 +76,7 @@ public class ChessBoardViewBase : MyChessComponentBase
                 var game = await JS.GetLocalStorage().Get<MyChessGame>("LocalGame");
                 if (game != null)
                 {
-                    MakeMoves(game);
+                    await MakeMoves(game);
                 }
             }
             catch (Exception)
@@ -87,11 +87,11 @@ public class ChessBoardViewBase : MyChessComponentBase
         }
     }
 
-    private void MakeMoves(MyChessGame game)
+    private async Task MakeMoves(MyChessGame game, int moves = int.MaxValue)
     {
         Board.Initialize();
 
-        foreach (var gameMove in game.Moves)
+        foreach (var gameMove in game.Moves.Take(moves))
         {
             Console.WriteLine($"Make move {gameMove.Move}");
 
@@ -112,6 +112,8 @@ public class ChessBoardViewBase : MyChessComponentBase
                 }
             }
         }
+
+        await DrawAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -130,6 +132,9 @@ public class ChessBoardViewBase : MyChessComponentBase
     {
         AppState.IsLoading = true;
         Game = await Client.GetGameAsync(id);
+        CurrentMoveNumber = Game.Moves.Count + 1;
+        MakeMoves(Game);
+        await DrawAsync();
         AppState.IsLoading = false;
     }
 
@@ -412,20 +417,28 @@ public class ChessBoardViewBase : MyChessComponentBase
         ShowCommentDialog = false;
     }
 
-    protected void FirstMove()
+    protected async Task FirstMove()
     {
+        CurrentMoveNumber = 1;
+        await MakeMoves(Game, CurrentMoveNumber);
     }
 
-    protected void PreviousMove()
+    protected async Task PreviousMove()
     {
+        CurrentMoveNumber = Math.Max(CurrentMoveNumber - 1, 1);
+        await MakeMoves(Game, CurrentMoveNumber);
     }
 
-    protected void NextMove()
+    protected async Task NextMove()
     {
+        CurrentMoveNumber = Math.Min(CurrentMoveNumber + 1, Game.Moves.Count + 1);
+        await MakeMoves(Game, CurrentMoveNumber);
     }
 
-    protected void LastMove()
+    protected async Task LastMove()
     {
+        CurrentMoveNumber = Game.Moves.Count + 1;
+        await MakeMoves(Game, CurrentMoveNumber);
     }
 
     private async Task SaveState()
