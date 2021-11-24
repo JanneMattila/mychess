@@ -34,7 +34,7 @@
 		<div class="row">
 			@foreach (var game in Games)
 			{
-				<a href="/play/@game?.ID?state=" class="GameList-link">
+				<a href="/play/@game?.ID?state=@Filters" class="GameList-link">
 					<div class="gameTemplate">
 						<div class="nameTemplate">
 							@game?.Name
