@@ -9,4 +9,10 @@ public static class JSRuntimeExtensions
         ArgumentNullException.ThrowIfNull(js);
         return new LocalStorage(js);
     }
+
+    public static async Task<bool> Confirm(this IJSRuntime js, string text)
+    {
+        ArgumentNullException.ThrowIfNull(js);
+        return await js.InvokeAsync<bool>("confirm", text);
+    }
 }

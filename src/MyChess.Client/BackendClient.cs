@@ -118,4 +118,18 @@ public class BackendClient
             exception.Redirect();
         }
     }
+
+
+    public async Task ResignGameAsync(string id)
+    {
+        try
+        {
+            var response = await _client.DeleteAsync($"/api/games/{id}");
+            response.EnsureSuccessStatusCode();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+    }
 }

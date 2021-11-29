@@ -526,8 +526,13 @@ public class ChessBoardViewBase : MyChessComponentBase
         await JS.GetLocalStorage().Set("LocalGame", Game);
     }
 
-    protected async void ResignGame()
+    protected async Task ResignGame()
     {
+        if (!await JS.Confirm("Do you want to resign current game?"))
+        {
+            return;
+        }
+
         if (IsLocal)
         {
             await JS.GetLocalStorage().Delete("LocalGame");
@@ -540,6 +545,25 @@ public class ChessBoardViewBase : MyChessComponentBase
             Board.Initialize();
             PreviousAvailableMoves.Clear();
             await DrawAsync();
+        }
+        else
+        {
+            try
+            {
+                AppState.IsLoading = true;
+                await Client.ResignGameAsync(Game.ID);
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex);
+                Error = "Could not resign the game. Please try again later.";
+                return;
+            }
+            finally
+            {
+                AppState.IsLoading = false;
+            }
+            NavigationManager.NavigateTo("/");
         }
     }
 }
