@@ -105,4 +105,17 @@ public class BackendClient
 
         return null;
     }
+
+    public async Task SubmitMoveAsync(string id, MyChessGameMove move)
+    {
+        try
+        {
+            var response = await _client.PostAsJsonAsync($"/api/games/{id}/moves", move);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+    }
 }

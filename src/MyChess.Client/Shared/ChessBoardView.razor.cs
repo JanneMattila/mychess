@@ -44,6 +44,9 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected bool ShowCommentDialog { get; set; }
     protected bool ShowGameNameDialog { get; set; }
     protected bool ShowEllipse { get; set; }
+    protected string GameName { get; set; }
+    protected string Comment { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -364,10 +367,16 @@ public class ChessBoardViewBase : MyChessComponentBase
 
             await SaveState();
         }
+        else
+        {
+            ShowGameNameDialog = IsNew;
+            ShowCommentDialog = true;
+        }
     }
 
     protected async Task Cancel()
     {
+        Error = string.Empty;
         ShowPromotionDialog = false;
         ShowCommentDialog = false;
         ShowConfirmationDialog = false;
@@ -416,9 +425,72 @@ public class ChessBoardViewBase : MyChessComponentBase
         }
     }
 
-    protected void ConfirmComment()
+    protected async Task ConfirmComment()
     {
+        Error = string.Empty;
+        if (IsNew && string.IsNullOrWhiteSpace(GameName))
+        {
+            Error = "Game name required";
+            return;
+        }
+
+        var lastMove = Board.LastMove;
+        var lastPromotion = Board.LastMovePromotion;
+        if (lastMove == null)
+        {
+            Console.WriteLine("No last move available");
+            return;
+        }
+
+        var move = new MyChessGameMove
+        {
+            Move = lastMove.ToString(),
+            Comment = Comment,
+            Start = _start,
+            End = DateTimeOffset.UtcNow
+        };
+        if (lastPromotion != null)
+        {
+            move.SpecialMove = lastPromotion.Rank switch
+            {
+                PieceRank.Bishop => MyChessGameSpecialMove.PromotionToBishop,
+                PieceRank.Knight => MyChessGameSpecialMove.PromotionToKnight,
+                PieceRank.Rook => MyChessGameSpecialMove.PromotionToRook,
+                PieceRank.Queen => MyChessGameSpecialMove.PromotionToQueen,
+                _ => throw new Exception($"Invalid rank: {lastPromotion.Rank}")
+            };
+        }
+
+        try
+        {
+            AppState.IsLoading = true;
+            await Client.SubmitMoveAsync(Game.ID, move);
+        }
+        catch (Exception ex)
+        {
+            Console.Write(ex);
+
+            if (IsNew)
+            {
+                Error = "Could not create game. Please try again later.";
+
+            }
+            else
+            {
+                Error = "Could not submit move. Please try again later.";
+            }
+            return;
+        }
+        finally
+        {
+            AppState.IsLoading = false;
+        }
+        Game.Moves.Add(move);
+        CurrentMoveNumber++;
+        ShowGameNameDialog = false;
         ShowCommentDialog = false;
+        Comment = string.Empty;
+        GameName = string.Empty;
     }
 
     protected async Task FirstMove()

@@ -47,14 +47,14 @@
 		{
 			<div id="gameNameDialog">
 				Game name:<br />
-				<input id="gameName" type="text" name="gameName" title="Game name" placeholder="Name your game here" class="Play-GameName" />
+				<input id="gameName" type="text" name="gameName" @bind-value="GameName" title="Game name" placeholder="Name your game here" class="Play-GameName" />
 				<br />
 			</div>
 		}
 
 		Comment:<br />
 		<label>
-			<textarea id="comment" name="comment" title="Comment" placeholder="Add your comment here" rows="3" cols="50" />
+			<textarea id="comment" name="comment" title="Comment" @bind="Comment" placeholder="Add your comment here" rows="3" cols="50" />
 		</label><br />
 		<button @onclick="ConfirmComment"><span role="img" aria-label="OK">✅</span> Confirm</button>
 		<button @onclick="Cancel"><span role="img" aria-label="Cancel">❌</span> Cancel</button>
