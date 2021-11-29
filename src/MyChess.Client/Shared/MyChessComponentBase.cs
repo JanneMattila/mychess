@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using MyChess.Client.Extensions;
 
 namespace MyChess.Client.Shared
 {
@@ -27,6 +28,22 @@ namespace MyChess.Client.Shared
         protected void NavigateToLogin()
         {
             NavigationManager.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}");
+        }
+
+        protected async Task<string> GetPlayerID()
+        {
+            try
+            {
+                var playerID = await JS.GetLocalStorage().Get<string>("PlayerID");
+                ArgumentNullException.ThrowIfNull(playerID);
+                return playerID;
+            }
+            catch (Exception)
+            {
+                var user = await Client.GetMe();
+                await JS.GetLocalStorage().Set("PlayerID", user.ID);
+                return user.ID;
+            }
         }
 
         protected virtual void Dispose(bool disposing)

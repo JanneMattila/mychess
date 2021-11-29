@@ -13,6 +13,21 @@ public class BackendClient
         _client = client;
     }
 
+    public async Task<User> GetMe()
+    {
+        var me = new User();
+        try
+        {
+            me = await _client.GetFromJsonAsync<User>("/api/users/me");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        ArgumentNullException.ThrowIfNull(me);
+        return me;
+    }
+
     public async Task<MyChessGame> GetGameAsync(string id, string state = "")
     {
         var game = new MyChessGame();
@@ -106,6 +121,23 @@ public class BackendClient
         return null;
     }
 
+    public async Task<MyChessGame> SubmitGameAsync(MyChessGame game)
+    {
+        MyChessGame? newGame = null;
+        try
+        {
+            var response = await _client.PostAsJsonAsync($"/api/games", game);
+            response.EnsureSuccessStatusCode();
+            newGame = await response.Content.ReadFromJsonAsync<MyChessGame?>();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        ArgumentNullException.ThrowIfNull(newGame);
+        return newGame;
+    }
+
     public async Task SubmitMoveAsync(string id, MyChessGameMove move)
     {
         try
@@ -118,7 +150,6 @@ public class BackendClient
             exception.Redirect();
         }
     }
-
 
     public async Task ResignGameAsync(string id)
     {
