@@ -4,20 +4,19 @@
 <div>
 	@if (Friends.Any())
 	{
-		<div class="row">
+		<div class="row g-0">
 			@foreach (var friend in Friends)
 			{
-				<a href="/play/new?friendID=@friend?.ID" class="FriendList-link">
-					<div class="friendTemplate">
-						<div class="nameTemplate">
-							@friend?.Name
-						</div>
-
-						<button type="button" class="manageTemplate" aria-label="Close" @onclick:preventDefault=true @onclick:stopPropagation=true @onclick="() => ManageFriend(friend?.ID)">
-							<span aria-hidden="true">Manage friend</span>
-						</button>
+				<div class="friendTemplate">
+					<div class="nameTemplate">
+						@friend?.Name
 					</div>
-				</a>
+
+					<button type="button" class="manageTemplate" aria-label="Close" @onclick:preventDefault=true @onclick:stopPropagation=true @onclick="() => ManageFriend(friend?.ID)">
+						<span aria-hidden="true">Manage friend</span>
+					</button>
+				    <a href="/play/new?friendID=@friend?.ID" class="FriendList-link"></a>
+				</div>
 			}
 		</div>
 		<div class="subtitle">

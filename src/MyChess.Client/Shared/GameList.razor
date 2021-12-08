@@ -31,32 +31,30 @@
 	}
 	else
 	{
-		<div class="row">
+		<div class="row g-0">
 			@foreach (var game in Games)
 			{
-				<a href="/play/@game?.ID?state=@Filters" class="GameList-link">
-					<div class="gameTemplate">
-						<div class="nameTemplate">
-							@game?.Name
-						</div>
-						<div class="commentTemplate">
-							@if (game?.Moves.Count > 0)
-							{
-								@game?.Moves[game.Moves.Count - 1].Comment
-							}
-						</div>
-						<div class="opponentTemplate">
-							@game?.GetOpponent()
-						</div>
-						<div class="dateTemplate">
-							@game?.GetDate()
-						</div>
-						<div class="statusTemplate">
-							@game?.GetStatus()
-						</div>
+				<div class="gameTemplate">
+					<div class="nameTemplate">
+						@game?.Name
 					</div>
-				</a>
-
+					<div class="commentTemplate">
+						@if (game?.Moves.Count > 0)
+						{
+							@game?.Moves[game.Moves.Count - 1].Comment
+						}
+					</div>
+					<div class="opponentTemplate">
+						@game?.GetOpponent()
+					</div>
+					<div class="dateTemplate">
+						@game?.GetDate()
+					</div>
+					<div class="statusTemplate">
+						@game?.GetStatus()
+					</div>
+				    <a href="/play/@game?.ID?state=@Filters" class="GameList-link"></a>
+				</div>
 			}
 		</div>
 		<div class="subtitle">

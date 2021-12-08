@@ -40,7 +40,14 @@
 }
 
 .GameList-link {
-    color: #ffffff;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    text-decoration: none;
+    z-index: 10;
+    opacity: 0;
 }
 
 .gameTemplate {
@@ -49,7 +56,8 @@
     margin: 10px;
     height: 190px;
     background-color: #454545;
-    width: 30%;
+    width: 40%;
+    position: relative;
 }
 
     .gameTemplate:hover {
