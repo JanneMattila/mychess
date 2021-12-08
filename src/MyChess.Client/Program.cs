@@ -24,6 +24,7 @@ builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
 
+    options.ProviderOptions.Cache.CacheLocation = "localStorage";
     options.ProviderOptions.LoginMode = "redirect";
 
     var applicationIdURI = builder.Configuration.GetValue<string>("applicationIdURI");
