@@ -60,6 +60,8 @@
 .manageTemplate {
     margin-top: 50px;
     width: 90%;
+    z-index: 20;
+    position: relative;
 }
 
 
