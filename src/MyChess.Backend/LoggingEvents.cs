@@ -62,6 +62,7 @@
         public const int GameHandlerMoveNotPlayerTurn = 2106;
         public const int GameHandlerGameNotFoundFromTable = 2107;
         public const int GameHandlerDeleteGameNotFound = 2108;
+        public const int GameHandlerDeleteGameAlreadyArchived = 2109;
 
         public const int FriendHandlerFriendFound = 2200;
         public const int FriendHandlerFriendNotFound = 2201;

@@ -18,6 +18,7 @@ namespace MyChess.Backend.Handlers.Internal
         private static readonly Action<ILogger, string, string, string, Exception> _gameHandlerMoveNotPlayerTurn;
 
         private static readonly Action<ILogger, string, Exception> _gameHandlerDeleteGameNotFound;
+        private static readonly Action<ILogger, string, Exception> _gameHandlerDeleteGameAlreadyArchived;
 
         static GamesHandlerLoggerExtensions()
         {
@@ -55,6 +56,10 @@ namespace MyChess.Backend.Handlers.Internal
                 LogLevel.Warning,
                 new EventId(LoggingEvents.GameHandlerDeleteGameNotFound, nameof(GameHandlerDeleteGameNotFound)),
                 "Could not find game {GameID} to be deleted.");
+            _gameHandlerDeleteGameAlreadyArchived = LoggerMessage.Define<string>(
+                LogLevel.Information,
+                new EventId(LoggingEvents.GameHandlerDeleteGameAlreadyArchived, nameof(GameHandlerDeleteGameAlreadyArchived)),
+                "Game {GameID} cannot be archived, since it's already archived.");
         }
 
         public static void GameHandlerGameFound(this ILogger logger, string gameID) => _gameHandlerGameFound(logger, gameID, null);
@@ -67,5 +72,6 @@ namespace MyChess.Backend.Handlers.Internal
         public static void GameHandlerMoveNotPlayerTurn(this ILogger logger, string gameID, string userID, string currentTurn) => _gameHandlerMoveNotPlayerTurn(logger, gameID, userID, currentTurn, null);
 
         public static void GameHandlerDeleteGameNotFound(this ILogger logger, string gameID) => _gameHandlerDeleteGameNotFound(logger, gameID, null);
+        public static void GameHandlerDeleteGameAlreadyArchived(this ILogger logger, string gameID) => _gameHandlerDeleteGameAlreadyArchived(logger, gameID, null);
     }
 }

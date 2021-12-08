@@ -299,6 +299,18 @@ namespace MyChess.Backend.Handlers
                 };
             }
 
+            if (game.State != GameState.Normal)
+            {
+                _log.GameHandlerDeleteGameAlreadyArchived(gameID);
+                return new HandlerError()
+                {
+                    Instance = LoggingEvents.CreateLinkToProblemDescription(LoggingEvents.GameHandlerDeleteGameAlreadyArchived),
+                    Status = (int)HttpStatusCode.BadRequest,
+                    Title = "Game already archived",
+                    Detail = "Archived game cannot be updated"
+                };
+            }
+
             MakeMoves(game);
 
             // Move game to archive

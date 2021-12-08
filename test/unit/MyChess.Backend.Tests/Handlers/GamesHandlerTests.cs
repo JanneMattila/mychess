@@ -306,5 +306,56 @@ namespace MyChess.Backend.Tests.Handlers
             Assert.Equal(expectedWaitingForOpponent, actualWaitingForOpponent);
             Assert.Equal(expectedArchive, actualWaitingArchive);
         }
+
+        [Fact]
+        public async Task Delete_Archived_Game()
+        {
+            // Arrange
+            var user1 = new AuthenticatedUser()
+            {
+                Name = "abc",
+                PreferredUsername = "a b",
+                UserIdentifier = "u1",
+                ProviderIdentifier = "p1"
+            };
+
+            // Player creating the game
+            await _context.UpsertAsync(TableNames.Users, new UserEntity()
+            {
+                PartitionKey = "u1",
+                RowKey = "p1",
+                UserID = "user123"
+            });
+            await _context.UpsertAsync(TableNames.UserID2User, new UserID2UserEntity()
+            {
+                PartitionKey = "user123",
+                RowKey = "user123",
+                UserPrimaryKey = "u1",
+                UserRowKey = "p1"
+            });
+
+            var game = new MyChessGame
+            {
+                ID = "aaa"
+            };
+            game.State = ChessBoardState.CheckMate.ToString();
+            game.Players.White.ID = "user123";
+
+            var compactor = new Compactor();
+            var data = compactor.Compact(game);
+            await _context.UpsertAsync(TableNames.GamesArchive, new GameEntity()
+            {
+                PartitionKey = "user123",
+                RowKey = "aaa",
+                Data = data
+            });
+
+            // Act
+            var actual = await _gamesHandler.DeleteGameAsync(user1, "aaa");
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.IsType<HandlerError>(actual);
+        }
     }
 }
