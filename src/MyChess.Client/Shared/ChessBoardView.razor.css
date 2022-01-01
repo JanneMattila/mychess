@@ -5,9 +5,19 @@
     color: red;
 }
 
+.Play-Form {
+    padding: 10px;
+    font-size: calc(10px + 2vmin);
+}
+
 .Play-GameName {
     font-size: calc(12px + 2vmin);
     padding: 5px;
     margin: 10px;
-    width: 80%;
+    width: inherit;
+}
+
+textarea {
+    width: inherit;
+    height: 150px;
 }
