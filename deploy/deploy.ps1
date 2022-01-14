@@ -9,7 +9,7 @@ Param (
     [string] $EnvironmentName = "local",
 
     [Parameter(HelpMessage = "GitHub Repo")]
-    [string] $Repo = "jannemattila/mychess",
+    [string] $Repo = "https://github.com/jannemattila/mychess",
     
     [Parameter(HelpMessage = "GitHub branch")] 
     [string] $Branch = "main",
@@ -37,7 +37,7 @@ Param (
     [Parameter(Mandatory = $true, HelpMessage = "WebPush Private Key")]
     [string] $WebPushPrivateKey,
 
-    [string] $Template = "$PSScriptRoot\azuredeploy.json",
+    [string] $Template = "$PSScriptRoot\azuredeploy.bicep",
     [string] $TemplateParameters = "$PSScriptRoot\azuredeploy.parameters.json"
 )
 
