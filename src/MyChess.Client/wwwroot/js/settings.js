@@ -41,6 +41,7 @@ MyChessSettings.enableNotifications = (webPushPublicKey) => __awaiter(this, void
         throw new Error(`Notification permission should be 'granted' but is ${permission}`);
     }
     var options = {
+        userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(webPushPublicKey)
     };
     const result = yield registration.pushManager.subscribe(options);
@@ -57,4 +58,8 @@ MyChessSettings.enableNotifications = (webPushPublicKey) => __awaiter(this, void
         auth: auth
     };
 });
+//MyChessSettings.beforeinstallprompt = async (deferredPrompt: any) => {
+//    deferredPrompt.prompt();
+//}
+//window.addEventListener('beforeinstallprompt', MyChessSettings.beforeinstallprompt);
 //# sourceMappingURL=settings.js.map
