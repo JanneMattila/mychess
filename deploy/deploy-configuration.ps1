@@ -22,7 +22,7 @@ Write-Host "Processing folder: $AppRootFolder"
 
 $settings = @{
     AzureAd = @{
-        Authority ="htts://login.microsoftonline.com/common"
+        Authority ="https://login.microsoftonline.com/common"
         ClientId = $ClientID
         ValidateAuthority = $true
     }
