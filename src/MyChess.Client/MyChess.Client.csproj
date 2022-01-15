@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TypeScriptTarget>ES2016</TypeScriptTarget>
+    <UserSecretsId>3ee62d47-2d64-4631-b79c-d8f3cfe6e6e5</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +22,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>-->
+  </ItemGroup>
+
+  <ItemGroup>
+      <!-- https://github.com/dotnet/aspnetcore/issues/33312 -->
+      <TrimmerRootAssembly Include="Microsoft.Authentication.WebAssembly.Msal" />
   </ItemGroup>
 
   <ItemGroup>
