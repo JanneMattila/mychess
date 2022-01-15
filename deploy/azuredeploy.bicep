@@ -71,6 +71,7 @@ var storageName = 'mychess${uniqueString(resourceGroup().id)}'
 var appAlertActionGroupName = '${appName}ActionGroup'
 var appInsightsExceptionQueryName = '${appName}AppInsightsExceptionQuery'
 var customDomainUri = 'https://${customDomain}'
+var storageTableDataContributor = '0a9a7e1f-b9d0-4cc4-a60d-0319b160aaa3'
 
 resource storageResource 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   name: storageName
@@ -81,6 +82,7 @@ resource storageResource 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   kind: 'StorageV2'
   properties: {
     supportsHttpsTrafficOnly: true
+    allowSharedKeyAccess: false
   }
 }
 
@@ -96,6 +98,9 @@ resource appInsightsResource 'Microsoft.Insights/components@2020-02-02' = {
 resource staticWebAppResource 'Microsoft.Web/staticSites@2021-02-01' = {
   name: appName
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     repositoryUrl: repositoryUrl
     branch: branch
@@ -108,6 +113,15 @@ resource staticWebAppResource 'Microsoft.Web/staticSites@2021-02-01' = {
   sku: {
     name: staticWebAppSku
     tier: staticWebAppSku
+  }
+}
+
+resource storageRoleAssignmentForStaticWebAppResource 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+  name: guid(storageResource.id, appName, storageTableDataContributor)
+  scope: storageResource
+  properties: {
+    principalId: staticWebAppResource.identity.principalId
+    roleDefinitionId: storageTableDataContributor
   }
 }
 
