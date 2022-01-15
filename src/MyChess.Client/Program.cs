@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MyChess;
 using MyChess.Client;
+using MyChess.Client.Models;
 using MyChess.Client.Shared;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -19,6 +20,10 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddTransient<ChessBoard>();
 builder.Services.AddScoped<AppState>();
+builder.Services.AddSingleton<WebPushOptions>(wpo => new WebPushOptions()
+{
+    WebPushPublicKey = builder.Configuration.GetValue<string>("webPushPublicKey")
+});
 
 builder.Services.AddMsalAuthentication(options =>
 {

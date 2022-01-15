@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.JSInterop;
+using MyChess.Client.Models;
 using MyChess.Client.Shared;
 using MyChess.Interfaces;
 
@@ -19,6 +20,10 @@ public class SettingsBase : MyChessComponentBase
     [AllowNull]
     [Inject]
     protected SignOutSessionStateManager SignOutManager { get; set; }
+
+    [AllowNull]
+    [Inject]
+    protected WebPushOptions WebPushOptions { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -55,7 +60,7 @@ public class SettingsBase : MyChessComponentBase
             var settings = new UserSettings();
             if (IsNotificationsEnabled)
             {
-                var notificationSettings = await JS.InvokeAsync<UserNotifications>("MyChessSettings.enableNotifications", "");
+                var notificationSettings = await JS.InvokeAsync<UserNotifications>("MyChessSettings.enableNotifications", WebPushOptions.WebPushPublicKey);
                 settings.Notifications.Add(new UserNotifications()
                 {
                     Enabled = true,
