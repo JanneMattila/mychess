@@ -21,18 +21,21 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
 builder.Services.AddBlazorApplicationInsights(async applicationInsights =>
 {
     var instrumentationKey = builder.Configuration.GetValue<string>("instrumentationKey");
-    //var telemetryItem = new TelemetryItem()
-    //{
-    //    Tags = new Dictionary<string, object>()
-    //        {
-    //            { "ai.cloud.role", "SPA" },
-    //            { "ai.cloud.roleInstance", "Blazor Wasm" },
-    //        }
-    //};
+    if (!string.IsNullOrEmpty(instrumentationKey))
+    {
+        //var telemetryItem = new TelemetryItem()
+        //{
+        //    Tags = new Dictionary<string, object>()
+        //        {
+        //            { "ai.cloud.role", "SPA" },
+        //            { "ai.cloud.roleInstance", "Blazor Wasm" },
+        //        }
+        //};
 
-    //await applicationInsights.AddTelemetryInitializer(telemetryItem);
-    await applicationInsights.SetInstrumentationKey(instrumentationKey);
-    await applicationInsights.LoadAppInsights();
+        //await applicationInsights.AddTelemetryInitializer(telemetryItem);
+        await applicationInsights.SetInstrumentationKey(instrumentationKey);
+        await applicationInsights.LoadAppInsights();
+    }
 });
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddTransient<ChessBoard>();
