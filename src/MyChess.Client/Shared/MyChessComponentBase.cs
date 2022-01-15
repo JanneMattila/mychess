@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using BlazorApplicationInsights;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MyChess.Client.Extensions;
@@ -24,6 +25,10 @@ namespace MyChess.Client.Shared
         [AllowNull]
         [Inject]
         protected IJSRuntime JS { get; set; }
+
+        [AllowNull]
+        [Inject] 
+        protected IApplicationInsights AppInsights { get; set; }
 
         protected void NavigateToLogin()
         {
