@@ -34,15 +34,16 @@ namespace MyChess.Backend.Data
 
             _log = log;
             var tableStorageUri = new Uri(options.Value.StorageConnectionString);
-            _usersTable = new TableClient(tableStorageUri, TableNames.Users, new DefaultAzureCredential());
-            _userFriendsTable = new TableClient(tableStorageUri, TableNames.UserFriends, new DefaultAzureCredential()); 
-            _userNotificationsTable = new TableClient(tableStorageUri, TableNames.UserNotifications, new DefaultAzureCredential()); 
-            _userSettingsTable = new TableClient(tableStorageUri, TableNames.UserSettings, new DefaultAzureCredential());
-            _userID2UserTable = new TableClient(tableStorageUri, TableNames.UserID2User, new DefaultAzureCredential());
-
-            _gamesWaitingForYouTable = new TableClient(tableStorageUri, TableNames.GamesWaitingForYou, new DefaultAzureCredential());
-            _gamesWaitingForOpponentTable = new TableClient(tableStorageUri, TableNames.GamesWaitingForOpponent, new DefaultAzureCredential());
-            _gamesArchiveTable = new TableClient(tableStorageUri, TableNames.GamesArchive, new DefaultAzureCredential()); 
+            var credential = new DefaultAzureCredential();
+            _usersTable = new TableClient(tableStorageUri, TableNames.Users, credential);
+            _userFriendsTable = new TableClient(tableStorageUri, TableNames.UserFriends, credential);
+            _userNotificationsTable = new TableClient(tableStorageUri, TableNames.UserNotifications, credential);
+            _userSettingsTable = new TableClient(tableStorageUri, TableNames.UserSettings, credential);
+            _userID2UserTable = new TableClient(tableStorageUri, TableNames.UserID2User, credential);
+            
+            _gamesWaitingForYouTable = new TableClient(tableStorageUri, TableNames.GamesWaitingForYou, credential);
+            _gamesWaitingForOpponentTable = new TableClient(tableStorageUri, TableNames.GamesWaitingForOpponent, credential);
+            _gamesArchiveTable = new TableClient(tableStorageUri, TableNames.GamesArchive, credential);
         }
 
         public void Initialize()
@@ -126,7 +127,7 @@ namespace MyChess.Backend.Data
         {
             Initialize();
             var table = GetTable(tableName);
-            var query = table.QueryAsync<T>($"PartitionKey eq {partitionKey}");
+            var query = table.QueryAsync<T>($"PartitionKey eq '{partitionKey}'");
             var result = query.AsPages(string.Empty);
             await foreach (var items in result)
             {
