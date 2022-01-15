@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos.Table;
+using Azure;
+using Azure.Data.Tables;
+using Azure.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MyChess.Backend.Data.Internal;
@@ -12,17 +14,15 @@ namespace MyChess.Backend.Data
     {
         private readonly ILogger<MyChessDataContext> _log;
 
-        private readonly CloudStorageAccount _cloudStorageAccount;
+        private readonly TableClient _usersTable;
+        private readonly TableClient _userFriendsTable;
+        private readonly TableClient _userNotificationsTable;
+        private readonly TableClient _userSettingsTable;
+        private readonly TableClient _userID2UserTable;
 
-        private readonly CloudTable _usersTable;
-        private readonly CloudTable _userFriendsTable;
-        private readonly CloudTable _userNotificationsTable;
-        private readonly CloudTable _userSettingsTable;
-        private readonly CloudTable _userID2UserTable;
-
-        private readonly CloudTable _gamesWaitingForYouTable;
-        private readonly CloudTable _gamesWaitingForOpponentTable;
-        private readonly CloudTable _gamesArchiveTable;
+        private readonly TableClient _gamesWaitingForYouTable;
+        private readonly TableClient _gamesWaitingForOpponentTable;
+        private readonly TableClient _gamesArchiveTable;
         private bool _initialized = false;
 
         public MyChessDataContext(ILogger<MyChessDataContext> log, IOptions<MyChessDataContextOptions> options)
@@ -33,18 +33,16 @@ namespace MyChess.Backend.Data
             }
 
             _log = log;
-            _cloudStorageAccount = CloudStorageAccount.Parse(options.Value.StorageConnectionString);
+            var tableStorageUri = new Uri(options.Value.StorageConnectionString);
+            _usersTable = new TableClient(tableStorageUri, TableNames.Users, new DefaultAzureCredential());
+            _userFriendsTable = new TableClient(tableStorageUri, TableNames.UserFriends, new DefaultAzureCredential()); 
+            _userNotificationsTable = new TableClient(tableStorageUri, TableNames.UserNotifications, new DefaultAzureCredential()); 
+            _userSettingsTable = new TableClient(tableStorageUri, TableNames.UserSettings, new DefaultAzureCredential());
+            _userID2UserTable = new TableClient(tableStorageUri, TableNames.UserID2User, new DefaultAzureCredential());
 
-            var tableClient = _cloudStorageAccount.CreateCloudTableClient();
-            _usersTable = tableClient.GetTableReference(TableNames.Users);
-            _userFriendsTable = tableClient.GetTableReference(TableNames.UserFriends);
-            _userNotificationsTable = tableClient.GetTableReference(TableNames.UserNotifications);
-            _userSettingsTable = tableClient.GetTableReference(TableNames.UserSettings);
-            _userID2UserTable = tableClient.GetTableReference(TableNames.UserID2User);
-
-            _gamesWaitingForYouTable = tableClient.GetTableReference(TableNames.GamesWaitingForYou);
-            _gamesWaitingForOpponentTable = tableClient.GetTableReference(TableNames.GamesWaitingForOpponent);
-            _gamesArchiveTable = tableClient.GetTableReference(TableNames.GamesArchive);
+            _gamesWaitingForYouTable = new TableClient(tableStorageUri, TableNames.GamesWaitingForYou, new DefaultAzureCredential());
+            _gamesWaitingForOpponentTable = new TableClient(tableStorageUri, TableNames.GamesWaitingForOpponent, new DefaultAzureCredential());
+            _gamesArchiveTable = new TableClient(tableStorageUri, TableNames.GamesArchive, new DefaultAzureCredential()); 
         }
 
         public void Initialize()
@@ -53,36 +51,36 @@ namespace MyChess.Backend.Data
             {
                 _log.DataContextInitializing();
 
-                var usersTableCreated = _usersTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.Users, usersTableCreated);
+                _usersTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.Users, false);
 
-                var userFriendsTableCreated = _userFriendsTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.UserFriends, userFriendsTableCreated);
+                _userFriendsTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserFriends, false);
 
-                var userNotificationsTableCreated = _userNotificationsTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.UserNotifications, userNotificationsTableCreated);
+                _userNotificationsTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserNotifications, false);
 
-                var userSettingsTableCreated = _userSettingsTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.UserSettings, userSettingsTableCreated);
+                _userSettingsTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserSettings, false);
 
-                var userID2UserTableCreated = _userID2UserTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.UserID2User, userID2UserTableCreated);
+                _userID2UserTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserID2User, false);
 
-                var gamesWaitingForYouTableCreated = _gamesWaitingForYouTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.GamesWaitingForYou, gamesWaitingForYouTableCreated);
+                _gamesWaitingForYouTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.GamesWaitingForYou, false);
 
-                var gamesWaitingForOpponentTableCreated = _gamesWaitingForOpponentTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.GamesWaitingForOpponent, gamesWaitingForOpponentTableCreated);
+                _gamesWaitingForOpponentTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.GamesWaitingForOpponent, false);
 
-                var gamesArchiveTableCreated = _gamesArchiveTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.GamesArchive, gamesArchiveTableCreated);
+                _gamesArchiveTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.GamesArchive, false);
 
                 _log.DataContextInitialized();
                 _initialized = true;
             }
         }
 
-        private CloudTable GetTable(string tableName)
+        private TableClient GetTable(string tableName)
         {
             return tableName switch
             {
@@ -99,52 +97,44 @@ namespace MyChess.Backend.Data
         }
 
         public async Task<T?> GetAsync<T>(string tableName, string partitionKey, string rowKey)
-            where T : TableEntity
+            where T : class, ITableEntity, new()
         {
             Initialize();
             var table = GetTable(tableName);
-            var retrieveOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
-            var result = await table.ExecuteAsync(retrieveOperation);
-            return result.Result as T;
+            var entity = await table.GetEntityAsync<T>(partitionKey, rowKey);
+            return entity.Value as T;
         }
 
-        public async Task<TableResult> UpsertAsync<T>(string tableName, T entity)
-            where T : TableEntity
+        public async Task UpsertAsync<T>(string tableName, T entity)
+            where T : ITableEntity
         {
             Initialize();
             var table = GetTable(tableName);
-            var upsertOperation = TableOperation.InsertOrReplace(entity);
-            return await table.ExecuteAsync(upsertOperation);
+            await table.UpsertEntityAsync<T>(entity);
         }
 
-        public async Task<TableResult> DeleteAsync<T>(string tableName, T entity)
-            where T : TableEntity
+        public async Task DeleteAsync<T>(string tableName, T entity)
+            where T : ITableEntity
         {
             Initialize();
             var table = GetTable(tableName);
-            entity.ETag = "*"; // Blindly delete this.
-            var deleteOperation = TableOperation.Delete(entity);
-            return await table.ExecuteAsync(deleteOperation);
+            await table.DeleteEntityAsync(entity.PartitionKey, entity.RowKey, ETag.All);
         }
 
         public async IAsyncEnumerable<T> GetAllAsync<T>(string tableName, string partitionKey)
-            where T : TableEntity, new()
+            where T : class, ITableEntity, new()
         {
             Initialize();
             var table = GetTable(tableName);
-            var query = new TableQuery<T>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
-            var token = new TableContinuationToken();
-
-            do
+            var query = table.QueryAsync<T>($"PartitionKey eq {partitionKey}");
+            var result = query.AsPages(string.Empty);
+            await foreach (var items in result)
             {
-                var result = await table.ExecuteQuerySegmentedAsync<T>(query, token);
-                foreach (var item in result)
+                foreach (var item in items.Values)
                 {
                     yield return item;
                 }
-                token = result.ContinuationToken;
-            } while (token != null);
+            }
         }
     }
 }

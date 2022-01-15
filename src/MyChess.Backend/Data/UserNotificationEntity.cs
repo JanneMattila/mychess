@@ -1,13 +1,22 @@
 ﻿using System;
-using Microsoft.Azure.Cosmos.Table;
+using Azure;
+using Azure.Data.Tables;
 
 namespace MyChess.Backend.Data
 {
-    public class UserNotificationEntity : TableEntity
+    public class UserNotificationEntity : ITableEntity
     {
         public UserNotificationEntity()
         {
         }
+
+        public string PartitionKey { get; set; }
+
+        public string RowKey { get; set; }
+
+        public DateTimeOffset? Timestamp { get; set; }
+
+        public ETag ETag { get; set; }
 
         public string Name { get; set; } = string.Empty;
 

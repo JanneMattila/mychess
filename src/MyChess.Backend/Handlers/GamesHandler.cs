@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.Azure.Cosmos.Table;
+using Azure;
 using Microsoft.Extensions.Logging;
 using MyChess.Backend.Data;
 using MyChess.Backend.Handlers.Internal;
@@ -347,10 +347,10 @@ namespace MyChess.Backend.Handlers
                             RowKey = game.ID
                         });
                     }
-                    catch (StorageException ex)
+                    catch (RequestFailedException ex)
                     {
                         // Ignore all errors when games are not found
-                        if (ex.RequestInformation.HttpStatusCode != 404)
+                        if (ex.Status != 404)
                         {
                             throw;
                         }
