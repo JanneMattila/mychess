@@ -3,7 +3,7 @@ Param (
     [string] $ResourceGroupName = "rg-mychess-local",
 
     [Parameter(HelpMessage = "Deployment target resource group location")] 
-    [string] $Location = "North Europe",
+    [string] $Location = "West Europe",
 
     [Parameter(HelpMessage = "Deployment environment name")] 
     [string] $EnvironmentName = "local",
@@ -88,31 +88,19 @@ $result = New-AzResourceGroupDeployment `
     -Mode Complete -Force `
     -Verbose
 
-if ($null -eq $result.Outputs.webAppName -or
-    $null -eq $result.Outputs.webAppUri -or
-    $null -eq $result.Outputs.instrumentationKey -or
-    $null -eq $result.Outputs.cdnCustomDomainName -or
-    $null -eq $result.Outputs.cdnCustomDomainUri) {
+if ($null -eq $result.Outputs.customDomainUri) {
     Throw "Template deployment didn't return web app information correctly and therefore deployment is cancelled."
 }
 
 $result
 
-$appStorageName = $result.Outputs.appStorageName.value
-$webAppName = $result.Outputs.webAppName.value
-$webAppUri = $result.Outputs.webAppUri.value
-$instrumentationKey = $result.Outputs.instrumentationKey.value
-$cdnCustomDomainUri = $result.Outputs.cdnCustomDomainUri.value
-
+$customDomainUri = $result.Outputs.customDomainUri.value
 
 # Publish variable to the Azure DevOps agents so that they
 # can be used in follow-up tasks such as application deployment
-Write-Host "##vso[task.setvariable variable=Custom.WebStorageName;]$webStorageName"
-Write-Host "##vso[task.setvariable variable=Custom.WebStorageUri;]$webStorageUri"
-Write-Host "##vso[task.setvariable variable=Custom.WebAppName;]$webAppName"
 Write-Host "##vso[task.setvariable variable=Custom.WebAppUri;]https://$CustomDomain"
 
 $azureADdeployment = . $PSScriptRoot\deploy_aad_apps.ps1 `
     -EnvironmentName $EnvironmentName `
-    -SPAUri $cdnCustomDomainUri `
+    -SPAUri $customDomainUri `
     -UpdateReplyUrl # Update reply urls

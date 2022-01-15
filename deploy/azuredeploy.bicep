@@ -118,11 +118,11 @@ resource appSettingsResource 'Microsoft.Web/staticSites/config@2021-01-15' = {
     AzureSignalRConnectionString: appSignalRResource.listKeys().primaryConnectionString
     Storage: 'DefaultEndpointsProtocol=https;AccountName=${storageName};AccountKey=${storageResource.listKeys().keys[0].value}'
     APPINSIGHTS_INSTRUMENTATIONKEY: appInsightsResource.properties.InstrumentationKey
-    'WebPush:PublicServerUri': customDomainUri
-    'WebPush:PublicKey': webPushPublicKey
-    'WebPush:PrivateKey': webPushPrivateKey
-    'AzureAD:ClientId': clientId
-    'AzureAD:Audience': applicationIdURI
+    WebPush__PublicServerUri: customDomainUri
+    WebPush__PublicKey: webPushPublicKey
+    WebPush__PrivateKey: webPushPrivateKey
+    AzureAD__ClientId: clientId
+    AzureAD__Audience: applicationIdURI
   }
 }
 
@@ -212,4 +212,4 @@ resource appInsightsExceptionQueryResource 'microsoft.insights/scheduledqueryrul
 }
 
 output instrumentationKey string = appInsightsResource.properties.InstrumentationKey
-output cdnCustomDomainUri string = customDomainUri
+output customDomainUri string = customDomainUri
