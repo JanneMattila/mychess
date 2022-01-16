@@ -13,9 +13,9 @@ namespace MyChess.Functions
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-#if DEBUG
+//#if DEBUG
             Microsoft.IdentityModel.Logging.IdentityModelEventSource.ShowPII = true;
-#endif
+//#endif
             builder.Services.AddOptions<AzureADOptions>()
                 .Configure<IConfiguration>((settings, configuration) =>
                 {
