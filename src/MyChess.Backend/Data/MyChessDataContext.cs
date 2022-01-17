@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
-using Azure.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MyChess.Backend.Data.Internal;
@@ -24,6 +23,7 @@ namespace MyChess.Backend.Data
         private readonly TableClient _gamesWaitingForOpponentTable;
         private readonly TableClient _gamesArchiveTable;
         private bool _initialized = false;
+        private string _configuration;
 
         public MyChessDataContext(ILogger<MyChessDataContext> log, IOptions<MyChessDataContextOptions> options)
         {
@@ -33,17 +33,28 @@ namespace MyChess.Backend.Data
             }
 
             _log = log;
-            var tableStorageUri = new Uri(options.Value.StorageConnectionString);
-            var credential = new DefaultAzureCredential();
-            _usersTable = new TableClient(tableStorageUri, TableNames.Users, credential);
-            _userFriendsTable = new TableClient(tableStorageUri, TableNames.UserFriends, credential);
-            _userNotificationsTable = new TableClient(tableStorageUri, TableNames.UserNotifications, credential);
-            _userSettingsTable = new TableClient(tableStorageUri, TableNames.UserSettings, credential);
-            _userID2UserTable = new TableClient(tableStorageUri, TableNames.UserID2User, credential);
-            
-            _gamesWaitingForYouTable = new TableClient(tableStorageUri, TableNames.GamesWaitingForYou, credential);
-            _gamesWaitingForOpponentTable = new TableClient(tableStorageUri, TableNames.GamesWaitingForOpponent, credential);
-            _gamesArchiveTable = new TableClient(tableStorageUri, TableNames.GamesArchive, credential);
+            _configuration = options.Value.StorageConnectionString;
+
+            _usersTable = CreateTable(TableNames.Users);
+            _userFriendsTable = CreateTable(TableNames.UserFriends);
+            _userNotificationsTable = CreateTable(TableNames.UserNotifications);
+            _userSettingsTable = CreateTable(TableNames.UserSettings);
+            _userID2UserTable = CreateTable(TableNames.UserID2User);
+
+            _gamesWaitingForYouTable = CreateTable(TableNames.GamesWaitingForYou);
+            _gamesWaitingForOpponentTable = CreateTable(TableNames.GamesWaitingForOpponent);
+            _gamesArchiveTable = CreateTable(TableNames.GamesArchive);
+        }
+
+        private TableClient CreateTable(string tableName)
+        {
+            // https://github.com/Azure/static-web-apps/issues/466
+            // https://docs.microsoft.com/en-us/azure/static-web-apps/apis
+            // Managed Functions -> Managed identity not supported.
+            //var credential = new DefaultAzureCredential();
+            //var tableStorageUri = new Uri(_configuration);
+            //return new TableClient(tableStorageUri, tableName, credential);
+            return new TableClient(_configuration, tableName);
         }
 
         public void Initialize()
