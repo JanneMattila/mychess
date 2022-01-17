@@ -63,29 +63,29 @@ namespace MyChess.Backend.Data
             {
                 _log.DataContextInitializing();
 
-                _usersTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.Users, false);
+                var response = _usersTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.Users, response != null);
 
-                _userFriendsTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.UserFriends, false);
+                response = _userFriendsTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserFriends, response != null);
 
-                _userNotificationsTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.UserNotifications, false);
+                response = _userNotificationsTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserNotifications, response != null);
 
-                _userSettingsTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.UserSettings, false);
+                response = _userSettingsTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserSettings, response != null);
 
-                _userID2UserTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.UserID2User, false);
+                response = _userID2UserTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.UserID2User, response != null);
 
-                _gamesWaitingForYouTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.GamesWaitingForYou, false);
+                response = _gamesWaitingForYouTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.GamesWaitingForYou, response != null);
 
-                _gamesWaitingForOpponentTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.GamesWaitingForOpponent, false);
+                response = _gamesWaitingForOpponentTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.GamesWaitingForOpponent, response != null);
 
-                _gamesArchiveTable.CreateIfNotExists();
-                _log.DataContextInitializeTable(TableNames.GamesArchive, false);
+                response = _gamesArchiveTable.CreateIfNotExists();
+                _log.DataContextInitializeTable(TableNames.GamesArchive, response != null);
 
                 _log.DataContextInitialized();
                 _initialized = true;
