@@ -1,9 +1,9 @@
 ﻿using BlazorApplicationInsights;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MyChess;
 using MyChess.Client;
+using MyChess.Client.Extensions;
 using MyChess.Client.Models;
 using MyChess.Client.Shared;
 
@@ -11,9 +11,14 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#App");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+// https://github.com/Azure/static-web-apps/issues/34
+// https://github.com/dotnet/AspNetCore.Docs/issues/21334
+// https://docs.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/additional-scenarios
+builder.Services.AddTransient<CustomAddressAuthorizationMessageHandler>();
 builder.Services.AddHttpClient<BackendClient>(
         client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
-    .AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+    //.AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+    .AddHttpMessageHandler<CustomAddressAuthorizationMessageHandler>();
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
     .CreateClient());
