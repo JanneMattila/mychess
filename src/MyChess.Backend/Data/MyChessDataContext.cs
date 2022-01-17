@@ -113,8 +113,19 @@ namespace MyChess.Backend.Data
         {
             Initialize();
             var table = GetTable(tableName);
-            var entity = await table.GetEntityAsync<T>(partitionKey, rowKey);
-            return entity.Value as T;
+            try
+            {
+                var entity = await table.GetEntityAsync<T>(partitionKey, rowKey);
+                return entity.Value as T;
+            }
+            catch (RequestFailedException ex)
+            {
+                if (ex.Status != 404)
+                {
+                    throw;
+                }
+            }
+            return null;
         }
 
         public async Task UpsertAsync<T>(string tableName, T entity)
