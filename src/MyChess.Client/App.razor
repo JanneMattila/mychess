@@ -3,6 +3,15 @@
     <Router AppAssembly="@typeof(App).Assembly">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <div class="welcome">
+			            <div class="welcome-Text">
+				             <img src="images/logo.svg" class="Load-logo" />
+				            <br />
+				            Loading...
+			            </div>
+		            </div>
+                </Authorizing>
                 <NotAuthorized>
                     @if (context.User.Identity?.IsAuthenticated != true)
                     {
