@@ -129,14 +129,14 @@ resource appSettingsResource 'Microsoft.Web/staticSites/config@2021-01-15' = {
   parent: staticWebAppResource
   name: 'appsettings'
   properties: {
-    AzureSignalRConnectionString: appSignalRResource.listKeys().primaryConnectionString
-    Storage: 'DefaultEndpointsProtocol=https;AccountName=${storageName};AccountKey=${storageResource.listKeys().keys[0].value}'
     APPINSIGHTS_INSTRUMENTATIONKEY: appInsightsResource.properties.InstrumentationKey
-    WebPush__PublicServerUri: customDomainUri
-    WebPush__PublicKey: webPushPublicKey
-    WebPush__PrivateKey: webPushPrivateKey
     AzureAD__ClientId: clientId
     AzureAD__Audience: applicationIdURI
+    AzureSignalRConnectionString: appSignalRResource.listKeys().primaryConnectionString
+    Storage: 'DefaultEndpointsProtocol=https;AccountName=${storageName};AccountKey=${storageResource.listKeys().keys[0].value}'
+    WebPush__PrivateKey: webPushPrivateKey
+    WebPush__PublicKey: webPushPublicKey
+    WebPush__PublicServerUri: customDomainUri
   }
 }
 
