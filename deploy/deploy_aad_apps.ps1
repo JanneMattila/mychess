@@ -21,7 +21,6 @@ $permissionGamesReadWrite = "e49b5223-2def-45c2-a632-b48b07c93124" # "Games.Read
 # Use existing Azure context to login to Azure AD
 $context = Get-AzContext
 $tenant = $context.Tenant.TenantId
-$tenant
 
 $installedModule = Get-Module -Name "Microsoft.Graph" -ListAvailable
 if ($null -eq $installedModule) {
@@ -115,8 +114,7 @@ else {
         Oauth2PermissionScopes      = $permissions.ToArray()
         PreAuthorizedApplications   = $preAuthorizedApps
         RequestedAccessTokenVersion = 2
-    } -Verbose -Debug
-    $apiApp
+    }
 
     New-MgServicePrincipal -AppId $apiApp.AppId
 
@@ -136,7 +134,6 @@ else {
 
     $spaApi = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphRequiredResourceAccess
     $spaApi.ResourceAppId = $apiApp.AppId # Backend app
-    $spaApi.ResourceAccess = [array]
     $resourceAccess = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphResourceAccess]
     $resourceAccess.Add($spaUserReadWrite)
     $resourceAccess.Add($spaGamesReadWrite)
