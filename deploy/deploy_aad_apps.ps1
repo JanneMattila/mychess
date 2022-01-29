@@ -22,6 +22,8 @@ $permissionGamesReadWrite = "e49b5223-2def-45c2-a632-b48b07c93124" # "Games.Read
 $context = Get-AzContext
 $tenant = $context.Tenant.TenantId
 
+Write-Host "Preparing Microsoft.Graph module..."
+
 $installedModule = Get-Module -Name "Microsoft.Graph" -ListAvailable
 if ($null -eq $installedModule) {
     Install-Module Microsoft.Graph -Scope CurrentUser
@@ -29,6 +31,8 @@ if ($null -eq $installedModule) {
 else {
     Import-Module Microsoft.Graph
 }
+
+Write-Host "Connecting to Microsoft Graph..."
 
 $accessToken = Get-AzAccessToken -ResourceTypeName MSGraph -TenantId $tenant
 Connect-MgGraph -AccessToken $accessToken.Token
@@ -42,25 +46,30 @@ else {
     $apiAppName = "$AppName Backend ($EnvironmentName)"
 }
 
+Write-Host "Finding applications '$spaAppName' and '$apiAppName'..."
+
 $spaApp = Get-MgApplication -Search "DisplayName:$spaAppName" -ConsistencyLevel eventual
 $apiApp = Get-MgApplication -Search "DisplayName:$apiAppName" -ConsistencyLevel Eventual
 if ($null -ne $spaApp) {
-    # Applications have been already created
     Write-Host "Applications have been already created"
 
     if ($UpdateReplyUrl) {
+
+        Write-Host "Validating redirect uri"
+
         if ($spaApp.Spa.RedirectUris -ne $SPAUri) {
-            Write-Host "Updating SPA urls"
+            Write-Host "Updating redirect uri"
             $spaApp.Web.HomePageUrl = $SPAUri
             $spaApp.Spa.RedirectUris = $SPAUri
             Update-MgApplication -ApplicationId $spaApp.Id -Spa $spaApp.Spa -Web $spaApp.Web
         }
         else {
-            Write-Host "No need to update SPA urls"
+            Write-Host "No need to update redirect uri"
         }
     }
 }
 else {
+    Write-Host "Creating new applications"
 
     $spaApp = New-MgApplication -DisplayName $spaAppName `
         -SignInAudience AzureADandPersonalMicrosoftAccount `
