@@ -16,6 +16,6 @@
   },
   "Host": {
     "CORS": "http://localhost:3000",
-    "CORSCredentials": true
+    "CORSCredentials": false
   }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using MyChess.Backend.Models;
 using MyChess.Interfaces;
 
 namespace MyChess.Functions
@@ -29,7 +30,7 @@ namespace MyChess.Functions
                     return true;
                 }
             }
-            
+
             return false;
         }
 

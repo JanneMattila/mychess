@@ -1,0 +1,15 @@
+﻿@inherits ProfileBase
+
+<AuthorizeView>
+    <Authorized>
+		<div class="Profile">
+			<a href="/settings" class="Profile-link"><img src="images/profile.svg" alt="Profile" /></a>
+		</div>
+    </Authorized>
+    <NotAuthorized>
+		<div class="Profile">
+			Want to play? Please
+			<button class="Profile-button" @onclick="NavigateToLogin">sign In</button>
+		</div>
+    </NotAuthorized>
+</AuthorizeView>

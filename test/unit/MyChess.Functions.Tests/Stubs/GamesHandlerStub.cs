@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using MyChess.Handlers;
+using MyChess.Backend.Handlers;
+using MyChess.Backend.Models;
 using MyChess.Interfaces;
-using MyChess.Models;
 
 namespace MyChess.Functions.Tests.Stubs
 {
     public class GamesHandlerStub : IGamesHandler
     {
         public MyChessGame? SingleGame { get; set; }
-        
+
         public List<MyChessGame> Games { get; set; } = new List<MyChessGame>();
 
         public HandlerError? Error { get; set; }

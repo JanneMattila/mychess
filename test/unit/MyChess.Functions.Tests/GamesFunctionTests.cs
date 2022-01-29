@@ -57,10 +57,10 @@ namespace MyChess.Functions.Tests
             // Arrange
             var expected = typeof(OkObjectResult);
             var expectedGames = 2;
-            
+
             _gamesHandlerStub.Games.Add(new MyChessGame());
             _gamesHandlerStub.Games.Add(new MyChessGame());
-            
+
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
@@ -127,7 +127,7 @@ namespace MyChess.Functions.Tests
             game.Players.Black.ID = "p2";
             game.Moves.Add(new MyChessGameMove()
             {
-                Move = "A2A3", Comment = "Cool move", 
+                Move = "A2A3", Comment = "Cool move",
                 Start = DateTimeOffset.UtcNow.AddMinutes(-1),
                 End = DateTimeOffset.UtcNow
             });
@@ -175,7 +175,7 @@ namespace MyChess.Functions.Tests
                 End = DateTimeOffset.UtcNow
             });
 
-            _gamesHandlerStub.Error = new Models.HandlerError()
+            _gamesHandlerStub.Error = new HandlerError()
             {
                 Instance = "some text/1234"
             };

@@ -1,0 +1,44 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+@inject AppState _appState;
+
+<div class="App-header-container">
+	<a href="/"><img src="/images/logo.svg" alt="My Chess" class="App-logo" /></a>
+	<div class="App-auth">
+		<Profile />
+	</div>
+</div>
+
+	@if (_appState.IsLoading)
+{
+	<div class="welcome">
+		<div class="welcome-Text">
+			<img src="images/logo.svg" class="Load-logo" />
+			<br />
+			Loading...
+		</div>
+	</div>
+}
+
+@Body
+
+<footer class="App-footer-container">
+	<a href="/About" class="App-footer-link">About </a>
+	<span class="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+	<a href="/privacy" class="App-footer-link">Privacy</a>
+	<span class="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+	<a href="/play/local" class="App-footer-link">Play locally</a>
+</footer>
+
+<CookieConsent />
+
+@code {
+	protected override void OnInitialized()
+	{
+		_appState.OnLoadingChange += StateHasChanged;
+	}
+	public void Dispose()
+	{
+		_appState.OnLoadingChange -= StateHasChanged;
+	}
+}

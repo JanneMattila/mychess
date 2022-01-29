@@ -1,0 +1,52 @@
+﻿@page "/settings"
+@inherits SettingsBase
+
+<EditForm Model="this">
+	<div>
+		<div class="title">Profile</div>
+		<div class="Settings-Container">
+			<label class="subtitle">
+				Your player identifier<br />
+				<div class="Settings-SubText">
+					Share this to your friend so that they can connect with you
+				</div>
+				<input type="text" value="@Settings.ID" readonly class="Settings-Identifier" /><br />
+				<button @onclick="CopyIdentifierToClipboard"><span role="img" aria-label="Copy">&#128203;</span> Copy your identifier</button>
+				<button @onclick="CopyAddFriendLinkToClipboard"><span role="img" aria-label="Share">&#128203;</span> Copy "Add as friend" link</button>
+			</label>
+
+			<div class="subtitle">Settings</div>
+
+			Notifications<br />
+			<label class="toggle-switch-wrapper">
+				<InputCheckbox @bind-Value="IsNotificationsEnabled" />
+				<span class="toggle-switch"></span>
+			</label>
+			<br />
+			<span class="Settings-Error">@NotificationText</span>
+
+			<div class="title">
+				<button @onclick="Save"><span role="img" aria-label="OK">✅</span> Save</button>
+				<button @onclick="Cancel"><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+			</div>
+
+@*			<div id="installAsApp" class="title" style={hidden}>
+				<button onClick={installAsApp}><span role="img" aria-label="Install as App">📦</span> Install as App</button>
+			</div>*@
+
+			<br />
+			<hr />
+			<br />
+			<a href="/friends" class="Settings-link">
+				<span role="img" aria-label="Manage your friends">👥</span> Manage your friends
+			</a>
+
+			<br />
+			<br />
+			<hr />
+			<br />
+
+			<button @onclick="SignOut">Sign out</button>
+		</div>
+	</div>
+</EditForm>

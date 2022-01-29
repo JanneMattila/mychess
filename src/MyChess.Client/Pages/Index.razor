@@ -1,0 +1,22 @@
+﻿@page "/"
+@inherits IndexBase
+
+<AuthorizeView>
+    <Authorized>
+		<GameList />
+    </Authorized>
+    <NotAuthorized>
+		<div>
+		<div class="title">Welcome to My Chess!</div>
+		<div class="welcomeText">
+			My Chess is social (and not that serious) chess game where
+			you can play chess online with your friends.
+			You can comment your moves and put some pressure to your friends (in fun way of course!).
+			<br />
+			<br />
+			Want to play? Please
+			<button @onclick="NavigateToLogin">sign In</button> to start playing right away.
+		</div>
+		</div>
+    </NotAuthorized>
+</AuthorizeView>

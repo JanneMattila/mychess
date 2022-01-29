@@ -11,3 +11,6 @@ After that My Chess has been re-written multiple times:
 - [Windows Phone 8](https://en.wikipedia.org/wiki/Windows_Phone_8)
 - [Windows Phone 8.1](https://en.wikipedia.org/wiki/Windows_Phone_8.1)
 - [Windows 10](https://en.wikipedia.org/wiki/Universal_Windows_Platform_apps) Universal Windows Platform app
+- ASP.NET web app with jQuery and simple javascript
+- React (hosted in Azure Storage account + Azure CDN certificat) with Azure Functions backend
+- Blazor SPA running in [Static web apps](https://docs.microsoft.com/en-us/azure/static-web-apps/overview) with Azure Functions backend

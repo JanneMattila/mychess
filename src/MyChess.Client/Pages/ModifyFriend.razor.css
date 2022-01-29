@@ -1,0 +1,29 @@
+﻿* {
+    box-sizing: border-box;
+}
+
+.Friends-Container {
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+.FriendList-AddFriend {
+    font-size: 18pt;
+}
+
+.FriendList-AddFriendSubText {
+    font-size: 12pt;
+}
+
+.FriendList-AddFriendError {
+    font-size: 16pt;
+    color: red;
+    text-decoration: none;
+}
+
+.FriendList-Identifier {
+    font-size: 10pt;
+    width: 300px;
+    background-color: lightgray;
+}

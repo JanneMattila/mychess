@@ -13,3 +13,15 @@ My Chess is social (and not that serious) chess game where you can play chess on
 ## Try it yourself
 
 You can try My Chess at the [mychess.jannemattila.com](https://mychess.jannemattila.com).
+
+## Static web app development
+
+To test Blazor client using [Azure Static Web Apps CLI](https://github.com/Azure/static-web-apps-cli):
+
+```powershell
+swa start https://localhost:5000 --run "cd ./src/MyChess.Client/ && dotnet watch run" --api-location ./src/MyChess.Functions --api-port=3000
+```
+
+```powershell
+swa start https://localhost:5000 --run "cd ./src/MyChess.Client/ && dotnet watch run" --api-port=7071
+```

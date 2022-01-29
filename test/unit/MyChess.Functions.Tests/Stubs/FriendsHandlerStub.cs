@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using MyChess.Handlers;
+using MyChess.Backend.Handlers;
+using MyChess.Backend.Models;
 using MyChess.Interfaces;
-using MyChess.Models;
 
 namespace MyChess.Functions.Tests.Stubs
 {

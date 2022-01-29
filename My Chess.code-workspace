@@ -17,5 +17,10 @@
 				"webRoot": "${workspaceFolder}"
 			}
 		]
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.powershell"
+		]
 	}
 }

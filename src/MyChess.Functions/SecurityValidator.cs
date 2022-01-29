@@ -10,8 +10,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
-using MyChess.Internal;
+using MyChess.Functions.Internal;
+using MyChess.Interfaces;
 
 namespace MyChess.Functions
 {
@@ -91,13 +91,14 @@ namespace MyChess.Functions
 
         public string? ParseAccessToken(HttpRequest req)
         {
-            if (!req.Headers.ContainsKey(HeaderNames.Authorization))
+            // https://github.com/Azure/static-web-apps/issues/34
+            if (!req.Headers.ContainsKey(CustomHeaderNames.Authorization /* HeaderNames.Authorization */))
             {
                 _log.FuncSecNoAuthHeader();
                 return null;
             }
 
-            var authorizationValue = req.Headers[HeaderNames.Authorization].ToString().Split(' ');
+            var authorizationValue = req.Headers[CustomHeaderNames.Authorization /* HeaderNames.Authorization */].ToString().Split(' ');
             if (authorizationValue.Length != 2 ||
                 authorizationValue[0] != JwtBearerDefaults.AuthenticationScheme)
             {
@@ -126,8 +127,8 @@ namespace MyChess.Functions
             try
             {
                 var claimsPrincipal = tokenHandler.ValidateToken(
-                    accessToken, 
-                    _tokenValidationParameters, 
+                    accessToken,
+                    _tokenValidationParameters,
                     out SecurityToken securityToken);
                 return claimsPrincipal;
             }

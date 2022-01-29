@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using MyChess.Functions.Tests.Helpers;
 using MyChess.Functions.Tests.Stubs;
 using MyChess.Interfaces;
-using MyChess.Models;
 using Xunit;
 
 namespace MyChess.Functions.Tests
@@ -58,7 +57,7 @@ namespace MyChess.Functions.Tests
             var expectedPlayAlwaysUp = true;
 
             _settingsHandlerStub.UserSettings.PlayAlwaysUp = true;
-            
+
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
@@ -82,7 +81,7 @@ namespace MyChess.Functions.Tests
             var expected = typeof(OkResult);
 
             var userSettings = new UserSettings();
-            
+
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);

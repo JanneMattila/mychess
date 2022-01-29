@@ -1,0 +1,37 @@
+﻿@page "/friends/{id}"
+@page "/friends/{verb}/{id}"
+
+@inherits ModifyFriendBase
+
+<div>
+	<div class="title">@Title</div>
+	<div id="addFriend" class="Friends-Container">
+		<label class="subtitle">
+			Friend identifier<br />
+			<div class="FriendList-AddFriendSubText">
+				This is your friends identifier.<br />
+				You need this in order to connect to your friend.
+			</div>
+			<input type="text" @bind-value="@Friend.ID" class="FriendList-Identifier" />
+		</label>
+		<br />
+		<label class="subtitle">
+			Friend name<br />
+			<div class="FriendList-AddFriendSubText">
+				This is your friends name.<br />
+				This is <b>only visible to you</b>.
+			</div>
+			<input type="text" @bind-value="@Friend.Name" />
+		</label>
+		<br />
+		<button @onclick="Save"><span role="img" aria-label="@Title">✅</span> @Title</button>
+		<button @onclick="Cancel"><span role="img" aria-label="Cancel">❌</span> Cancel</button>
+
+		@if (Error != null)
+		{
+			<div>
+				<a class="FriendList-AddFriendError" href="@Error.Instance" target="_blank" rel="noopener noreferrer">@Error.Detail</a>
+			</div>
+		}
+	</div>
+</div>

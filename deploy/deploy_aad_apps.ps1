@@ -9,10 +9,7 @@ Param (
     [switch] $UpdateReplyUrl,
 
     [Parameter(HelpMessage = "SPA Uri")] 
-    [string] $SPAUri = "http://localhost:5000/",
-    
-    [Parameter(HelpMessage = "API Backend Uri")] 
-    [string] $APIUri = "http://localhost:7071/"
+    [string] $SPAUri = "http://localhost:5000/"
 )
 
 $ErrorActionPreference = "Stop"
@@ -23,25 +20,22 @@ $permissionGamesReadWrite = "e49b5223-2def-45c2-a632-b48b07c93124" # "Games.Read
 
 # Use existing Azure context to login to Azure AD
 $context = Get-AzContext
-$accountId = $context.Account.Id
 $tenant = $context.Tenant.TenantId
-$scope = "https://graph.windows.net" # Azure AD Graph API
-$dialog = [Microsoft.Azure.Commands.Common.Authentication.ShowDialog]::Never
 
-$azureSession = [Microsoft.Azure.Commands.Common.Authentication.AzureSession]::Instance.AuthenticationFactory.Authenticate($context.Account, $context.Environment, $tenant, $null, $dialog, $null, $scope)
+Write-Host "Preparing Microsoft.Graph module..."
 
-# Azure AD Graph API token
-$accessToken = $azureSession.AccessToken
-
-$aadInstalledModule = Get-Module -Name "AzureAD" -ListAvailable
-if ($null -eq $aadInstalledModule) {
-    Install-Module AzureAD -Scope CurrentUser -Force
+$installedModule = Get-Module -Name "Microsoft.Graph" -ListAvailable
+if ($null -eq $installedModule) {
+    Install-Module Microsoft.Graph -Scope CurrentUser
 }
 else {
-    Import-Module AzureAD
+    Import-Module Microsoft.Graph
 }
 
-Connect-AzureAD -AadAccessToken $accessToken -AccountId $accountId -TenantId $tenant | Out-Null
+Write-Host "Connecting to Microsoft Graph..."
+
+$accessToken = Get-AzAccessToken -ResourceTypeName MSGraph -TenantId $tenant
+Connect-MgGraph -AccessToken $accessToken.Token
 
 if ("Prod" -eq $EnvironmentName) {
     $spaAppName = "$AppName App"
@@ -52,64 +46,48 @@ else {
     $apiAppName = "$AppName Backend ($EnvironmentName)"
 }
 
-Get-AzureADApplication -Filter "DisplayName eq '$spaAppName'"
-$spaApp = Get-AzureADApplication -Filter "DisplayName eq '$spaAppName'"
-$apiApp = Get-AzureADApplication -Filter "DisplayName eq '$apiAppName'"
+Write-Host "Finding applications '$spaAppName' and '$apiAppName'..."
 
+$spaApp = Get-MgApplication -Search "DisplayName:$spaAppName" -ConsistencyLevel eventual
+$apiApp = Get-MgApplication -Search "DisplayName:$apiAppName" -ConsistencyLevel Eventual
 if ($null -ne $spaApp) {
-    # Applications have been already created
     Write-Host "Applications have been already created"
 
     if ($UpdateReplyUrl) {
-        if ($spaApp.Homepage -ne $SPAUri) {
-            Write-Host "Updating SPA urls"
-            Set-AzureADApplication `
-                -ObjectId $spaApp.ObjectId `
-                -ReplyUrls $SPAUri `
-                -Homepage $SPAUri
-        }
-        else {
-            Write-Host "No need to update SPA urls"
-        }
 
-        if ($apiApp.Homepage -ne $APIUri) {
-            Write-Host "Updating API urls"
-            Set-AzureADApplication `
-                -ObjectId $apiApp.ObjectId `
-                -Homepage $APIUri
+        Write-Host "Validating redirect uri"
+
+        if ($spaApp.Spa.RedirectUris -ne $SPAUri) {
+            Write-Host "Updating redirect uri"
+            $spaApp.Web.HomePageUrl = $SPAUri
+            $spaApp.Spa.RedirectUris = $SPAUri
+            Update-MgApplication -ApplicationId $spaApp.Id -Spa $spaApp.Spa -Web $spaApp.Web
         }
         else {
-            Write-Host "No need to update API urls"
+            Write-Host "No need to update redirect uri"
         }
     }
 }
 else {
-    ###########################
-    # Setup SPA app:
-    #
-    # Note: "New-AzureADApplication" does not yet support
-    # setting up "signInAudience" to "AzureADandPersonalMicrosoftAccount"
-    # 
-    Write-Warning @"
-You need to *manually* update these two properties:
-- "signInAudience" to value "AzureADandPersonalMicrosoftAccount"
-- "accessTokenAcceptedVersion" to value 2
-"@
-    $spaApp = New-AzureADApplication -DisplayName $spaAppName `
-        -AvailableToOtherTenants $true `
-        -Homepage $SPAUri `
-        -ReplyUrls $SPAUri
-    $spaReaderApp
+    Write-Host "Creating new applications"
 
-    New-AzureADServicePrincipal -AppId $spaApp.AppId
+    $spaApp = New-MgApplication -DisplayName $spaAppName `
+        -SignInAudience AzureADandPersonalMicrosoftAccount `
+        -Web @{ HomePageUrl = $SPAUri } `
+        -Spa @{ RedirectUris = $SPAUri }
+
+    # https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/1028
+    # -LogoInputFile $PSScriptRoot\Logo_48x48.png
+
+    New-MgServicePrincipal -AppId $spaApp.AppId
 
     ######################
     # Setup functions app:
     # - Expose API "User.ReadWrite"
     # - Expose API "Games.ReadWrite"
-    $permissions = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.OAuth2Permission]
+    $permissions = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphPermissionScope]
 
-    $userReadWritePermission = New-Object Microsoft.Open.AzureAD.Model.OAuth2Permission
+    $userReadWritePermission = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphPermissionScope
     $userReadWritePermission.Id = $permissionUserReadWrite
     $userReadWritePermission.Value = "User.ReadWrite"
     $userReadWritePermission.Type = "User"
@@ -119,7 +97,7 @@ You need to *manually* update these two properties:
     $userReadWritePermission.UserConsentDescription = "Read-write access to user data"
     $permissions.Add($userReadWritePermission)
 
-    $gamesReadWritePermission = New-Object Microsoft.Open.AzureAD.Model.OAuth2Permission
+    $gamesReadWritePermission = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphPermissionScope
     $gamesReadWritePermission.Id = $permissionGamesReadWrite
     $gamesReadWritePermission.Value = "Games.ReadWrite"
     $gamesReadWritePermission.Type = "User"
@@ -130,72 +108,51 @@ You need to *manually* update these two properties:
     $permissions.Add($gamesReadWritePermission)
 
     # Define SPA app to be pre-authorized app of API app
-    $preAuthorizedApplicationPermission = New-Object Microsoft.Open.AzureAD.Model.PreAuthorizedApplicationPermission
-    $preAuthorizedApplicationPermission.DirectAccessGrant = $false
-    $preAuthorizedApplicationPermission.AccessGrants = New-Object System.Collections.Generic.List[string]
-    $preAuthorizedApplicationPermission.AccessGrants.Add($permissionUserReadWrite)
-    $preAuthorizedApplicationPermission.AccessGrants.Add($permissionGamesReadWrite)
-
-    $preAuthorizedApp = New-Object Microsoft.Open.AzureAD.Model.PreAuthorizedApplication
+    $preAuthorizedApp = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphPreAuthorizedApplication
     $preAuthorizedApp.AppId = $spaApp.AppId
-    $preAuthorizedApp.Permissions = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.PreAuthorizedApplicationPermission]
-    $preAuthorizedApp.Permissions.Add($preAuthorizedApplicationPermission)
-
-    $preAuthorizedApps = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.PreAuthorizedApplication]
+    $preAuthorizedApp.DelegatedPermissionIds = $permissionUserReadWrite, $permissionGamesReadWrite
+    
+    $preAuthorizedApps = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphPreAuthorizedApplication]
     $preAuthorizedApps.Add($preAuthorizedApp)    
 
-    #
-    # Note: "New-AzureADApplication" does not yet support
-    # setting up "signInAudience" to "AzureADandPersonalMicrosoftAccount"
-    # 
     $postfix = $EnvironmentName.ToLower()
-    $apiApp = New-AzureADApplication -DisplayName $apiAppName `
-        -AvailableToOtherTenants $true `
+    $apiApp = New-MgApplication -DisplayName $apiAppName `
+        -SignInAudience AzureADandPersonalMicrosoftAccount `
         -IdentifierUris "api://mychess.backend.$postfix" `
-        -PublicClient $false `
-        -Oauth2Permissions $permissions #`
-    #-PreAuthorizedApplications $preAuthorizedApps
-    $apiApp
+        -Api @{
+        Oauth2PermissionScopes      = $permissions.ToArray()
+        PreAuthorizedApplications   = $preAuthorizedApps
+        RequestedAccessTokenVersion = 2
+    }
 
-    New-AzureADServicePrincipal -AppId $apiApp.AppId
-
-    Write-Host "Updating API icon"
-    Set-AzureADApplicationLogo `
-        -ObjectId $apiApp.ObjectId `
-        -FilePath $PSScriptRoot\Logo_48x48.png
+    New-MgServicePrincipal -AppId $apiApp.AppId
 
     ###########################
     # Finalize Setup of SPA app:
-    $spaAccesses = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
+    $spaAccesses = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphResourceAccess]
 
     # API permission for "User.ReadWrite" in backend app
-    $spaUserReadWrite = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
+    $spaUserReadWrite = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphResourceAccess
     $spaUserReadWrite.Id = $userReadWritePermission.Id # "User.ReadWrite"
     $spaUserReadWrite.Type = "Scope"
 
     # API permission for "Games.ReadWrite" in backend app
-    $spaGamesReadWrite = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
+    $spaGamesReadWrite = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphResourceAccess
     $spaGamesReadWrite.Id = $gamesReadWritePermission.Id # "Games.ReadWrite"
     $spaGamesReadWrite.Type = "Scope"   
 
-    $spaApi = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
+    $spaApi = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphRequiredResourceAccess
     $spaApi.ResourceAppId = $apiApp.AppId # Backend app
-    $spaApi.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
-    $spaApi.ResourceAccess.Add($spaUserReadWrite)
-    $spaApi.ResourceAccess.Add($spaGamesReadWrite)
+    $resourceAccess = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphResourceAccess]
+    $resourceAccess.Add($spaUserReadWrite)
+    $resourceAccess.Add($spaGamesReadWrite)
+    $spaApi.ResourceAccess = $resourceAccess
 
     # Add required accesses
     $spaAccesses.Add($spaApi)
 
     Write-Host "Updating SPA API Permissions"
-    Set-AzureADApplication `
-        -ObjectId $spaApp.ObjectId `
-        -RequiredResourceAccess $spaAccesses
-
-    Write-Host "Updating SPA icon"
-    Set-AzureADApplicationLogo `
-        -ObjectId $spaApp.ObjectId `
-        -FilePath $PSScriptRoot\Logo_48x48.png
+    Update-MgApplication -ApplicationId $spaApp.Id -RequiredResourceAccess $spaAccesses
 }
 
 $values = new-object psobject -property @{

@@ -1,0 +1,29 @@
+﻿@inject IJSRuntime JSRuntime
+
+@if (!_isCookieConsentAccepted)
+{
+	<div id="cookieConsent" class="cookieConsent-Container" role="alert">
+		<div class="cookieConsent-Text">
+			<img src="images/logo.svg" />
+			This website uses cookies to enhance the user experience.
+			<button type="button" class="" aria-label="Close" @onclick="AcceptCookieConsent">
+				<span aria-hidden="true">Accept</span>
+			</button>
+		</div>
+	</div>
+}
+
+@code {
+    private bool _isCookieConsentAccepted;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isCookieConsentAccepted = await JSRuntime.InvokeAsync<bool>("MyChess.isCookieConsentAccepted");
+    }
+
+	private void AcceptCookieConsent()
+	{
+		JSRuntime.InvokeVoidAsync("MyChess.acceptCookieConsent");
+		_isCookieConsentAccepted = true;
+	}
+}

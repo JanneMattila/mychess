@@ -1,0 +1,88 @@
+﻿* {
+    box-sizing: border-box;
+}
+
+.FriendList-link {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    text-decoration: none;
+    z-index: 10;
+    opacity: 0;
+}
+
+.FriendList-AddFriend {
+    font-size: 18pt;
+}
+
+.FriendList-AddFriendSubText {
+    font-size: 12pt;
+}
+
+.FriendList-AddFriendError {
+    font-size: 16pt;
+    color: red;
+    text-decoration: none;
+}
+
+.FriendList-Identifier {
+    font-size: 10pt;
+    width: 300px;
+    background-color: lightgray;
+}
+
+.friendTemplate {
+    float: left;
+    padding: 10px 25px;
+    margin: 10px;
+    height: 160px;
+    background-color: #454545;
+    width: 40%;
+    position: relative;
+}
+
+    .friendTemplate:hover {
+        background-color: #656565;
+        cursor: pointer;
+    }
+
+.nameTemplate {
+    text-align: center;
+    font-size: 18pt;
+    text-overflow: ellipsis;
+    color: white;
+    overflow: hidden;
+    height: 40px;
+}
+
+.manageTemplate {
+    margin-top: 50px;
+    width: 90%;
+    z-index: 20;
+    position: relative;
+}
+
+
+.row {
+    text-align: center;
+    justify-content: center;
+}
+
+    .row::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+[class*="template-"] {
+    background-color: #454545;
+}
+
+
+@media only screen and (max-width: 768px) {
+    .friendTemplate {
+        width: 85%;
+    }
+}
