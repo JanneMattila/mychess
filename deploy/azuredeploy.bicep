@@ -82,7 +82,7 @@ resource storageResource 'Microsoft.Storage/storageAccounts@2021-06-01' = {
   kind: 'StorageV2'
   properties: {
     supportsHttpsTrafficOnly: true
-    allowSharedKeyAccess: false
+    allowSharedKeyAccess: true
   }
 }
 
