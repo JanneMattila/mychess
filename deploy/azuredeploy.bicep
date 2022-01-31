@@ -116,7 +116,7 @@ resource staticWebAppResource 'Microsoft.Web/staticSites@2021-02-01' = {
   }
 }
 
-resource storageRoleAssignmentForStaticWebAppResource 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource storageRoleAssignmentForStaticWebAppResource 'Microsoft.Authorization/roleAssignments@2015-07-01' = {
   name: guid(storageResource.id, appName, storageTableDataContributor)
   scope: storageResource
   properties: {

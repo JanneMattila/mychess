@@ -48,8 +48,8 @@ else {
 
 Write-Host "Finding applications '$spaAppName' and '$apiAppName'..."
 
-$spaApp = Get-MgApplication -Search "DisplayName:$spaAppName" -ConsistencyLevel eventual
-$apiApp = Get-MgApplication -Search "DisplayName:$apiAppName" -ConsistencyLevel Eventual
+$spaApp = Get-MgApplication -Filter "DisplayName eq '$spaAppName'"
+$apiApp = Get-MgApplication -Filter "DisplayName eq '$apiAppName'"
 if ($null -ne $spaApp) {
     Write-Host "Applications have been already created"
 

@@ -23,11 +23,11 @@ Param (
     [Parameter(Mandatory = $true, HelpMessage = "Alert email address")]
     [string] $AlertEmailAddress,
 
-    [Parameter(HelpMessage="SignalR Pricing tier. Check details at https://azure.microsoft.com/en-us/pricing/details/signalr-service/")] 
+    [Parameter(HelpMessage = "SignalR Pricing tier. Check details at https://azure.microsoft.com/en-us/pricing/details/signalr-service/")] 
     [ValidateSet("Free_F1", "Standard_S1")]
     [string] $SignalRServicePricingTier = "Free_F1",
 
-    [Parameter(HelpMessage="SignalR Service unit count")] 
+    [Parameter(HelpMessage = "SignalR Service unit count")] 
     [ValidateSet(1, 2, 5, 10, 20, 50, 100)]
     [int] $SignalRServiceUnits = 1,
 
@@ -63,7 +63,9 @@ if ($null -eq (Get-AzResourceGroup -Name $ResourceGroupName -Location $Location 
     New-AzResourceGroup -Name $ResourceGroupName -Location $Location -Verbose
 }
 
-$azureADdeployment = . $PSScriptRoot\deploy_aad_apps.ps1 -EnvironmentName $EnvironmentName
+$azureADdeployment = . $PSScriptRoot\deploy_aad_apps.ps1 `
+    -EnvironmentName $EnvironmentName `
+    -SPAUri "https://$CustomDomain/authentication/login-callback"
 
 # Additional parameters that we pass to the template deployment
 $additionalParameters = New-Object -TypeName hashtable
@@ -99,8 +101,3 @@ $customDomainUri = $result.Outputs.customDomainUri.value
 # Publish variable to the Azure DevOps agents so that they
 # can be used in follow-up tasks such as application deployment
 Write-Host "##vso[task.setvariable variable=Custom.WebAppUri;]https://$CustomDomain"
-
-$azureADdeployment = . $PSScriptRoot\deploy_aad_apps.ps1 `
-    -EnvironmentName $EnvironmentName `
-    -SPAUri $customDomainUri `
-    -UpdateReplyUrl # Update reply urls
