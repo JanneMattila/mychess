@@ -116,14 +116,14 @@ resource staticWebAppResource 'Microsoft.Web/staticSites@2021-02-01' = {
   }
 }
 
-resource storageRoleAssignmentForStaticWebAppResource 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(storageResource.id, appName, storageTableDataContributor)
-  scope: storageResource
-  properties: {
-    principalId: staticWebAppResource.identity.principalId
-    roleDefinitionId: storageTableDataContributor
-  }
-}
+// resource storageRoleAssignmentForStaticWebAppResource 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+//   name: guid(storageResource.id, appName, storageTableDataContributor)
+//   scope: storageResource
+//   properties: {
+//     principalId: staticWebAppResource.identity.principalId
+//     roleDefinitionId: storageTableDataContributor
+//   }
+// }
 
 resource appSettingsResource 'Microsoft.Web/staticSites/config@2021-01-15' = {
   parent: staticWebAppResource
