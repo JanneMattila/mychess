@@ -18,11 +18,11 @@
 }
 
 input[type=text] {
-    width: 600px;
+    width: 400px;
 }
 
 textarea {
-    width: 600px;
+    width: 400px;
     height: 150px;
     overflow-wrap: break-word;
     padding: 5px 2px;

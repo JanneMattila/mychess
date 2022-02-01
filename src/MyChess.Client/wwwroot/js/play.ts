@@ -146,6 +146,7 @@ MyChessPlay.initialize = (canvasElement: HTMLCanvasElement, dotnetRef: any): voi
 
     _dotnetRef = dotnetRef;
     _context = _canvasElement.getContext("2d");
+    _context.imageSmoothingEnabled = false;
 
     resizeCanvas();
 
@@ -156,7 +157,6 @@ MyChessPlay.draw = (game: any) => {
     console.log(game);
 
     _game = game;
-
     if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined) {
         console.log("Not yet ready to draw");
         return;
