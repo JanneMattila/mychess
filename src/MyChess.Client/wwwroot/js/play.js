@@ -124,6 +124,14 @@ MyChessPlay.initialize = (canvasElement, dotnetRef) => {
     resizeCanvas();
     MyChessPlay.draw(undefined);
 };
+MyChessPlay.scrollToComment = () => {
+    setTimeout(() => {
+        const element = document.getElementById("comment");
+        if (element) {
+            element.scrollIntoView();
+        }
+    }, 100);
+};
 MyChessPlay.draw = (game) => {
     console.log(game);
     _game = game;

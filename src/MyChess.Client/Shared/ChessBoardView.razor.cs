@@ -376,6 +376,8 @@ public class ChessBoardViewBase : MyChessComponentBase
         {
             ShowGameNameDialog = IsNew;
             ShowCommentDialog = true;
+
+            await JS.InvokeVoidAsync("MyChessPlay.scrollToComment");
         }
     }
 
