@@ -140,7 +140,7 @@ public class ChessBoardViewBase : MyChessComponentBase
             state = parameterState;
         }
         Game = await Client.GetGameAsync(id, state);
-        CurrentMoveNumber = Game.Moves.Count + 1;
+        CurrentMoveNumber = Game.Moves.Count;
         await MakeMoves(Game);
         await DrawAsync();
         AppState.IsLoading = false;
@@ -549,14 +549,14 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected async Task NextMove()
     {
         await Cancel();
-        CurrentMoveNumber = Math.Min(CurrentMoveNumber + 1, Game.Moves.Count + 1);
+        CurrentMoveNumber = Math.Min(CurrentMoveNumber + 1, Game.Moves.Count);
         await MakeMoves(Game, CurrentMoveNumber);
     }
 
     protected async Task LastMove()
     {
         await Cancel();
-        CurrentMoveNumber = Game.Moves.Count + 1;
+        CurrentMoveNumber = Game.Moves.Count;
         await MakeMoves(Game, CurrentMoveNumber);
     }
 
