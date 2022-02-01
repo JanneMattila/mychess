@@ -120,7 +120,8 @@ MyChessPlay.initialize = (canvasElement, dotnetRef) => {
     setTouchHandlers(_canvasElement);
     _dotnetRef = dotnetRef;
     _context = _canvasElement.getContext("2d");
-    _context.imageSmoothingEnabled = false;
+    const scale = 2;
+    _context.scale(scale, scale);
     resizeCanvas();
     MyChessPlay.draw(undefined);
 };
