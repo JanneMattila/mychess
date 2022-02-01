@@ -17,7 +17,16 @@
     width: inherit;
 }
 
+input[type=text] {
+    width: 600px;
+}
+
 textarea {
-    width: inherit;
+    width: 600px;
     height: 150px;
+    overflow-wrap: break-word;
+    padding: 5px 2px;
+    box-sizing: border-box;
+    border-radius: 2px;
+    resize: none;
 }
