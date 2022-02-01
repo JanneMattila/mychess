@@ -133,7 +133,13 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected async Task RefreshGame(string id)
     {
         AppState.IsLoading = true;
-        Game = await Client.GetGameAsync(id);
+        var state = string.Empty;
+        var query = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).Query;
+        if (QueryHelpers.ParseQuery(query).TryGetValue("state", out var parameterState))
+        {
+            state = parameterState;
+        }
+        Game = await Client.GetGameAsync(id, state);
         CurrentMoveNumber = Game.Moves.Count + 1;
         await MakeMoves(Game);
         await DrawAsync();
