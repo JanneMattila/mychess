@@ -54,10 +54,12 @@ const resizeCanvas = () => {
         if (_dotnetRef !== undefined) {
             _dotnetRef.invokeMethod("UpdateSize", _pieceSize);
         }
-        _canvasElement.width = _pieceSize * 8;
-        _canvasElement.height = _pieceSize * 8;
-        //element.style.width = `${Math.round(size)}px`;
-        //element.style.height = `${Math.round(size)}px`;
+        const ratio = 1; // Math.ceil(window.devicePixelRatio);
+        const newSize = _pieceSize * 8;
+        _canvasElement.width = newSize * ratio;
+        _canvasElement.height = newSize * ratio;
+        //_canvasElement.style.width = `${Math.round(newSize)}px`;
+        //_canvasElement.style.height = `${Math.round(newSize)}px`;
         MyChessPlay.draw(_game);
     }
 };
@@ -120,7 +122,7 @@ MyChessPlay.initialize = (canvasElement, dotnetRef) => {
     setTouchHandlers(_canvasElement);
     _dotnetRef = dotnetRef;
     _context = _canvasElement.getContext("2d");
-    const scale = 2;
+    const scale = window.devicePixelRatio;
     _context.scale(scale, scale);
     resizeCanvas();
     MyChessPlay.draw(undefined);
