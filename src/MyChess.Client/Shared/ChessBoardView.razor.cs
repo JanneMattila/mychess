@@ -532,6 +532,8 @@ public class ChessBoardViewBase : MyChessComponentBase
         ShowCommentDialog = false;
         Comment = string.Empty;
         GameName = string.Empty;
+
+        await DrawAsync();
     }
 
     protected async Task FirstMove()

@@ -40,15 +40,12 @@ const loadImages = () => {
 };
 loadImages();
 const resizeCanvas = () => {
-    console.log("resize canvas");
-    console.log(_canvasElement);
     if (_canvasElement) {
         const element = document.getElementById("game");
         const maxWidth = document.documentElement.clientWidth;
         const maxHeight = document.documentElement.clientHeight;
         const availableWidth = maxWidth * 0.98;
         const availableHeight = maxHeight * 0.70;
-        console.log("availableWidth: " + availableWidth + ", availableHeight: " + availableHeight);
         let size = availableWidth;
         if (availableHeight < availableWidth) {
             size = availableHeight;
