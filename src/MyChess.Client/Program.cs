@@ -28,18 +28,17 @@ builder.Services.AddBlazorApplicationInsights(async applicationInsights =>
     var instrumentationKey = builder.Configuration.GetValue<string>("instrumentationKey");
     if (!string.IsNullOrEmpty(instrumentationKey))
     {
-        //var telemetryItem = new TelemetryItem()
-        //{
-        //    Tags = new Dictionary<string, object>()
-        //        {
-        //            { "ai.cloud.role", "SPA" },
-        //            { "ai.cloud.roleInstance", "Blazor Wasm" },
-        //        }
-        //};
+        var telemetryItem = new TelemetryItem()
+        {
+            Tags = new Dictionary<string, object>()
+                {
+                    { "ai.cloud.role", "SPA" },
+                    { "ai.cloud.roleInstance", "Blazor" },
+                }
+        };
 
-        //await applicationInsights.AddTelemetryInitializer(telemetryItem);
+        await applicationInsights.AddTelemetryInitializer(telemetryItem);
         await applicationInsights.SetInstrumentationKey(instrumentationKey);
-        await applicationInsights.LoadAppInsights();
     }
 });
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
