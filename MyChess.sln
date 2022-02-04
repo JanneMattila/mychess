@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{7B2AAD5E-368
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
-		azure-pipelines-deploy.yml = azure-pipelines-deploy.yml
-		azure-pipelines.yml = azure-pipelines.yml
 		doc\data.drawio.svg = doc\data.drawio.svg
 		LICENSE = LICENSE
 		README.md = README.md
@@ -35,7 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{CF6F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{687BED3D-9EF7-438F-95F4-188C32736656}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\azure-static-web-apps-lemon-sea-03362af03.yml = .github\workflows\azure-static-web-apps-lemon-sea-03362af03.yml
+		.github\workflows\README.md = .github\workflows\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{C28B4796-8A82-4D04-BC53-9939F765F074}"
