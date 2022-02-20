@@ -132,11 +132,11 @@ MyChessPlay.scrollToComment = () => {
         const element = document.getElementById("comment");
         if (element) {
             element.scrollIntoView();
+            element.focus();
         }
     }, 100);
 };
 MyChessPlay.draw = (game) => {
-    console.log(game);
     _game = game;
     if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined) {
         console.log("Not yet ready to draw");
