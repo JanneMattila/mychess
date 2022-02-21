@@ -129,10 +129,16 @@ MyChessPlay.initialize = (canvasElement, dotnetRef) => {
 };
 MyChessPlay.scrollToComment = () => {
     setTimeout(() => {
-        const element = document.getElementById("comment");
-        if (element) {
-            element.scrollIntoView();
-            element.focus();
+        const elementName = document.getElementById("gameName");
+        const elementComment = document.getElementById("comment");
+        if (elementName) {
+            elementName.focus();
+        }
+        else if (elementComment) {
+            elementComment.focus();
+        }
+        if (elementComment) {
+            elementComment.scrollIntoView();
         }
     }, 100);
 };
@@ -140,6 +146,20 @@ MyChessPlay.draw = (game) => {
     _game = game;
     if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined) {
         console.log("Not yet ready to draw");
+        return;
+    }
+    for (let row = 0; row < game.length; row++) {
+        const r = game[row];
+        for (let column = 0; column < r.length; column++) {
+            const item = r[column];
+            drawImage(item, row, column);
+        }
+    }
+    _context.restore();
+};
+MyChessPlay.animateDraw = (game, animations) => {
+    if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined || animations === undefined) {
+        console.log("Not yet ready to draw animation");
         return;
     }
     for (let row = 0; row < game.length; row++) {
