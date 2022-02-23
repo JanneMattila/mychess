@@ -14,6 +14,30 @@ public class GameListBase : MyChessComponentBase
     protected override async Task OnInitializedAsync()
     {
         await RefreshGames();
+        AppFocus.OnFocus += SilentUpdate;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        AppFocus.OnFocus -= SilentUpdate;
+    }
+
+    protected async Task SilentUpdate()
+    {
+        try
+        {
+            Games = await Client.GetGamesAsync(Filters);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await AppInsights.TrackException(new BlazorApplicationInsights.Error()
+            {
+                Message = ex.Message,
+                Name = "FailedSilentRefresh"
+            });
+        }
     }
 
     protected async Task RefreshGames()

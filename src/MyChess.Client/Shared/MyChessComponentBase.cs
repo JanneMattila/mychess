@@ -27,7 +27,7 @@ namespace MyChess.Client.Shared
         protected IJSRuntime JS { get; set; }
 
         [AllowNull]
-        [Inject] 
+        [Inject]
         protected IApplicationInsights AppInsights { get; set; }
 
         protected void NavigateToLogin()
@@ -49,6 +49,12 @@ namespace MyChess.Client.Shared
                 await JS.GetLocalStorage().Set("PlayerID", user.ID);
                 return user.ID;
             }
+        }
+
+        [JSInvokable]
+        public static void OnFocus()
+        {
+            AppFocus.Focus();
         }
 
         protected virtual void Dispose(bool disposing)
