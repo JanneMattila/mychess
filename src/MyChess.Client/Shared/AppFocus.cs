@@ -7,6 +7,6 @@
             OnFocus?.Invoke();
         }
 
-        public static event Func<Task> OnFocus;
+        public static event Func<Task>? OnFocus;
     }
 }
