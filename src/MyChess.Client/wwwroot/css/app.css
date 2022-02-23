@@ -48,7 +48,7 @@ body {
 
 .Load-logo {
     pointer-events: none;
-    padding: 10px;
+    padding: 5px;
 }
 
 @media (prefers-reduced-motion: no-preference) {

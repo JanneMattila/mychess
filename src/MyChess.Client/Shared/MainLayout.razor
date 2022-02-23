@@ -3,13 +3,20 @@
 @inject AppState _appState;
 
 <div class="App-header-container">
-	<a href="/"><img src="/images/logo.svg" alt="My Chess" class="App-logo" /></a>
+    @if (_appState.IsSmallLoading)
+    {
+        <a href="/"><img src="/images/logo.svg" alt="My Chess" class="Load-logo" /></a>
+    }
+    else
+    {
+        <a href="/"><img src="/images/logo.svg" alt="My Chess" class="App-logo" /></a>
+    }
 	<div class="App-auth">
 		<Profile />
 	</div>
 </div>
 
-	@if (_appState.IsLoading)
+@if (_appState.IsLoading)
 {
 	<div class="welcome">
 		<div class="welcome-Text">

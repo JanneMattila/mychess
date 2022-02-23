@@ -27,6 +27,8 @@ public class GameListBase : MyChessComponentBase
     {
         try
         {
+            AppState.IsSmallLoading = true;
+
             Games = await Client.GetGamesAsync(Filters);
             StateHasChanged();
         }
@@ -38,6 +40,7 @@ public class GameListBase : MyChessComponentBase
                 Name = "FailedSilentRefresh"
             });
         }
+        AppState.IsSmallLoading = false;
     }
 
     protected async Task RefreshGames()

@@ -18,5 +18,22 @@
         }
 
         public event Action OnLoadingChange;
+
+        private bool _isSmallLoading = false;
+        public bool IsSmallLoading
+        {
+            get
+            {
+                return _isSmallLoading;
+            }
+            set
+            {
+                _isSmallLoading = value;
+
+                OnSmallLoadingChange?.Invoke();
+            }
+        }
+
+        public event Action OnSmallLoadingChange;
     }
 }
