@@ -76,7 +76,7 @@ namespace MyChess.Functions
             {
                 _log.FuncGamesFetchAllGames();
                 var games = await _gamesHandler.GetGamesAsync(authenticatedUser, state);
-                var response = req.CreateResponse(HttpStatusCode.OK);
+                var response = req.CreateResponse();
                 await response.WriteAsJsonAsync(games);
                 return response;
             }
@@ -95,7 +95,7 @@ namespace MyChess.Functions
                 //        GroupName = id,
                 //        Action = GroupAction.Add
                 //    });
-                var response = req.CreateResponse(HttpStatusCode.OK);
+                var response = req.CreateResponse();
                 await response.WriteAsJsonAsync(game);
                 return response;
             }
@@ -108,9 +108,10 @@ namespace MyChess.Functions
             var result = await _gamesHandler.CreateGameAsync(authenticatedUser, gameToCreate);
             if (result.Game != null)
             {
-                var response = req.CreateResponse(HttpStatusCode.Created);
+                var response = req.CreateResponse();
                 response.Headers.Add(HeaderNames.Location, $"/api/games/{result.Game.ID}");
                 await response.WriteAsJsonAsync(result.Game);
+                response.StatusCode = HttpStatusCode.Created;
                 return response;
             }
             else if (result.Error != null)
@@ -123,8 +124,9 @@ namespace MyChess.Functions
                     Title = result.Error.Title
                 };
 
-                var response = req.CreateResponse((HttpStatusCode)problemDetail.Status);
+                var response = req.CreateResponse();
                 await response.WriteAsJsonAsync(problemDetail);
+                response.StatusCode = (HttpStatusCode)problemDetail.Status;
                 return response;
             }
             else
@@ -151,8 +153,9 @@ namespace MyChess.Functions
                     Title = result.Title
                 };
 
-                var response = req.CreateResponse((HttpStatusCode)problemDetail.Status);
+                var response = req.CreateResponse();
                 await response.WriteAsJsonAsync(problemDetail);
+                response.StatusCode = (HttpStatusCode)problemDetail.Status;
                 return response;
             }
         }

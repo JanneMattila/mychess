@@ -85,8 +85,9 @@ public class SettingsFunction
                 Title = result.Title
             };
 
-            var response = req.CreateResponse((HttpStatusCode)problemDetail.Status);
+            var response = req.CreateResponse();
             await response.WriteAsJsonAsync(problemDetail);
+            response.StatusCode = (HttpStatusCode)problemDetail.Status;
             return response;
         }
     }

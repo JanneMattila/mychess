@@ -67,7 +67,7 @@ public class FriendsFunction
         {
             _log.FuncFriendsFetchAllFriends();
             var friends = await _friendsHandler.GetFriendsAsync(authenticatedUser);
-            var response = req.CreateResponse(HttpStatusCode.OK);
+            var response = req.CreateResponse();
             await response.WriteAsJsonAsync(friends);
             return response;
         }
@@ -79,7 +79,7 @@ public class FriendsFunction
             {
                 return req.CreateResponse(HttpStatusCode.NotFound);
             }
-            var response = req.CreateResponse(HttpStatusCode.OK);
+            var response = req.CreateResponse();
             await response.WriteAsJsonAsync(friend);
             return response;
         }
@@ -92,9 +92,10 @@ public class FriendsFunction
         var result = await _friendsHandler.AddNewFriend(authenticatedUser, friendToAdd);
         if (result.Friend != null)
         {
-            var response = req.CreateResponse(HttpStatusCode.Created);
+            var response = req.CreateResponse();
             response.Headers.Add(HeaderNames.Location, $"/api/friend/{result.Friend.ID}");
             await response.WriteAsJsonAsync(result.Friend);
+            response.StatusCode = HttpStatusCode.Created;
             return response;
         }
         else if (result.Error != null)
@@ -107,8 +108,9 @@ public class FriendsFunction
                 Title = result.Error.Title
             };
 
-            var response = req.CreateResponse((HttpStatusCode)problemDetail.Status);
+            var response = req.CreateResponse();
             await response.WriteAsJsonAsync(problemDetail);
+            response.StatusCode = (HttpStatusCode)problemDetail.Status;
             return response;
         }
         else

@@ -59,7 +59,7 @@ public class MeFunction
     {
         _log.FuncMeFetchMe();
         var me = await _meHandler.LoginAsync(authenticatedUser);
-        var response = req.CreateResponse(HttpStatusCode.OK);
+        var response = req.CreateResponse();
         await response.WriteAsJsonAsync(me);
         return response;
     }
