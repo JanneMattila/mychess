@@ -2,34 +2,33 @@
 using MyChess.Interfaces;
 using Xunit;
 
-namespace MyChess.Backend.Tests.Data
+namespace MyChess.Backend.Tests.Data;
+
+public class CompactorTests
 {
-    public class CompactorTests
+    private readonly Compactor _compactor;
+
+    public CompactorTests()
     {
-        private readonly Compactor _compactor;
+        _compactor = new Compactor();
+    }
 
-        public CompactorTests()
+    [Fact]
+    public void Compress_Decompress_Test()
+    {
+        // Arrange
+        var expected = new MyChessGame
         {
-            _compactor = new Compactor();
-        }
+            ID = "abc"
+        };
+        expected.Players.Black.ID = "def";
+        var buffer = _compactor.Compact(expected);
 
-        [Fact]
-        public void Compress_Decompress_Test()
-        {
-            // Arrange
-            var expected = new MyChessGame
-            {
-                ID = "abc"
-            };
-            expected.Players.Black.ID = "def";
-            var buffer = _compactor.Compact(expected);
+        // Act
+        var actual = _compactor.Decompress(buffer);
 
-            // Act
-            var actual = _compactor.Decompress(buffer);
-
-            // Assert
-            Assert.Equal(expected.ID, actual.ID);
-            Assert.Equal(expected.Players.Black.ID, actual.Players.Black.ID);
-        }
+        // Assert
+        Assert.Equal(expected.ID, actual.ID);
+        Assert.Equal(expected.Players.Black.ID, actual.Players.Black.ID);
     }
 }

@@ -1,29 +1,28 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
-namespace MyChess.Tests
+namespace MyChess.Tests;
+
+public class ChessBoardTests
 {
-    public class ChessBoardTests
+    private readonly ChessBoard _board;
+
+    public ChessBoardTests()
     {
-        private readonly ChessBoard _board;
+        _board = new ChessBoard(NullLogger<ChessBoard>.Instance);
+        _board.Initialize();
+    }
 
-        public ChessBoardTests()
-        {
-            _board = new ChessBoard(NullLogger<ChessBoard>.Instance);
-            _board.Initialize();
-        }
+    [Fact]
+    public void AvailableMoves_In_Start_Test()
+    {
+        // Arrange
+        var expected = 20;
 
-        [Fact]
-        public void AvailableMoves_In_Start_Test()
-        {
-            // Arrange
-            var expected = 20;
+        // Act
+        var actual = _board.GetAllAvailableMoves().Length;
 
-            // Act
-            var actual = _board.GetAllAvailableMoves().Length;
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
+        // Assert
+        Assert.Equal(expected, actual);
     }
 }
