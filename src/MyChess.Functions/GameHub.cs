@@ -21,7 +21,9 @@ public class GameHub : ServerlessHub
     }
 
     [FunctionName("negotiate")]
-    public async Task<HttpResponseData> Negotiate([HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequestData req)
+    public async Task<HttpResponseData> Negotiate(
+        [HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequestData req,
+        [SignalRConnectionInfoInput(HubName = "GameHub")] string connectionInfo)
     {
         var principal = await _securityValidator.GetClaimsPrincipalAsync(req);
         if (principal == null)
@@ -29,10 +31,8 @@ public class GameHub : ServerlessHub
             return req.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
-        var authenticatedUser = principal.ToAuthenticatedUser();
-
         var response = req.CreateResponse(HttpStatusCode.OK);
-        await response.WriteAsJsonAsync(Negotiate(authenticatedUser.UserIdentifier));
+        await response.WriteStringAsync(connectionInfo);
         return response;
     }
 }

@@ -27,9 +27,13 @@ public class GamesMoveFunction
     }
 
     [Function("GamesMove")]
+    //[SignalROutput(HubName = "GameHub")]
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{id}/moves")] HttpRequestData req,
-        //[SignalR(HubName = "GameHub")] IAsyncCollector<SignalRMessage> signalRMessages,
+        // Use following references to migrate to isolated worker:
+        // https://github.com/aspnet/AzureSignalR-samples/blob/main/samples/DotnetIsolated-BidirectionChat/Functions.cs
+        // https://github.com/Azure/azure-functions-dotnet-worker/issues/294
+        //[Microsoft.Azure.Functions.Worker.(HubName = "GameHub")] IAsyncCollector<SignalRMessage> signalRMessages,
         string id)
     {
         using var _ = _log.FuncGamesMoveScope();
