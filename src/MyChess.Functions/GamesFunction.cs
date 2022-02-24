@@ -52,7 +52,6 @@ namespace MyChess.Functions
 
             var authenticatedUser = principal.ToAuthenticatedUser();
 
-
             var state = "";
             var value = HttpUtility.ParseQueryString(req.Url.Query).Get("state");
             if (string.IsNullOrEmpty(value) == false)

@@ -4,21 +4,24 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using MyChess.Backend;
 using MyChess.Backend.Handlers;
+using MyChess.Functions.Internal;
 using MyChess.Interfaces;
 
 namespace MyChess.Functions;
 
 public class GamesMoveFunction
 {
+    private readonly ILogger<GamesMoveFunction> _log;
     private readonly IGamesHandler _gamesHandler;
     private readonly ISecurityValidator _securityValidator;
 
     public GamesMoveFunction(
+        ILogger<GamesMoveFunction> log,
         IGamesHandler gamesHandler,
         ISecurityValidator securityValidator)
     {
+        _log = log;
         _gamesHandler = gamesHandler;
         _securityValidator = securityValidator;
     }
@@ -27,11 +30,11 @@ public class GamesMoveFunction
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{id}/moves")] HttpRequestData req,
         //[SignalR(HubName = "GameHub")] IAsyncCollector<SignalRMessage> signalRMessages,
-        string id,
-        ILogger log)
+        string id)
     {
-        using var scope = log.BeginScope("GamesMove");
-        log.LogInformation(LoggingEvents.FuncGamesMoveStarted, "GamesMove function processing request.");
+        using var _ = _log.FuncGamesMoveScope();
+
+        _log.FuncGamesMoveStarted();
 
         var principal = await _securityValidator.GetClaimsPrincipalAsync(req);
         if (principal == null)
@@ -41,15 +44,13 @@ public class GamesMoveFunction
 
         if (!principal.HasPermission(PermissionConstants.GamesReadWrite))
         {
-            log.LogWarning(LoggingEvents.FuncGamesMoveUserDoesNotHavePermission,
-                "User {user} does not have permission {permission}", principal.Identity?.Name, PermissionConstants.GamesReadWrite);
+            _log.FuncGamesMoveUserDoesNotHavePermission(principal.Identity?.Name, PermissionConstants.GamesReadWrite);
             return req.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
         var authenticatedUser = principal.ToAuthenticatedUser();
 
-        log.LogInformation(LoggingEvents.FuncGamesMoveProcessingMethod,
-            "Processing {method} request", req.Method);
+        _log.FuncGamesMoveProcessingMethod(req.Method);
 
         var moveToAdd = await JsonSerializer.DeserializeAsync<MyChessGameMove>(req.Body);
         var error = await _gamesHandler.AddMoveAsync(authenticatedUser, id, moveToAdd);

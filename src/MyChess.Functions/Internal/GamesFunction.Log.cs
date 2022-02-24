@@ -29,7 +29,7 @@ internal static class GamesFunctionLoggerExtensions
             "User {User} does not have permission {Permission}");
         _funcGamesProcessingMethod = LoggerMessage.Define<string>(
             LogLevel.Trace,
-            new EventId(LoggingEvents.FuncGamesUserDoesNotHavePermission, nameof(FuncGamesProcessingMethod)),
+            new EventId(LoggingEvents.FuncGamesProcessingMethod, nameof(FuncGamesProcessingMethod)),
             "Processing {Method} request");
         _funcGamesFetchAllGames = LoggerMessage.Define(
             LogLevel.Trace,
