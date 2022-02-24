@@ -17,7 +17,6 @@ public class SecurityValidatorTests
     }
 
     [Theory]
-    [InlineData("", "", null)]
     [InlineData("X-MyChessAuth", "", null)]
     [InlineData("X-MyChessAuth", "Bearer", null)]
     [InlineData("X-MyChessAuth", "Basic abcdef", null)]
@@ -25,7 +24,7 @@ public class SecurityValidatorTests
     public void Security_Validator_Header_Test(string name, string value, string? expected)
     {
         // Arrange
-        var request = HttpRequestHelper.Create("GET", headers: new HttpHeadersCollection()
+        var request = HttpRequestHelper.Create(headers: new HttpHeadersCollection()
         {
             {  name, value }
         });

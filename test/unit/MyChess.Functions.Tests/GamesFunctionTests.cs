@@ -5,7 +5,6 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using MyChess.Functions.Tests.Helpers;
 using MyChess.Functions.Tests.Stubs;
@@ -31,34 +30,35 @@ namespace MyChess.Functions.Tests
         public async Task No_ClaimsPrincipal_Test()
         {
             // Arrange
-            var expected = typeof(UnauthorizedResult);
+            var expected = HttpStatusCode.Unauthorized;
+            var req = HttpRequestHelper.Create();
 
             // Act
-            var actual = await _gamesFunction.Run(null, null);
+            var actual = await _gamesFunction.Run(req, null);
 
             // Assert
-            Assert.IsType(expected, actual);
+            Assert.Equal(expected, actual.StatusCode);
         }
 
         [Fact]
         public async Task No_Required_Permission_Test()
         {
             // Arrange
-            var expected = typeof(UnauthorizedResult);
+            var expected = HttpStatusCode.Unauthorized;
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
+            var req = HttpRequestHelper.Create();
 
             // Act
-            var actual = await _gamesFunction.Run(null, null);
+            var actual = await _gamesFunction.Run(req, null);
 
             // Assert
-            Assert.IsType(expected, actual);
+            Assert.Equal(expected, actual.StatusCode);
         }
 
         [Fact]
         public async Task Fetch_Games_Test()
         {
             // Arrange
-            var expected = typeof(HttpResponseData);
             var expectedGames = 2;
 
             _gamesHandlerStub.Games.Add(new MyChessGame());
@@ -68,13 +68,13 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("GET", query: "state=WaitingForYou");
+            var req = HttpRequestHelper.Create(query: "state=WaitingForYou");
 
             // Act
             var actual = await _gamesFunction.Run(req, /*SignalRHelper.Create(),*/ string.Empty);
 
             // Assert
-            Assert.IsType(expected, actual);
+            actual.Body.Position = 0;
             var list = await JsonSerializer.DeserializeAsync<List<MyChessGame>>(actual.Body);
             Assert.Equal(expectedGames, list?.Count);
         }
@@ -83,7 +83,7 @@ namespace MyChess.Functions.Tests
         public async Task Fetch_Single_Game_Test()
         {
             // Arrange
-            var expected = typeof(OkObjectResult);
+            var expected = HttpStatusCode.OK;
             var expectedGameID = "abc";
 
             _gamesHandlerStub.SingleGame = new MyChessGame()
@@ -95,13 +95,14 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("GET", query: "state=Archive");
+            var req = HttpRequestHelper.Create(query: "state=Archive");
 
             // Act
             var actual = await _gamesFunction.Run(req, /*SignalRHelper.Create(),*/ "abc");
 
             // Assert
-            Assert.IsType(expected, actual);
+            Assert.Equal(expected, actual.StatusCode);
+            actual.Body.Position = 0;
             var body = await JsonSerializer.DeserializeAsync<MyChessGame>(actual.Body);
             Assert.Equal(expectedGameID, body?.ID);
         }
@@ -110,7 +111,7 @@ namespace MyChess.Functions.Tests
         public async Task Create_Game_Test()
         {
             // Arrange
-            var expected = typeof(CreatedResult);
+            var expected = HttpStatusCode.Created;
             var expectedGameID = "abc";
             var game = new MyChessGame()
             {
@@ -143,8 +144,8 @@ namespace MyChess.Functions.Tests
             var actual = await _gamesFunction.Run(req, /*SignalRHelper.Create(),*/ "abc");
 
             // Assert
-            Assert.IsType(expected, actual);
-            Assert.Equal(HttpStatusCode.Created, actual.StatusCode);
+            Assert.Equal(expected, actual.StatusCode);
+            actual.Body.Position = 0;
             var body = await JsonSerializer.DeserializeAsync<MyChessGame>(actual.Body);
             Assert.Equal(expectedGameID, body?.ID);
         }
@@ -153,7 +154,6 @@ namespace MyChess.Functions.Tests
         public async Task Create_Game_Fails_Due_Invalid_Opponent_Test()
         {
             // Arrange
-            var expected = typeof(ObjectResult);
             var expectedError = "1234";
             var game = new MyChessGame()
             {
@@ -186,7 +186,7 @@ namespace MyChess.Functions.Tests
             var actual = await _gamesFunction.Run(req, /*SignalRHelper.Create(),*/ "abc");
 
             // Assert
-            Assert.IsType(expected, actual);
+            actual.Body.Position = 0;
             var actualError = await JsonSerializer.DeserializeAsync<ProblemDetails>(actual.Body);
             Assert.EndsWith(expectedError, actualError?.Instance);
         }

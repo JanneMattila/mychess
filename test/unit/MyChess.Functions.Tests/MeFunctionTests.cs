@@ -28,9 +28,10 @@ public class MeFunctionTests
     {
         // Arrange
         var expected = HttpStatusCode.Unauthorized;
+        var req = HttpRequestHelper.Create();
 
         // Act
-        var actual = await _meFunction.Run(null);
+        var actual = await _meFunction.Run(req);
 
         // Assert
         Assert.Equal(expected, actual.StatusCode);
@@ -42,9 +43,10 @@ public class MeFunctionTests
         // Arrange
         var expected = HttpStatusCode.Unauthorized;
         _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
+        var req = HttpRequestHelper.Create();
 
         // Act
-        var actual = await _meFunction.Run(null);
+        var actual = await _meFunction.Run(req);
 
         // Assert
         Assert.Equal(expected, actual.StatusCode);
@@ -63,13 +65,14 @@ public class MeFunctionTests
         identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
         _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-        var req = HttpRequestHelper.Create("GET");
+        var req = HttpRequestHelper.Create();
 
         // Act
         var actual = await _meFunction.Run(req);
 
         // Assert
         Assert.Equal(expected, actual.StatusCode);
+        actual.Body.Position = 0;
         var actualUser = await JsonSerializer.DeserializeAsync<User>(actual.Body);
         Assert.Equal(expectedUserID, actualUser?.ID);
     }

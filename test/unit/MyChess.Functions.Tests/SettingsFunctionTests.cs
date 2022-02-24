@@ -29,9 +29,10 @@ public class SettingsFunctionTests
     {
         // Arrange
         var expected = HttpStatusCode.Unauthorized;
+        var req = HttpRequestHelper.Create();
 
         // Act
-        var actual = await _settingsFunction.Run(null);
+        var actual = await _settingsFunction.Run(req);
 
         // Assert
         Assert.Equal(expected, actual.StatusCode);
@@ -43,9 +44,10 @@ public class SettingsFunctionTests
         // Arrange
         var expected = HttpStatusCode.Unauthorized;
         _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
+        var req = HttpRequestHelper.Create();
 
         // Act
-        var actual = await _settingsFunction.Run(null);
+        var actual = await _settingsFunction.Run(req);
 
         // Assert
         Assert.Equal(expected, actual.StatusCode);
@@ -64,13 +66,14 @@ public class SettingsFunctionTests
         identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
         _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-        var req = HttpRequestHelper.Create("GET");
+        var req = HttpRequestHelper.Create();
 
         // Act
         var actual = await _settingsFunction.Run(req);
 
         // Assert
         Assert.Equal(expected, actual.StatusCode);
+        actual.Body.Position = 0;
         var actualUserSettings = await JsonSerializer.DeserializeAsync<UserSettings>(actual.Body);
         Assert.Equal(expectedPlayAlwaysUp, actualUserSettings?.PlayAlwaysUp);
     }
@@ -79,7 +82,7 @@ public class SettingsFunctionTests
     public async Task Update_Settings_Test()
     {
         // Arrange
-        var expected = typeof(OkResult);
+        var expected = HttpStatusCode.OK;
 
         var userSettings = new UserSettings();
 
@@ -93,8 +96,7 @@ public class SettingsFunctionTests
         var actual = await _settingsFunction.Run(req);
 
         // Assert
-        var actualSettings = await JsonSerializer.DeserializeAsync<UserSettings>(actual.Body);
-        Assert.IsType(expected, actualSettings);
+        Assert.Equal(expected, actual.StatusCode);
     }
 
 
@@ -102,7 +104,7 @@ public class SettingsFunctionTests
     public async Task Update_Settings_With_Failure_Test()
     {
         // Arrange
-        var expected = typeof(ObjectResult);
+        var expected = HttpStatusCode.NotImplemented;
 
         var userSettings = new UserSettings();
         _settingsHandlerStub.Error = new HandlerError()
@@ -120,6 +122,9 @@ public class SettingsFunctionTests
         var actual = await _settingsFunction.Run(req);
 
         // Assert
-        Assert.IsType(expected, actual);
+        Assert.Equal(expected, actual.StatusCode);
+        actual.Body.Position = 0;
+        var actualError = await JsonSerializer.DeserializeAsync<ProblemDetails>(actual.Body);
+        Assert.Equal(501, actualError?.Status);
     }
 }

@@ -29,34 +29,36 @@ public class FriendsFunctionTests
     public async Task No_ClaimsPrincipal_Test()
     {
         // Arrange
-        var expected = typeof(UnauthorizedResult);
+        var expected = HttpStatusCode.Unauthorized;
+        var req = HttpRequestHelper.Create();
 
         // Act
-        var actual = await _friendsFunction.Run(null, null);
+        var actual = await _friendsFunction.Run(req, null);
 
         // Assert
-        Assert.IsType(expected, actual);
+        Assert.Equal(expected, actual.StatusCode);
     }
 
     [Fact]
     public async Task No_Required_Permission_Test()
     {
         // Arrange
-        var expected = typeof(UnauthorizedResult);
+        var expected = HttpStatusCode.Unauthorized;
         _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
+        var req = HttpRequestHelper.Create();
 
         // Act
-        var actual = await _friendsFunction.Run(null, null);
+        var actual = await _friendsFunction.Run(req, null);
 
         // Assert
-        Assert.IsType(expected, actual);
+        Assert.Equal(expected, actual.StatusCode);
     }
 
     [Fact]
     public async Task Fetch_Players_Test()
     {
         // Arrange
-        var expected = typeof(OkObjectResult);
+        var expected = HttpStatusCode.OK;
         var expectedFriends = 2;
 
         _friendsHandlerStub.Friends.Add(new User());
@@ -66,13 +68,14 @@ public class FriendsFunctionTests
         identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
         _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-        var req = HttpRequestHelper.Create("GET");
+        var req = HttpRequestHelper.Create();
 
         // Act
         var actual = await _friendsFunction.Run(req, null);
 
         // Assert
-        Assert.IsType(expected, actual);
+        Assert.Equal(expected, actual.StatusCode);
+        actual.Body.Position = 0;
         var list = await JsonSerializer.DeserializeAsync<List<User>>(actual.Body);
         Assert.Equal(expectedFriends, list?.Count);
     }
@@ -81,7 +84,7 @@ public class FriendsFunctionTests
     public async Task Fetch_Single_friend_Test()
     {
         // Arrange
-        var expected = typeof(OkObjectResult);
+        var expected = HttpStatusCode.OK;
         var expectedPlayerID = "abc";
 
         _friendsHandlerStub.SingleFriend = new User()
@@ -93,13 +96,14 @@ public class FriendsFunctionTests
         identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "User.ReadWrite"));
         _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-        var req = HttpRequestHelper.Create("GET");
+        var req = HttpRequestHelper.Create();
 
         // Act
         var actual = await _friendsFunction.Run(req, "abc");
 
         // Assert
-        Assert.IsType(expected, actual);
+        Assert.Equal(expected, actual.StatusCode);
+        actual.Body.Position = 0;
         var actualPlayer = await JsonSerializer.DeserializeAsync<User>(actual.Body);
         Assert.Equal(expectedPlayerID, actualPlayer?.ID);
     }
@@ -108,7 +112,7 @@ public class FriendsFunctionTests
     public async Task Add_Friend_Test()
     {
         // Arrange
-        var expected = typeof(CreatedResult);
+        var expected = HttpStatusCode.Created;
         var expectedPlayerID = "abc";
         var friend = new User()
         {
@@ -131,8 +135,8 @@ public class FriendsFunctionTests
         var actual = await _friendsFunction.Run(req, "abc");
 
         // Assert
-        Assert.IsType(expected, actual);
-        Assert.Equal(HttpStatusCode.Created, actual.StatusCode);
+        Assert.Equal(expected, actual.StatusCode);
+        actual.Body.Position = 0;
         var actualPlayer = await JsonSerializer.DeserializeAsync<User>(actual.Body);
         Assert.Equal(expectedPlayerID, actualPlayer?.ID);
     }
@@ -141,7 +145,6 @@ public class FriendsFunctionTests
     public async Task Add_Friend_Fails_Due_Invalid_Player_Test()
     {
         // Arrange
-        var expected = typeof(ObjectResult);
         var expectedError = "1234";
         var friend = new User()
         {
@@ -164,7 +167,7 @@ public class FriendsFunctionTests
         var actual = await _friendsFunction.Run(req, "abc");
 
         // Assert
-        Assert.IsType(expected, actual);
+        actual.Body.Position = 0;
         var actualError = await JsonSerializer.DeserializeAsync<ProblemDetails>(actual.Body);
         Assert.EndsWith(expectedError, actualError?.Instance);
     }
