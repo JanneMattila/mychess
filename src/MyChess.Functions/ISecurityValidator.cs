@@ -1,12 +1,10 @@
 ﻿using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Functions.Worker.Http;
 
-namespace MyChess.Functions
+namespace MyChess.Functions;
+
+public interface ISecurityValidator
 {
-    public interface ISecurityValidator
-    {
-        Task<bool> InitializeAsync();
-        Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(HttpRequest req);
-    }
+    Task<bool> InitializeAsync();
+    Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(HttpRequestData req);
 }

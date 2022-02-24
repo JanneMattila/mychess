@@ -4,17 +4,17 @@
 ### Get list of games
 GET {{endpoint}}/api/games HTTP/1.1
 Content-type: application/json
-Authorization: Bearer {{auth}}
+X-MyChessAuth: Bearer {{auth}}
 
 ### Get single game
 GET {{endpoint}}/api/games/123-abc-123 HTTP/1.1
 Content-type: application/json
-Authorization: Bearer {{auth}}
+X-MyChessAuth: Bearer {{auth}}
 
 ### Post move to game
 POST {{endpoint}}/api/games/123-abc-123/moves HTTP/1.1
 Content-type: application/json
-Authorization: Bearer {{auth}}
+X-MyChessAuth: Bearer {{auth}}
 
 {
   "move": "A1A2",
