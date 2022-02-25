@@ -58,6 +58,8 @@ public class GamesMoveFunction
         _log.FuncGamesMoveProcessingMethod(req.Method);
 
         var moveToAdd = await JsonSerializer.DeserializeAsync<MyChessGameMove>(req.Body);
+        ArgumentNullException.ThrowIfNull(moveToAdd);
+
         var error = await _gamesHandler.AddMoveAsync(authenticatedUser, id, moveToAdd);
         if (error == null)
         {

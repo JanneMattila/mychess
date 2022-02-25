@@ -10,14 +10,14 @@ namespace MyChess.Backend.Data
         {
         }
 
-        public string PartitionKey { get; set; }
+        public string PartitionKey { get; set; } = string.Empty;
 
-        public string RowKey { get; set; }
+        public string RowKey { get; set; } = string.Empty;
 
         public DateTimeOffset? Timestamp { get; set; }
 
         public ETag ETag { get; set; }
-        
+
         public byte[] Data { get; set; } = new byte[0];
     }
 }

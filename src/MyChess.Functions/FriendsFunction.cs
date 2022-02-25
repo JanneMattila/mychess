@@ -89,6 +89,8 @@ public class FriendsFunction
     {
         _log.FuncFriendsAddNewFriend();
         var friendToAdd = await JsonSerializer.DeserializeAsync<User>(req.Body);
+        ArgumentNullException.ThrowIfNull(friendToAdd);
+
         var result = await _friendsHandler.AddNewFriend(authenticatedUser, friendToAdd);
         if (result.Friend != null)
         {

@@ -24,6 +24,8 @@ namespace MyChess
             VerticalLocation = verticalLocation;
         }
 
+        // Must match 'int ChessBoardLocation.CompareTo(object obj)' implicitly implemented member 'int IComparable.CompareTo(object? obj)'
+#nullable disable
         public int CompareTo(object obj)
         {
             if (obj == null)
@@ -46,5 +48,6 @@ namespace MyChess
                 throw new ArgumentException("Object is not a ChessBoardLocation");
             }
         }
+#nullable enable
     }
 }
