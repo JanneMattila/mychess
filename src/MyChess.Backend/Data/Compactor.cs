@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Text.Json;
@@ -34,7 +35,8 @@ namespace MyChess.Backend.Data
             }
 
             var json = Encoding.UTF8.GetString(buffer);
-            return JsonSerializer.Deserialize<MyChessGame>(json);
+            return JsonSerializer.Deserialize<MyChessGame>(json) ??
+                   throw new ArgumentNullException("Cannot deserialize game data.");
         }
     }
 }

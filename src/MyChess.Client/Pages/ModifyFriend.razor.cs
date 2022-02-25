@@ -9,10 +9,10 @@ namespace MyChess.Client.Pages;
 public class ModifyFriendBase : MyChessComponentBase
 {
     [Parameter]
-    public string Verb { get; set; }
+    public string Verb { get; set; } = string.Empty;
 
     [Parameter]
-    public string ID { get; set; }
+    public string ID { get; set; } = string.Empty;
 
     public string Title { get; set; } = "Modify friend";
 

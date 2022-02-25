@@ -6,5 +6,5 @@ namespace MyChess.Client.Pages;
 public class PlayBase : MyChessComponentBase
 {
     [Parameter]
-    public string ID { get; set; }
+    public string ID { get; set; } = string.Empty;
 }

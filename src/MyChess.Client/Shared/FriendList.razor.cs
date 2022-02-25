@@ -4,7 +4,7 @@ using MyChess.Interfaces;
 namespace MyChess.Client.Shared;
 
 [Authorize]
-public class FriendListBase: MyChessComponentBase
+public class FriendListBase : MyChessComponentBase
 {
     protected List<User> Friends { get; set; } = new();
 
@@ -25,9 +25,12 @@ public class FriendListBase: MyChessComponentBase
         await RefreshFriends();
     }
 
-    protected void ManageFriend(string id)
+    protected void ManageFriend(string? id)
     {
-        NavigationManager.NavigateTo($"/friends/{id}");
+        if (id != null)
+        {
+            NavigationManager.NavigateTo($"/friends/{id}");
+        }
     }
 
     protected void AddNewFriend()

@@ -17,7 +17,7 @@
             }
         }
 
-        public event Action OnLoadingChange;
+        public event Action? OnLoadingChange;
 
         private bool _isSmallLoading = false;
         public bool IsSmallLoading
@@ -34,6 +34,6 @@
             }
         }
 
-        public event Action OnSmallLoadingChange;
+        public event Action? OnSmallLoadingChange;
     }
 }

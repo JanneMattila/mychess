@@ -33,7 +33,7 @@ public class FriendsFunctionTests
         var req = HttpRequestHelper.Create();
 
         // Act
-        var actual = await _friendsFunction.Run(req, null);
+        var actual = await _friendsFunction.Run(req, string.Empty);
 
         // Assert
         Assert.Equal(expected, actual.StatusCode);
@@ -48,7 +48,7 @@ public class FriendsFunctionTests
         var req = HttpRequestHelper.Create();
 
         // Act
-        var actual = await _friendsFunction.Run(req, null);
+        var actual = await _friendsFunction.Run(req, string.Empty);
 
         // Assert
         Assert.Equal(expected, actual.StatusCode);
@@ -71,7 +71,7 @@ public class FriendsFunctionTests
         var req = HttpRequestHelper.Create();
 
         // Act
-        var actual = await _friendsFunction.Run(req, null);
+        var actual = await _friendsFunction.Run(req, string.Empty);
 
         // Assert
         Assert.Equal(expected, actual.StatusCode);

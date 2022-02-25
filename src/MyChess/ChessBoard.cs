@@ -462,7 +462,7 @@ namespace MyChess
                         return;
                     }
 
-                    ChessMove opponentMove = opponentMoves.Where(
+                    ChessMove? opponentMove = opponentMoves.Where(
                         o => o.To.HorizontalLocation == currentColumn && o.To.VerticalLocation == row).FirstOrDefault();
                     if (opponentMove != null)
                     {
@@ -756,7 +756,7 @@ namespace MyChess
             var boardChanges = new List<ChessBoardChange>();
             var availableMoves = GetAvailableMoves(CurrentPlayer, move.From.HorizontalLocation, move.From.VerticalLocation, validateCheck);
 
-            ChessMove selectedMove = availableMoves.Where(o => o.CompareTo(move) == 0).FirstOrDefault();
+            ChessMove? selectedMove = availableMoves.Where(o => o.CompareTo(move) == 0).FirstOrDefault();
 
             if (selectedMove == null)
             {
@@ -958,7 +958,7 @@ namespace MyChess
                 var availableMovesText = string.Join(", ", movesAvailable.Select(m => m.ToString()));
                 var errorText = $"Cannot make move \"{moveText}\" since it's not available. Available moves are: \"{availableMovesText}\".";
                 Trace.TraceError(errorText);
-                
+
                 throw new ApplicationException(errorText);
             }
             return MakeMove(move);
