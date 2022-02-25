@@ -8,107 +8,106 @@ using MyChess.Backend.Tests.Handlers.Stubs;
 using MyChess.Interfaces;
 using Xunit;
 
-namespace MyChess.Backend.Tests.Handlers
+namespace MyChess.Backend.Tests.Handlers;
+
+public class SettingsHandlerTests
 {
-    public class SettingsHandlerTests
+    private readonly SettingsHandler _settingsHandler;
+    private readonly MyChessContextStub _context;
+
+    public SettingsHandlerTests()
     {
-        private readonly SettingsHandler _settingsHandler;
-        private readonly MyChessContextStub _context;
+        _context = new MyChessContextStub();
+        _settingsHandler = new SettingsHandler(NullLogger<SettingsHandler>.Instance, _context);
+    }
 
-        public SettingsHandlerTests()
+    [Fact]
+    public async Task Get_Settings_As_New_User()
+    {
+        // Arrange
+        var expected = 0;
+        var user = new AuthenticatedUser()
         {
-            _context = new MyChessContextStub();
-            _settingsHandler = new SettingsHandler(NullLogger<SettingsHandler>.Instance, _context);
-        }
+            Name = "abc",
+            PreferredUsername = "a b",
+            UserIdentifier = "u",
+            ProviderIdentifier = "p"
+        };
 
-        [Fact]
-        public async Task Get_Settings_As_New_User()
+        // Act
+        var actual = await _settingsHandler.GetSettingsAsync(user);
+
+        // Assert
+        Assert.Equal(expected, actual.Notifications.Count);
+    }
+
+    [Fact]
+    public async Task Get_Settings_As_Existing_User_With_Notification()
+    {
+        // Arrange
+        var expectedNotifications = 1;
+        var expectedPlayAlwaysUp = true;
+        var user = new AuthenticatedUser()
         {
-            // Arrange
-            var expected = 0;
-            var user = new AuthenticatedUser()
-            {
-                Name = "abc",
-                PreferredUsername = "a b",
-                UserIdentifier = "u",
-                ProviderIdentifier = "p"
-            };
+            Name = "abc",
+            PreferredUsername = "a b",
+            UserIdentifier = "u",
+            ProviderIdentifier = "p"
+        };
 
-            // Act
-            var actual = await _settingsHandler.GetSettingsAsync(user);
-
-            // Assert
-            Assert.Equal(expected, actual.Notifications.Count);
-        }
-
-        [Fact]
-        public async Task Get_Settings_As_Existing_User_With_Notification()
+        await _context.UpsertAsync(TableNames.Users, new UserEntity()
         {
-            // Arrange
-            var expectedNotifications = 1;
-            var expectedPlayAlwaysUp = true;
-            var user = new AuthenticatedUser()
-            {
-                Name = "abc",
-                PreferredUsername = "a b",
-                UserIdentifier = "u",
-                ProviderIdentifier = "p"
-            };
-
-            await _context.UpsertAsync(TableNames.Users, new UserEntity()
-            {
-                PartitionKey = "u",
-                RowKey = "p",
-                UserID = "user123"
-            });
-            await _context.UpsertAsync(TableNames.UserSettings, new UserSettingEntity()
-            {
-                PartitionKey = "user123",
-                RowKey = "user123",
-                PlayAlwaysUp = true
-            });
-            await _context.UpsertAsync(TableNames.UserNotifications, new UserNotificationEntity()
-            {
-                PartitionKey = "user123",
-                RowKey = "user123",
-                Name = "Browser"
-            });
-
-            // Act
-            var actual = await _settingsHandler.GetSettingsAsync(user);
-
-            // Assert
-            Assert.NotNull(actual);
-            Assert.Equal(expectedNotifications, actual.Notifications.Count);
-            Assert.Equal(expectedPlayAlwaysUp, actual.PlayAlwaysUp);
-        }
-
-        [Fact]
-        public async Task Update_Settings_Test()
+            PartitionKey = "u",
+            RowKey = "p",
+            UserID = "user123"
+        });
+        await _context.UpsertAsync(TableNames.UserSettings, new UserSettingEntity()
         {
-            // Arrange
-            var expectedRows = 1;
-            var expectedPlayAlwaysUp = true;
-            var user = new AuthenticatedUser()
-            {
-                Name = "abc",
-                PreferredUsername = "a b",
-                UserIdentifier = "u",
-                ProviderIdentifier = "p"
-            };
+            PartitionKey = "user123",
+            RowKey = "user123",
+            PlayAlwaysUp = true
+        });
+        await _context.UpsertAsync(TableNames.UserNotifications, new UserNotificationEntity()
+        {
+            PartitionKey = "user123",
+            RowKey = "user123",
+            Name = "Browser"
+        });
 
-            var playerSettings = new UserSettings();
-            playerSettings.PlayAlwaysUp = true;
+        // Act
+        var actual = await _settingsHandler.GetSettingsAsync(user);
 
-            // Act
-            var actual = await _settingsHandler.UpdateSettingsAsync(user, playerSettings);
+        // Assert
+        Assert.NotNull(actual);
+        Assert.Equal(expectedNotifications, actual.Notifications.Count);
+        Assert.Equal(expectedPlayAlwaysUp, actual.PlayAlwaysUp);
+    }
 
-            // Assert
-            Assert.Null(actual);
-            var table = _context.Tables[TableNames.UserSettings];
-            Assert.Equal(expectedRows, table.Count);
-            var row = table.First() as UserSettingEntity;
-            Assert.Equal(expectedPlayAlwaysUp, row.PlayAlwaysUp);
-        }
+    [Fact]
+    public async Task Update_Settings_Test()
+    {
+        // Arrange
+        var expectedRows = 1;
+        var expectedPlayAlwaysUp = true;
+        var user = new AuthenticatedUser()
+        {
+            Name = "abc",
+            PreferredUsername = "a b",
+            UserIdentifier = "u",
+            ProviderIdentifier = "p"
+        };
+
+        var playerSettings = new UserSettings();
+        playerSettings.PlayAlwaysUp = true;
+
+        // Act
+        var actual = await _settingsHandler.UpdateSettingsAsync(user, playerSettings);
+
+        // Assert
+        Assert.Null(actual);
+        var table = _context.Tables[TableNames.UserSettings];
+        Assert.Equal(expectedRows, table.Count);
+        var row = table.First() as UserSettingEntity;
+        Assert.Equal(expectedPlayAlwaysUp, row.PlayAlwaysUp);
     }
 }

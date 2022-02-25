@@ -1,10 +1,6 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols;
@@ -89,16 +85,18 @@ namespace MyChess.Functions
             return true;
         }
 
-        public string? ParseAccessToken(HttpRequest req)
+        public string? ParseAccessToken(Microsoft.Azure.Functions.Worker.Http.HttpRequestData req)
         {
             // https://github.com/Azure/static-web-apps/issues/34
-            if (!req.Headers.ContainsKey(CustomHeaderNames.Authorization /* HeaderNames.Authorization */))
+            if (!req.Headers.Contains(CustomHeaderNames.Authorization /* HeaderNames.Authorization */))
             {
                 _log.FuncSecNoAuthHeader();
                 return null;
             }
 
-            var authorizationValue = req.Headers[CustomHeaderNames.Authorization /* HeaderNames.Authorization */].ToString().Split(' ');
+            var authorizationValue = req.Headers
+                .GetValues(CustomHeaderNames.Authorization /* HeaderNames.Authorization */)
+                .First().Split(' ');
             if (authorizationValue.Length != 2 ||
                 authorizationValue[0] != JwtBearerDefaults.AuthenticationScheme)
             {
@@ -109,7 +107,7 @@ namespace MyChess.Functions
             return authorizationValue[1];
         }
 
-        public async Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(HttpRequest req)
+        public async Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(Microsoft.Azure.Functions.Worker.Http.HttpRequestData req)
         {
             var accessToken = ParseAccessToken(req);
             if (accessToken == null)

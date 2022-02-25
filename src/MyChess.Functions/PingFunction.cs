@@ -1,25 +1,22 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+﻿using System.Net;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 
-namespace MyChess.Functions
+namespace MyChess.Functions;
+
+public class PingFunction
 {
-    public class PingFunction
+    private readonly ISecurityValidator _securityValidator;
+
+    public PingFunction(ISecurityValidator securityValidator)
     {
-        private readonly ISecurityValidator _securityValidator;
+        _securityValidator = securityValidator;
+    }
 
-        public PingFunction(ISecurityValidator securityValidator)
-        {
-            _securityValidator = securityValidator;
-        }
-
-        [FunctionName("Ping")]
-        public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ping")] HttpRequest req)
-        {
-            await _securityValidator.InitializeAsync();
-            return new OkResult();
-        }
+    [Function("Ping")]
+    public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "ping")] HttpRequestData req)
+    {
+        await _securityValidator.InitializeAsync();
+        return req.CreateResponse(HttpStatusCode.OK);
     }
 }

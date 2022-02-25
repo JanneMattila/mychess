@@ -1,38 +1,38 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using System.Net;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Extensions.SignalRService;
 using Microsoft.Extensions.Logging;
 
-namespace MyChess.Functions
+namespace MyChess.Functions;
+
+public class GameHub : ServerlessHub
 {
-    public class GameHub : ServerlessHub
+    private readonly ILogger<GameHub> _log;
+    private readonly ISecurityValidator _securityValidator;
+
+    public GameHub(
+        ILogger<GameHub> log,
+        ISecurityValidator securityValidator)
     {
-        private readonly ILogger<GameHub> _log;
-        private readonly ISecurityValidator _securityValidator;
+        _log = log;
+        _securityValidator = securityValidator;
+    }
 
-        public GameHub(
-            ILogger<GameHub> log,
-            ISecurityValidator securityValidator)
+    [FunctionName("negotiate")]
+    public async Task<HttpResponseData> Negotiate(
+        [HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequestData req,
+        [SignalRConnectionInfoInput(HubName = "GameHub")] string connectionInfo)
+    {
+        var principal = await _securityValidator.GetClaimsPrincipalAsync(req);
+        if (principal == null)
         {
-            _log = log;
-            _securityValidator = securityValidator;
+            return req.CreateResponse(HttpStatusCode.Unauthorized);
         }
 
-        [FunctionName("negotiate")]
-        public async Task<IActionResult> Negotiate([HttpTrigger(AuthorizationLevel.Anonymous)] HttpRequest req)
-        {
-            var principal = await _securityValidator.GetClaimsPrincipalAsync(req);
-            if (principal == null)
-            {
-                return new UnauthorizedResult();
-            }
-
-            var authenticatedUser = principal.ToAuthenticatedUser();
-
-            return new OkObjectResult(Negotiate(authenticatedUser.UserIdentifier));
-        }
+        var response = req.CreateResponse(HttpStatusCode.OK);
+        await response.WriteStringAsync(connectionInfo);
+        return response;
     }
 }

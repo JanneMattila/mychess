@@ -4,45 +4,43 @@ using MyChess.Backend.Data;
 using MyChess.Backend.Handlers;
 using MyChess.Backend.Models;
 using MyChess.Backend.Tests.Handlers.Stubs;
-using MyChess.Interfaces;
 using Xunit;
 
-namespace MyChess.Backend.Tests.Handlers
+namespace MyChess.Backend.Tests.Handlers;
+
+public class MeHandlerTests
 {
-    public class MeHandlerTests
+    private readonly MeHandler _meHandler;
+    private readonly MyChessContextStub _context;
+
+    public MeHandlerTests()
     {
-        private readonly MeHandler _meHandler;
-        private readonly MyChessContextStub _context;
+        _context = new MyChessContextStub();
+        _meHandler = new MeHandler(NullLogger<MeHandler>.Instance, _context);
+    }
 
-        public MeHandlerTests()
+    [Fact]
+    public async Task Login()
+    {
+        // Arrange
+        var expectedUserID = "user123";
+        var user = new AuthenticatedUser()
         {
-            _context = new MyChessContextStub();
-            _meHandler = new MeHandler(NullLogger<MeHandler>.Instance, _context);
-        }
+            UserIdentifier = "u",
+            ProviderIdentifier = "p"
+        };
 
-        [Fact]
-        public async Task Login()
+        await _context.UpsertAsync(TableNames.Users, new UserEntity()
         {
-            // Arrange
-            var expectedUserID = "user123";
-            var user = new AuthenticatedUser()
-            {
-                UserIdentifier = "u",
-                ProviderIdentifier = "p"
-            };
+            PartitionKey = "u",
+            RowKey = "p",
+            UserID = "user123"
+        });
 
-            await _context.UpsertAsync(TableNames.Users, new UserEntity()
-            {
-                PartitionKey = "u",
-                RowKey = "p",
-                UserID = "user123"
-            });
+        // Act
+        var actual = await _meHandler.LoginAsync(user);
 
-            // Act
-            var actual = await _meHandler.LoginAsync(user);
-
-            // Assert
-            Assert.Equal(expectedUserID, actual.ID);
-        }
+        // Assert
+        Assert.Equal(expectedUserID, actual.ID);
     }
 }

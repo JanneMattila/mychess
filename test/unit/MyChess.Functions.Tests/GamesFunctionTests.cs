@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -28,34 +30,35 @@ namespace MyChess.Functions.Tests
         public async Task No_ClaimsPrincipal_Test()
         {
             // Arrange
-            var expected = typeof(UnauthorizedResult);
+            var expected = HttpStatusCode.Unauthorized;
+            var req = HttpRequestHelper.Create();
 
             // Act
-            var actual = await _gamesFunction.Run(null, null, null);
+            var actual = await _gamesFunction.Run(req, null);
 
             // Assert
-            Assert.IsType(expected, actual);
+            Assert.Equal(expected, actual.StatusCode);
         }
 
         [Fact]
         public async Task No_Required_Permission_Test()
         {
             // Arrange
-            var expected = typeof(UnauthorizedResult);
+            var expected = HttpStatusCode.Unauthorized;
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
+            var req = HttpRequestHelper.Create();
 
             // Act
-            var actual = await _gamesFunction.Run(null, null, null);
+            var actual = await _gamesFunction.Run(req, null);
 
             // Assert
-            Assert.IsType(expected, actual);
+            Assert.Equal(expected, actual.StatusCode);
         }
 
         [Fact]
         public async Task Fetch_Games_Test()
         {
             // Arrange
-            var expected = typeof(OkObjectResult);
             var expectedGames = 2;
 
             _gamesHandlerStub.Games.Add(new MyChessGame());
@@ -65,18 +68,14 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("GET", query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
-            {
-                {  "state", "WaitingForYou" }
-            });
+            var req = HttpRequestHelper.Create(query: "state=WaitingForYou");
 
             // Act
-            var actual = await _gamesFunction.Run(req, SignalRHelper.Create(), null);
+            var actual = await _gamesFunction.Run(req, /*SignalRHelper.Create(),*/ string.Empty);
 
             // Assert
-            Assert.IsType(expected, actual);
-            var body = actual as OkObjectResult;
-            var list = body?.Value as List<MyChessGame>;
+            actual.Body.Position = 0;
+            var list = await JsonSerializer.DeserializeAsync<List<MyChessGame>>(actual.Body);
             Assert.Equal(expectedGames, list?.Count);
         }
 
@@ -84,7 +83,7 @@ namespace MyChess.Functions.Tests
         public async Task Fetch_Single_Game_Test()
         {
             // Arrange
-            var expected = typeof(OkObjectResult);
+            var expected = HttpStatusCode.OK;
             var expectedGameID = "abc";
 
             _gamesHandlerStub.SingleGame = new MyChessGame()
@@ -96,26 +95,23 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("GET", query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>()
-            {
-                {  "state", "Archive" }
-            });
+            var req = HttpRequestHelper.Create(query: "state=Archive");
 
             // Act
-            var actual = await _gamesFunction.Run(req, SignalRHelper.Create(), "abc");
+            var actual = await _gamesFunction.Run(req, /*SignalRHelper.Create(),*/ "abc");
 
             // Assert
-            Assert.IsType(expected, actual);
-            var body = actual as OkObjectResult;
-            var actualGame = body?.Value as MyChessGame;
-            Assert.Equal(expectedGameID, actualGame?.ID);
+            Assert.Equal(expected, actual.StatusCode);
+            actual.Body.Position = 0;
+            var body = await JsonSerializer.DeserializeAsync<MyChessGame>(actual.Body);
+            Assert.Equal(expectedGameID, body?.ID);
         }
 
         [Fact]
         public async Task Create_Game_Test()
         {
             // Arrange
-            var expected = typeof(CreatedResult);
+            var expected = HttpStatusCode.Created;
             var expectedGameID = "abc";
             var game = new MyChessGame()
             {
@@ -127,7 +123,8 @@ namespace MyChess.Functions.Tests
             game.Players.Black.ID = "p2";
             game.Moves.Add(new MyChessGameMove()
             {
-                Move = "A2A3", Comment = "Cool move",
+                Move = "A2A3",
+                Comment = "Cool move",
                 Start = DateTimeOffset.UtcNow.AddMinutes(-1),
                 End = DateTimeOffset.UtcNow
             });
@@ -141,23 +138,22 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("POST", body: game, query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
+            var req = HttpRequestHelper.Create("POST", body: game, query: "");
 
             // Act
-            var actual = await _gamesFunction.Run(req, SignalRHelper.Create(), "abc");
+            var actual = await _gamesFunction.Run(req, /*SignalRHelper.Create(),*/ "abc");
 
             // Assert
-            Assert.IsType(expected, actual);
-            var body = actual as CreatedResult;
-            var actualGame = body?.Value as MyChessGame;
-            Assert.Equal(expectedGameID, actualGame?.ID);
+            Assert.Equal(expected, actual.StatusCode);
+            actual.Body.Position = 0;
+            var body = await JsonSerializer.DeserializeAsync<MyChessGame>(actual.Body);
+            Assert.Equal(expectedGameID, body?.ID);
         }
 
         [Fact]
         public async Task Create_Game_Fails_Due_Invalid_Opponent_Test()
         {
             // Arrange
-            var expected = typeof(ObjectResult);
             var expectedError = "1234";
             var game = new MyChessGame()
             {
@@ -184,15 +180,14 @@ namespace MyChess.Functions.Tests
             identity.AddClaim(new Claim("http://schemas.microsoft.com/identity/claims/scope", "Games.ReadWrite"));
             _securityValidatorStub.ClaimsPrincipal = new ClaimsPrincipal(identity);
 
-            var req = HttpRequestHelper.Create("POST", body: game, query: new Dictionary<string, Microsoft.Extensions.Primitives.StringValues>());
+            var req = HttpRequestHelper.Create("POST", body: game, query: "");
 
             // Act
-            var actual = await _gamesFunction.Run(req, SignalRHelper.Create(), "abc");
+            var actual = await _gamesFunction.Run(req, /*SignalRHelper.Create(),*/ "abc");
 
             // Assert
-            Assert.IsType(expected, actual);
-            var body = actual as ObjectResult;
-            var actualError = body?.Value as ProblemDetails;
+            actual.Body.Position = 0;
+            var actualError = await JsonSerializer.DeserializeAsync<ProblemDetails>(actual.Body);
             Assert.EndsWith(expectedError, actualError?.Instance);
         }
     }

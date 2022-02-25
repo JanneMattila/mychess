@@ -1,8 +1,7 @@
-﻿namespace MyChess.Functions
+﻿namespace MyChess.Functions;
+
+public static class PermissionConstants
 {
-    public static class PermissionConstants
-    {
-        public const string UserReadWrite = "User.ReadWrite";
-        public const string GamesReadWrite = "Games.ReadWrite";
-    }
+    public const string UserReadWrite = "User.ReadWrite";
+    public const string GamesReadWrite = "Games.ReadWrite";
 }
