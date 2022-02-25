@@ -296,6 +296,40 @@ public class ChessBoardViewBase : MyChessComponentBase
     }
 
     [JSInvokable]
+    public async Task<bool> CanvasOnKeyDown(string code)
+    {
+        Console.WriteLine($"CanvasOnKeyDown: {code}");
+        if (ShowCommentDialog || ShowPromotionDialog || ShowConfirmationDialog ||
+             PreviousAvailableMoves.Any())
+        {
+            return false;
+        }
+
+        switch (code)
+        {
+            case "Home":
+                await FirstMove();
+                return true;
+            case "ArrowLeft":
+            case "ArrowDown":
+            case "PageDown":
+                await PreviousMove();
+                return true;
+            case "ArrowRight":
+            case "ArrowUp":
+            case "PageUp":
+                await NextMove();
+                return true;
+            case "End":
+                await LastMove();
+                return true;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    [JSInvokable]
     public async Task UpdateSize(int pieceSize)
     {
         Console.WriteLine($"UpdateSize: {pieceSize}");

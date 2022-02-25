@@ -83,6 +83,36 @@ window.addEventListener('resize', () => {
     resizeCanvas();
 });
 
+window.addEventListener('keydown', (event: KeyboardEvent) => {
+    const code = event.code;
+    console.log(`keyup: ${event.code}`);
+    if (_dotnetRef !== undefined) {
+        // Minimal impact to any keyboard activity
+        switch (code) {
+            case "Home":
+            case "ArrowLeft":
+            case "ArrowDown":
+            case "PageDown":
+            case "ArrowRight":
+            case "ArrowUp":
+            case "PageUp":
+            case "End":
+                _dotnetRef.invokeMethodAsync("CanvasOnKeyDown", event.code)
+                    .then((cancel) => {
+                        console.log(`cancel: ${cancel}`);
+                        if (cancel) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            event.cancelBubble = true;
+                        }
+                    });
+                break;
+            default:
+                break;
+        }
+    }
+});
+
 const drawImage = (item: any, row: number, column: number) => {
     const x = Math.floor(column * _pieceSize);
     const y = Math.floor(row * _pieceSize);
