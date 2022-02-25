@@ -50,16 +50,16 @@ const resizeCanvas = () => {
         if (availableHeight < availableWidth) {
             size = availableHeight;
         }
+        const ratio = window.devicePixelRatio;
         _pieceSize = Math.max(Math.floor(size / 8), _pieceSizeMin);
         if (_dotnetRef !== undefined) {
             _dotnetRef.invokeMethod("UpdateSize", _pieceSize);
         }
-        const ratio = 1; // Math.ceil(window.devicePixelRatio);
         const newSize = _pieceSize * 8;
+        _canvasElement.style.width = `${Math.round(newSize)}px`;
+        _canvasElement.style.height = `${Math.round(newSize)}px`;
         _canvasElement.width = newSize * ratio;
         _canvasElement.height = newSize * ratio;
-        //_canvasElement.style.width = `${Math.round(newSize)}px`;
-        //_canvasElement.style.height = `${Math.round(newSize)}px`;
         MyChessPlay.draw(_game);
     }
 };
@@ -104,7 +104,6 @@ const drawImage = (item, row, column) => {
     }
     const img = _images[item.image];
     _context.drawImage(img, x, y, _pieceSize, _pieceSize);
-    _context.restore();
 };
 const setTouchHandlers = (canvas) => {
     //canvas.addEventListener('click', (event: MouseEvent) => {
@@ -122,8 +121,6 @@ MyChessPlay.initialize = (canvasElement, dotnetRef) => {
     setTouchHandlers(_canvasElement);
     _dotnetRef = dotnetRef;
     _context = _canvasElement.getContext("2d");
-    const scale = window.devicePixelRatio;
-    _context.scale(scale, scale);
     resizeCanvas();
     MyChessPlay.draw(undefined);
 };
@@ -148,6 +145,9 @@ MyChessPlay.draw = (game) => {
         console.log("Not yet ready to draw");
         return;
     }
+    _context.save();
+    const scale = window.devicePixelRatio;
+    _context.scale(scale, scale);
     for (let row = 0; row < game.length; row++) {
         const r = game[row];
         for (let column = 0; column < r.length; column++) {
@@ -155,6 +155,13 @@ MyChessPlay.draw = (game) => {
             drawImage(item, row, column);
         }
     }
+    // devicePixelRatio debugging helpers:
+    //let { width: cssWidth, height: cssHeight } = _canvasElement.getBoundingClientRect();
+    //console.log("Draw");
+    //_context.font = "30px Arial";
+    //_context.fillText( `dpr: ${window.devicePixelRatio}`, 10, 200);
+    //_context.fillText(`canvas: ${_canvasElement.width}x${_canvasElement.height}`, 10, 230);
+    //_context.fillText(`canvas.style: ${cssWidth}x${cssHeight}`, 10, 260);
     _context.restore();
 };
 MyChessPlay.animateDraw = (game, animations) => {
