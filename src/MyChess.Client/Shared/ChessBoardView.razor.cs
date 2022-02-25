@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.JSInterop;
 using MyChess.Client.Extensions;
 using MyChess.Client.Models;
@@ -11,7 +12,7 @@ namespace MyChess.Client.Shared;
 public class ChessBoardViewBase : MyChessComponentBase
 {
     [Parameter]
-    public string ID { get; set; }
+    public string ID { get; set; } = string.Empty;
 
     protected ElementReference _canvas;
 
@@ -19,23 +20,23 @@ public class ChessBoardViewBase : MyChessComponentBase
     private string _promotion = "";
     private int _pieceSize = 20;
 
-    private DotNetObjectReference<ChessBoardViewBase> _selfRef;
+    private DotNetObjectReference<ChessBoardViewBase>? _selfRef;
 
     protected bool IsLocal { get; set; } = false;
 
-    public string FriendID { get; set; }
+    public string FriendID { get; set; } = string.Empty;
 
     protected bool IsNew { get; set; } = false;
 
     protected MyChessGame Game { get; set; } = new();
 
     [Inject]
-    protected ChessBoard Board { get; set; }
+    protected ChessBoard Board { get; set; } = new(NullLogger<ChessBoard>.Instance);
 
-    public string Status { get; set; }
-    public string Error { get; set; }
-    public string LastComment { get; set; }
-    public string ThinkTime { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public string Error { get; set; } = string.Empty;
+    public string LastComment { get; set; } = string.Empty;
+    public string ThinkTime { get; set; } = string.Empty;
     public List<ChessMove> PreviousAvailableMoves { get; set; } = new();
     public int CurrentMoveNumber { get; set; }
 
@@ -44,8 +45,8 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected bool ShowCommentDialog { get; set; }
     protected bool ShowGameNameDialog { get; set; }
     protected bool ShowEllipse { get; set; }
-    protected string GameName { get; set; }
-    protected string Comment { get; set; }
+    protected string GameName { get; set; } = string.Empty;
+    protected string Comment { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {

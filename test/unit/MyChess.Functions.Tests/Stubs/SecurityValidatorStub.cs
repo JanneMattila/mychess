@@ -16,6 +16,9 @@ public class SecurityValidatorStub : ISecurityValidator
 
     public async Task<ClaimsPrincipal?> GetClaimsPrincipalAsync(HttpRequestData req)
     {
+        // Security validator can return null for ClaimsPrincipal if no valid user auth is available
+#nullable disable
         return await Task.FromResult<ClaimsPrincipal>(ClaimsPrincipal);
+#nullable enable
     }
 }

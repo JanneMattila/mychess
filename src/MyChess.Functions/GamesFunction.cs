@@ -104,6 +104,8 @@ namespace MyChess.Functions
         {
             _log.FuncGamesCreateNewGame();
             var gameToCreate = await JsonSerializer.DeserializeAsync<MyChessGame>(req.Body);
+            ArgumentNullException.ThrowIfNull(gameToCreate);
+
             var result = await _gamesHandler.CreateGameAsync(authenticatedUser, gameToCreate);
             if (result.Game != null)
             {

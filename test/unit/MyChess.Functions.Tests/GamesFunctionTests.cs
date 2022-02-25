@@ -34,7 +34,7 @@ namespace MyChess.Functions.Tests
             var req = HttpRequestHelper.Create();
 
             // Act
-            var actual = await _gamesFunction.Run(req, null);
+            var actual = await _gamesFunction.Run(req, string.Empty);
 
             // Assert
             Assert.Equal(expected, actual.StatusCode);
@@ -49,7 +49,7 @@ namespace MyChess.Functions.Tests
             var req = HttpRequestHelper.Create();
 
             // Act
-            var actual = await _gamesFunction.Run(req, null);
+            var actual = await _gamesFunction.Run(req, string.Empty);
 
             // Assert
             Assert.Equal(expected, actual.StatusCode);

@@ -70,6 +70,8 @@ public class SettingsFunction
     {
         _log.FuncGamesCreateNewGame();
         var userSettings = await JsonSerializer.DeserializeAsync<UserSettings>(req.Body);
+        ArgumentNullException.ThrowIfNull(userSettings);
+
         var result = await _settingsHandler.UpdateSettingsAsync(authenticatedUser, userSettings);
         if (result == null)
         {

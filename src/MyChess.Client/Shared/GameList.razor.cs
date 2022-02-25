@@ -9,7 +9,7 @@ public class GameListBase : MyChessComponentBase
     protected bool ShowFilters { get; set; } = false;
     protected string Filters { get; set; } = GameFilterType.WaitingForYou;
     protected string Title { get; set; } = "Games waiting for you";
-    protected List<MyChessGame> Games { get; set; }
+    protected List<MyChessGame> Games { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {

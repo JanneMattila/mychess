@@ -32,6 +32,8 @@ namespace MyChess
             SpecialMove = specialMove;
         }
 
+        // Must match 'int ChessMove.CompareTo(object obj)' implicitly implemented member 'int IComparable.CompareTo(object? obj)'
+#nullable disable
         public int CompareTo(object obj)
         {
             if (obj == null)
@@ -62,6 +64,7 @@ namespace MyChess
                 throw new ArgumentException("Object is not a ChessMove");
             }
         }
+#nullable enable
 
         public override string ToString()
         {

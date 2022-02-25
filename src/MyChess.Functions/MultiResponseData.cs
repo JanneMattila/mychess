@@ -8,5 +8,5 @@ public class MultiResponseData
     [SignalROutput(HubName = "GameHub")]
     public List<object> Notifications { get; set; } = new List<object>();
 
-    public HttpResponseData Response { get; set; }
+    public HttpResponseData? Response { get; set; }
 }
