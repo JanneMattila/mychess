@@ -213,6 +213,7 @@ public class ChessBoardViewBase : MyChessComponentBase
         }
 
         await JS.InvokeVoidAsync("MyChessPlay.draw", rows);
+        //await JS.InvokeVoidAsync("MyChessPlay.animate", rows);
     }
 
     protected string GetThinkTime()
@@ -327,6 +328,14 @@ public class ChessBoardViewBase : MyChessComponentBase
                 break;
         }
         return false;
+    }
+
+
+    [JSInvokable]
+    public async Task AnimationEnded()
+    {
+        Console.WriteLine($"AnimationEnded");
+        await Task.CompletedTask;
     }
 
     [JSInvokable]

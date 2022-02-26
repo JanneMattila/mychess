@@ -1,4 +1,7 @@
 var MyChessPlay = MyChessPlay || {};
+let _animationRunning = false;
+let _animationUpdate = 0;
+let _animations;
 let _pieceSizeMin = 20;
 let _pieceSize = _pieceSizeMin;
 let _canvasElement;
@@ -96,19 +99,21 @@ window.addEventListener('keydown', (event) => {
         }
     }
 });
-const drawImage = (item, row, column) => {
+const drawImage = (item, row, column, skipHighlights = false, skipBackground = false) => {
     const x = Math.floor(column * _pieceSize);
     const y = Math.floor(row * _pieceSize);
-    _context.save();
-    if ((row + column) % 2 == 0) {
-        _context.fillStyle = "#A9A9A9";
+    if (!skipBackground) {
+        _context.save();
+        if ((row + column) % 2 == 0) {
+            _context.fillStyle = "#A9A9A9";
+        }
+        else {
+            _context.fillStyle = "#FFFFFF";
+        }
+        _context.fillRect(x, y, _pieceSize, _pieceSize);
+        _context.fill();
+        _context.restore();
     }
-    else {
-        _context.fillStyle = "#FFFFFF";
-    }
-    _context.fillRect(x, y, _pieceSize, _pieceSize);
-    _context.fill();
-    _context.restore();
     if (item.lastMove.length > 0) {
         _context.save();
         if (item.lastMove === "HighlightPreviousFrom") {
@@ -193,18 +198,49 @@ MyChessPlay.draw = (game) => {
     //_context.fillText(`canvas.style: ${cssWidth}x${cssHeight}`, 10, 260);
     _context.restore();
 };
-MyChessPlay.animateDraw = (game, animations) => {
-    if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined || animations === undefined) {
+const update = (timestamp) => {
+    const delta = (timestamp - _animationUpdate) / 2000;
+    if (_context === undefined || _imagesLoaded !== _imagesToLoad || _game === undefined) {
         console.log("Not yet ready to draw animation");
         return;
     }
-    for (let row = 0; row < game.length; row++) {
-        const r = game[row];
+    console.log("Delta:", delta);
+    _context.save();
+    const scale = window.devicePixelRatio;
+    _context.scale(scale, scale);
+    for (let row = 0; row < _game.length; row++) {
+        const r = _game[row];
         for (let column = 0; column < r.length; column++) {
             const item = r[column];
-            drawImage(item, row, column);
+            drawImage(item, row, column, true);
         }
     }
+    drawImage({
+        image: "queen_white", lastMove: [], moveAvailable: false
+    }, 0 + delta * 7, 5, true, true);
     _context.restore();
+    return delta;
+};
+const playAnimationFrame = (timestamp) => {
+    if (_animationUpdate === 0) {
+        _animationUpdate = timestamp;
+    }
+    const delta = update(timestamp);
+    if (delta < 1 /* _animations !== undefined */) {
+        window.requestAnimationFrame(playAnimationFrame);
+    }
+    else {
+        // Animation has ended.
+        console.log("AnimationEnded");
+        _dotnetRef.invokeMethodAsync("AnimationEnded");
+    }
+};
+MyChessPlay.animate = (game, animations) => {
+    console.log("AnimationStarted:");
+    console.log(animations);
+    _game = game;
+    _animationUpdate = 0;
+    _animations = animations;
+    playAnimationFrame(0);
 };
 //# sourceMappingURL=play.js.map
