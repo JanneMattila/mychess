@@ -60,15 +60,26 @@ namespace MyChess.Backend.Handlers
                     {
                         await webPushClient.SendNotificationAsync(subscription, json, vapidDetails);
                         success++;
+
+                        if (notificationEntity.FailedCount > 0)
+                        {
+                            // After successful send, reset failed count
+                            notificationEntity.FailedCount = 0;
+                            await _context.UpsertAsync(TableNames.UserNotifications, notificationEntity);
+                        }
                     }
                     catch (Exception ex)
                     {
                         failed++;
                         _log.NotificationsHandlerSendFailed(userID, ex);
 
-                        notificationEntity.Enabled = false;
+                        notificationEntity.FailedCount++;
+                        if (notificationEntity.FailedCount > 10)
+                        {
+                            // Disable sending notifications to this endpoint
+                            notificationEntity.Enabled = false;
+                        }
 
-                        // Disable sending notifications to this endpoint
                         await _context.UpsertAsync(TableNames.UserNotifications, notificationEntity);
                     }
                 }
