@@ -2,7 +2,6 @@
 #nullable disable
 using System;
 using Microsoft.Extensions.Logging;
-using MyChess.Backend;
 
 namespace MyChess.Backend.Handlers.Internal
 {
