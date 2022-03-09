@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MyChess.Backend.Data;
 using MyChess.Backend.Handlers;
 
@@ -18,6 +19,11 @@ public class Program
             .ConfigureFunctionsWorkerDefaults()
             .ConfigureServices(s =>
             {
+                s.AddApplicationInsightsTelemetryWorkerService();
+                s.AddLogging(builder =>
+                {
+                    builder.AddApplicationInsights();
+                });
 
                 s.AddOptions<AzureADOptions>()
                     .Configure<IConfiguration>((settings, configuration) =>

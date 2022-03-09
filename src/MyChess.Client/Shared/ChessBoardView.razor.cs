@@ -48,9 +48,27 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected string GameName { get; set; } = string.Empty;
     protected string Comment { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        Console.WriteLine($"Parameters updated: {ID}");
+
+        ShowConfirmationDialog = false;
+        ShowPromotionDialog = false;
+        ShowCommentDialog = false;
+        ShowGameNameDialog = false;
+        ShowEllipse = false;
+        GameName = string.Empty;
+        Comment = string.Empty;
+        Status = string.Empty;
+        Error = string.Empty;
+        LastComment = string.Empty;
+        ThinkTime = string.Empty;
+        CurrentMoveNumber = 0;
+        PreviousAvailableMoves.Clear();
         Board.Initialize();
+        Game = new();
+        IsLocal = false;
+        IsNew = false;
 
         if (ID == "local")
         {
@@ -88,6 +106,69 @@ public class ChessBoardViewBase : MyChessComponentBase
                 Board.Initialize();
             }
         }
+        await base.OnParametersSetAsync();
+        await DrawAsync();
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AppFocus.OnFocus += SilentUpdate;
+        await Task.CompletedTask;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        AppFocus.OnFocus -= SilentUpdate;
+    }
+
+    protected async Task SilentUpdate()
+    {
+        if (IsLocal || IsNew)
+        {
+            return;
+        }
+
+        try
+        {
+            AppState.IsSmallLoading = true;
+            Console.WriteLine("Checking for game updates in the background");
+
+            var state = string.Empty;
+            var query = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).Query;
+            if (QueryHelpers.ParseQuery(query).TryGetValue("state", out var parameterState))
+            {
+                state = parameterState;
+            }
+            var gameUpdate = await Client.GetGameAsync(ID, state);
+
+            if (gameUpdate != null)
+            {
+                if (gameUpdate.Moves.Count > Game.Moves.Count)
+                {
+                    Console.WriteLine("Game updated silently in the background");
+                    Game = gameUpdate;
+                    CurrentMoveNumber = Game.Moves.Count;
+                    await MakeMoves(Game);
+                    await DrawAsync();
+                    StateHasChanged();
+                }
+                else
+                {
+                    Console.WriteLine("No game updates");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await AppInsights.TrackException(new BlazorApplicationInsights.Error()
+            {
+                Message = ex.Message,
+                Name = "FailedSilentRefreshGameview"
+            });
+        }
+        AppState.IsSmallLoading = false;
     }
 
     private async Task MakeMoves(MyChessGame game, int moves = int.MaxValue)
