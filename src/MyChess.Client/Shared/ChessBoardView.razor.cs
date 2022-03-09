@@ -249,52 +249,66 @@ public class ChessBoardViewBase : MyChessComponentBase
         var lastMove = Board.LastMove;
         var lastMoveCapture = Board.LastMoveCapture;
 
-        var rows = new List<List<ChessBoardGraphics>>();
+        var graphics = new ChessBoardDraw();
+        foreach (var previousMove in PreviousAvailableMoves)
+        {
+            graphics.AvailableMoves.Add(new ChessBoardPosition()
+            {
+                Column = previousMove.To.VerticalLocation,
+                Row = previousMove.To.HorizontalLocation
+            });
+        }
+
+        // Add different highlights to board: Previous moves and captures
+        if (lastMove != null)
+        {
+            graphics.Highlights.Add(new ChessBoardGraphics()
+            {
+                Column = lastMove.From.HorizontalLocation,
+                Row = lastMove.From.VerticalLocation,
+                Data = "HighlightPreviousFrom"
+            });
+            if (lastMoveCapture != null)
+            {
+                graphics.Highlights.Add(new ChessBoardGraphics()
+                {
+                    Column = lastMoveCapture.From.HorizontalLocation,
+                    Row = lastMoveCapture.From.VerticalLocation,
+                    Data = "HighlightCapture"
+                });
+            }
+            else
+            {
+                graphics.Highlights.Add(new ChessBoardGraphics()
+                {
+                    Column = lastMove.To.HorizontalLocation,
+                    Row = lastMove.To.VerticalLocation,
+                    Data = "HighlightPreviousTo"
+                });
+            }
+        }
+
+        // Add all pieces on the board
         for (var row = 0; row < ChessBoard.BOARD_SIZE; row++)
         {
-            var cells = new List<ChessBoardGraphics>();
             for (var column = 0; column < ChessBoard.BOARD_SIZE; column++)
             {
                 var piece = Board.GetPiece(column, row);
-                var moveAvailable = PreviousAvailableMoves
-                    .Any(p => p.To.VerticalLocation == row && p.To.HorizontalLocation == column);
-                var lastMoveHighlight = "";
-                if (lastMove != null)
+                if (piece.Player != PiecePlayer.None)
                 {
-                    if (lastMove.From.HorizontalLocation == column &&
-                        lastMove.From.VerticalLocation == row)
+                    var image = piece.Rank.ToString().ToLower() + "_" + piece.Player.ToString().ToLower();
+                    graphics.Pieces.Add(new ChessBoardGraphics()
                     {
-                        lastMoveHighlight = "HighlightPreviousFrom";
-                    }
-                    else if (lastMoveCapture != null &&
-                        lastMoveCapture.From.HorizontalLocation == column &&
-                        lastMoveCapture.From.VerticalLocation == row)
-                    {
-                        lastMoveHighlight = "HighlightCapture";
-                    }
-                    else if (lastMove.To.HorizontalLocation == column &&
-                        lastMove.To.VerticalLocation == row)
-                    {
-                        lastMoveHighlight = "HighlightPreviousTo";
-                    }
+                        Row = row,
+                        Column = column,
+                        Data = image
+                    });
                 }
-
-                var image = piece.Player == PiecePlayer.None ?
-                    "empty" :
-                    piece.Rank.ToString().ToLower() + "_" + piece.Player.ToString().ToLower();
-
-                cells.Add(new ChessBoardGraphics()
-                {
-                    MoveAvailable = moveAvailable,
-                    LastMove = lastMoveHighlight,
-                    Image = image
-                });
             }
-            rows.Add(cells);
         }
 
-        await JS.InvokeVoidAsync("MyChessPlay.draw", rows);
-        //await JS.InvokeVoidAsync("MyChessPlay.animate", rows);
+        await JS.InvokeVoidAsync("MyChessPlay.draw", graphics);
+        //await JS.InvokeVoidAsync("MyChessPlay.animate", graphics);
     }
 
     protected string GetThinkTime()

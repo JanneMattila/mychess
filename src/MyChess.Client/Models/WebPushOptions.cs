@@ -1,7 +1,6 @@
-﻿namespace MyChess.Client.Models
+﻿namespace MyChess.Client.Models;
+
+public class WebPushOptions
 {
-    public class WebPushOptions
-    {
-        public string WebPushPublicKey { get; set; } = string.Empty;
-    }
+    public string WebPushPublicKey { get; set; } = string.Empty;
 }

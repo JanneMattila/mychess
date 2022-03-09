@@ -100,44 +100,6 @@ window.addEventListener('keydown', (event) => {
     }
 });
 const drawImage = (item, row, column, skipHighlights = false, skipBackground = false) => {
-    const x = Math.floor(column * _pieceSize);
-    const y = Math.floor(row * _pieceSize);
-    if (!skipBackground) {
-        _context.save();
-        if ((row + column) % 2 == 0) {
-            _context.fillStyle = "#A9A9A9";
-        }
-        else {
-            _context.fillStyle = "#FFFFFF";
-        }
-        _context.fillRect(x, y, _pieceSize, _pieceSize);
-        _context.fill();
-        _context.restore();
-    }
-    if (item.lastMove.length > 0) {
-        _context.save();
-        if (item.lastMove === "HighlightPreviousFrom") {
-            _context.fillStyle = "rgba(195, 140, 140, 0.9)";
-        }
-        else if (item.lastMove === "HighlightCapture") {
-            _context.fillStyle = "rgba(255, 216, 0, 0.9)";
-        }
-        else if (item.lastMove === "HighlightPreviousTo") {
-            _context.fillStyle = "rgba(140, 195, 140, 0.9)";
-        }
-        _context.fillRect(x, y, _pieceSize, _pieceSize);
-        _context.fill();
-        _context.restore();
-    }
-    if (item.moveAvailable) {
-        _context.save();
-        _context.fillStyle = "rgba(0, 255, 0, 0.5)";
-        _context.fillRect(x, y, _pieceSize, _pieceSize);
-        _context.fill();
-        _context.restore();
-    }
-    const img = _images[item.image];
-    _context.drawImage(img, x, y, _pieceSize, _pieceSize);
 };
 const setTouchHandlers = (canvas) => {
     //canvas.addEventListener('click', (event: MouseEvent) => {
@@ -179,15 +141,59 @@ MyChessPlay.draw = (game) => {
         console.log("Not yet ready to draw");
         return;
     }
+    console.log("draw");
+    console.log(game);
     _context.save();
     const scale = window.devicePixelRatio;
     _context.scale(scale, scale);
-    for (let row = 0; row < game.length; row++) {
-        const r = game[row];
-        for (let column = 0; column < r.length; column++) {
-            const item = r[column];
-            drawImage(item, row, column);
+    // Draw chess board
+    for (let row = 0; row < 8; row++) {
+        for (let column = 0; column < 8; column++) {
+            const x = Math.floor(column * _pieceSize);
+            const y = Math.floor(row * _pieceSize);
+            _context.save();
+            if ((row + column) % 2 == 0) {
+                _context.fillStyle = "#A9A9A9";
+            }
+            else {
+                _context.fillStyle = "#FFFFFF";
+            }
+            _context.fillRect(x, y, _pieceSize, _pieceSize);
+            _context.fill();
+            _context.restore();
         }
+    }
+    for (const highlights of game.highlights) {
+        const x = Math.floor(highlights.column * _pieceSize);
+        const y = Math.floor(highlights.row * _pieceSize);
+        _context.save();
+        if (highlights.data === "HighlightPreviousFrom") {
+            _context.fillStyle = "rgba(195, 140, 140, 0.9)";
+        }
+        else if (highlights.data === "HighlightCapture") {
+            _context.fillStyle = "rgba(255, 216, 0, 0.9)";
+        }
+        else if (highlights.data === "HighlightPreviousTo") {
+            _context.fillStyle = "rgba(140, 195, 140, 0.9)";
+        }
+        _context.fillRect(x, y, _pieceSize, _pieceSize);
+        _context.fill();
+        _context.restore();
+    }
+    for (const availableMove of game.availableMoves) {
+        const y = Math.floor(availableMove.column * _pieceSize);
+        const x = Math.floor(availableMove.row * _pieceSize);
+        _context.save();
+        _context.fillStyle = "rgba(0, 255, 0, 0.5)";
+        _context.fillRect(x, y, _pieceSize, _pieceSize);
+        _context.fill();
+        _context.restore();
+    }
+    for (const piece of game.pieces) {
+        const x = Math.floor(piece.column * _pieceSize);
+        const y = Math.floor(piece.row * _pieceSize);
+        const img = _images[piece.data];
+        _context.drawImage(img, x, y, _pieceSize, _pieceSize);
     }
     // devicePixelRatio debugging helpers:
     //let { width: cssWidth, height: cssHeight } = _canvasElement.getBoundingClientRect();
