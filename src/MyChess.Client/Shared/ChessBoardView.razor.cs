@@ -250,14 +250,8 @@ public class ChessBoardViewBase : MyChessComponentBase
 
         if (direction != 0)
         {
-            foreach (var lastMove in Board.LastMoveList)
+            foreach (var lastMove in Board.LastMoveList.OrderBy(m => m))
             {
-                //if (lastMove.SpecialMove == ChessSpecialMove.Capture)
-                //{
-                //    // Don't animate captured piece
-                //    continue;
-                //}
-
                 var from = new ChessBoardPosition()
                 {
                     Column = lastMove.From.Column,
@@ -268,6 +262,13 @@ public class ChessBoardViewBase : MyChessComponentBase
                     Column = lastMove.To.Column,
                     Row = lastMove.To.Row
                 };
+
+                if (lastMove.SpecialMove == ChessSpecialMove.Capture)
+                {
+                    // Captured piece to locations is outside board.
+                    to = from;
+                }
+
                 graphics.Animations.Add(new ChessBoardAnimation()
                 {
                     From = direction > 0 ? from : to,
@@ -444,19 +445,23 @@ public class ChessBoardViewBase : MyChessComponentBase
         {
             case "Home":
                 await FirstMove();
+                StateHasChanged();
                 return true;
             case "ArrowLeft":
             case "ArrowDown":
             case "PageDown":
                 await PreviousMove();
+                StateHasChanged();
                 return true;
             case "ArrowRight":
             case "ArrowUp":
             case "PageUp":
                 await NextMove();
+                StateHasChanged();
                 return true;
             case "End":
                 await LastMove();
+                StateHasChanged();
                 return true;
             default:
                 break;
@@ -727,14 +732,16 @@ public class ChessBoardViewBase : MyChessComponentBase
     {
         await Cancel();
         CurrentMoveNumber = Math.Max(CurrentMoveNumber - 1, 1);
-        await MakeMoves(Game, CurrentMoveNumber, direction: 1);
+        await MakeMoves(Game, CurrentMoveNumber, direction: 0);
     }
 
     protected async Task NextMove()
     {
         await Cancel();
+        var currentVisibleMoveNumber = CurrentMoveNumber;
         CurrentMoveNumber = Math.Min(CurrentMoveNumber + 1, Game.Moves.Count);
-        await MakeMoves(Game, CurrentMoveNumber, direction: 1);
+        // Do not animate if already at the latest move
+        await MakeMoves(Game, CurrentMoveNumber, direction: currentVisibleMoveNumber == CurrentMoveNumber ? 0 : 1);
     }
 
     protected async Task LastMove()
