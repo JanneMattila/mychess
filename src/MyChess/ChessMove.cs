@@ -68,10 +68,10 @@ public class ChessMove : IComparable
 
     public override string ToString()
     {
-        char horizontalFrom = (char)((int)'A' + this.From.HorizontalLocation);
-        char verticalFrom = (char)((int)'1' + (7 - this.From.VerticalLocation));
-        char horizontalTo = (char)((int)'A' + this.To.HorizontalLocation);
-        char verticalTo = (char)((int)'1' + (7 - this.To.VerticalLocation));
+        char horizontalFrom = (char)((int)'A' + this.From.Column);
+        char verticalFrom = (char)((int)'1' + (7 - this.From.Row));
+        char horizontalTo = (char)((int)'A' + this.To.Column);
+        char verticalTo = (char)((int)'1' + (7 - this.To.Row));
 
         return string.Format("{0}{1}{2}{3}", horizontalFrom, verticalFrom, horizontalTo, verticalTo);
     }

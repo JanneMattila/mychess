@@ -6,9 +6,9 @@ public class ChessBoardLocation : IComparable
 {
     public static readonly int OUTSIDE_BOARD = -1;
 
-    public int HorizontalLocation { get; private set; }
+    public int Column { get; private set; }
 
-    public int VerticalLocation { get; private set; }
+    public int Row { get; private set; }
 
     public static ChessBoardLocation OutsideBoard
     {
@@ -20,8 +20,8 @@ public class ChessBoardLocation : IComparable
 
     public ChessBoardLocation(int horizontalLocation, int verticalLocation)
     {
-        HorizontalLocation = horizontalLocation;
-        VerticalLocation = verticalLocation;
+        Column = horizontalLocation;
+        Row = verticalLocation;
     }
 
     // Must match 'int ChessBoardLocation.CompareTo(object obj)' implicitly implemented member 'int IComparable.CompareTo(object? obj)'
@@ -35,10 +35,10 @@ public class ChessBoardLocation : IComparable
 
         if (obj is ChessBoardLocation otherLocation)
         {
-            int compare = HorizontalLocation.CompareTo(otherLocation.HorizontalLocation);
+            int compare = Column.CompareTo(otherLocation.Column);
             if (compare == 0)
             {
-                return VerticalLocation.CompareTo(otherLocation.VerticalLocation);
+                return Row.CompareTo(otherLocation.Row);
             }
 
             return compare;

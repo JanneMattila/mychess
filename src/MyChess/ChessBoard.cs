@@ -220,8 +220,8 @@ public class ChessBoard
         }
 
         ownKingUnderThreat = opponentMoves.Where(o =>
-            o.To.HorizontalLocation == kingLocation.HorizontalLocation &&
-            o.To.VerticalLocation == kingLocation.VerticalLocation).Any();
+            o.To.Column == kingLocation.Column &&
+            o.To.Row == kingLocation.Row).Any();
 
         if (ownKingUnderThreat == true)
         {
@@ -301,17 +301,17 @@ public class ChessBoard
                 bool invalidMove = false;
                 ChessMove move = moves[i];
 
-                if (move.To.HorizontalLocation < 0 || move.To.HorizontalLocation > BOARD_SIZE - 1)
+                if (move.To.Column < 0 || move.To.Column > BOARD_SIZE - 1)
                 {
                     // Out of bounds
                     invalidMove = true;
                 }
-                else if (move.To.VerticalLocation < 0 || move.To.VerticalLocation > BOARD_SIZE - 1)
+                else if (move.To.Row < 0 || move.To.Row > BOARD_SIZE - 1)
                 {
                     // Out of bounds
                     invalidMove = true;
                 }
-                else if (_pieces[move.To.HorizontalLocation, move.To.VerticalLocation].Player == player)
+                else if (_pieces[move.To.Column, move.To.Row].Player == player)
                 {
                     // Already occupied by team mate
                     invalidMove = true;
@@ -395,8 +395,8 @@ public class ChessBoard
         // Rook is at start location. Has it moved earlier?
         var rooksEarlierMove = _moves.Where(
             m => m.First().Player == player && m.First().Rank == PieceRank.Rook &&
-                 m.First().From.VerticalLocation == rookRow &&
-                 m.First().From.HorizontalLocation == rookColumn).FirstOrDefault();
+                 m.First().From.Row == rookRow &&
+                 m.First().From.Column == rookColumn).FirstOrDefault();
 
         if (rooksEarlierMove != null)
         {
@@ -435,7 +435,7 @@ public class ChessBoard
                 }
 
                 ChessMove? opponentMove = opponentMoves.Where(
-                    o => o.To.HorizontalLocation == currentColumn && o.To.VerticalLocation == row).FirstOrDefault();
+                    o => o.To.Column == currentColumn && o.To.Row == row).FirstOrDefault();
                 if (opponentMove != null)
                 {
                     return;
@@ -544,7 +544,7 @@ public class ChessBoard
             ChessBoardPiece piece = GetPiece(column + columnDelta, row);
             if (piece.Rank == PieceRank.Pawn && piece.Player != player)
             {
-                if (_previousMove.To.HorizontalLocation == column + columnDelta && _previousMove.To.VerticalLocation == row && Math.Abs(_previousMove.To.VerticalLocation - _previousMove.From.VerticalLocation) == 2)
+                if (_previousMove.To.Column == column + columnDelta && _previousMove.To.Row == row && Math.Abs(_previousMove.To.Row - _previousMove.From.Row) == 2)
                 {
                     moves.Add(new ChessMove(PieceRank.Pawn, player, column, row, column + columnDelta, row + rowDelta, ChessSpecialMove.EnPassant));
                 }
@@ -725,7 +725,7 @@ public class ChessBoard
     private List<ChessMove> MakeMove(ChessMove move, bool validateCheck)
     {
         var executedMoves = new List<ChessMove>();
-        var availableMoves = GetAvailableMoves(CurrentPlayer, move.From.HorizontalLocation, move.From.VerticalLocation, validateCheck);
+        var availableMoves = GetAvailableMoves(CurrentPlayer, move.From.Column, move.From.Row, validateCheck);
 
         ChessMove? selectedMove = availableMoves.Where(o => o.CompareTo(move) == 0).FirstOrDefault();
 
@@ -739,60 +739,60 @@ public class ChessBoard
         switch (selectedMove.SpecialMove)
         {
             case ChessSpecialMove.EnPassant:
-                var enPassantPiece = _pieces[selectedMove.To.HorizontalLocation, selectedMove.From.VerticalLocation];
+                var enPassantPiece = _pieces[selectedMove.To.Column, selectedMove.From.Row];
                 executedMoves.Add(
                     new ChessMove(
                         enPassantPiece.Rank, enPassantPiece.Player,
-                        selectedMove.To.HorizontalLocation, selectedMove.From.VerticalLocation,
+                        selectedMove.To.Column, selectedMove.From.Row,
                         ChessBoardLocation.OUTSIDE_BOARD, ChessBoardLocation.OUTSIDE_BOARD, ChessSpecialMove.Capture));
 
-                _pieces[selectedMove.To.HorizontalLocation, selectedMove.From.VerticalLocation] = ChessBoardPiece.Empty;
+                _pieces[selectedMove.To.Column, selectedMove.From.Row] = ChessBoardPiece.Empty;
                 break;
 
             case ChessSpecialMove.Castling:
                 int rookStartColumn;
                 int rookEndColumn;
-                if (selectedMove.From.HorizontalLocation < selectedMove.To.HorizontalLocation)
+                if (selectedMove.From.Column < selectedMove.To.Column)
                 {
                     // Right hand side castling
                     rookStartColumn = 7;
-                    rookEndColumn = selectedMove.To.HorizontalLocation - 1;
+                    rookEndColumn = selectedMove.To.Column - 1;
                 }
                 else
                 {
                     // Left hand side castling
                     rookStartColumn = 0;
-                    rookEndColumn = selectedMove.To.HorizontalLocation + 1;
+                    rookEndColumn = selectedMove.To.Column + 1;
                 }
 
-                var rookPiece = _pieces[rookStartColumn, selectedMove.From.VerticalLocation];
+                var rookPiece = _pieces[rookStartColumn, selectedMove.From.Row];
                 executedMoves.Add(
                     new ChessMove(
                         rookPiece.Rank, rookPiece.Player,
-                        rookStartColumn, selectedMove.From.VerticalLocation,
-                        rookEndColumn, selectedMove.To.VerticalLocation, ChessSpecialMove.Castling));
+                        rookStartColumn, selectedMove.From.Row,
+                        rookEndColumn, selectedMove.To.Row, ChessSpecialMove.Castling));
 
-                _pieces[rookStartColumn, selectedMove.From.VerticalLocation] = ChessBoardPiece.Empty;
-                _pieces[rookEndColumn, selectedMove.From.VerticalLocation] = new ChessBoardPiece(rookPiece.Player, rookPiece.Rank);
+                _pieces[rookStartColumn, selectedMove.From.Row] = ChessBoardPiece.Empty;
+                _pieces[rookEndColumn, selectedMove.From.Row] = new ChessBoardPiece(rookPiece.Player, rookPiece.Rank);
                 break;
 
             case ChessSpecialMove.Promotion:
                 executedMoves.Add(
                     new ChessMove(
                         selectedMove.Rank, selectedMove.Player,
-                        selectedMove.From.HorizontalLocation, selectedMove.From.VerticalLocation,
+                        selectedMove.From.Column, selectedMove.From.Row,
                         ChessBoardLocation.OUTSIDE_BOARD, ChessBoardLocation.OUTSIDE_BOARD, ChessSpecialMove.PromotionOut));
 
                 executedMoves.Add(
                     new ChessMove(
                         PieceRank.Queen, selectedMove.Player,
                         ChessBoardLocation.OUTSIDE_BOARD, ChessBoardLocation.OUTSIDE_BOARD,
-                        selectedMove.To.HorizontalLocation, selectedMove.To.VerticalLocation, ChessSpecialMove.PromotionIn));
+                        selectedMove.To.Column, selectedMove.To.Row, ChessSpecialMove.PromotionIn));
 
                 // Use default promotion to queen:
-                ChessBoardPiece piece = _pieces[selectedMove.From.HorizontalLocation, selectedMove.From.VerticalLocation];
+                ChessBoardPiece piece = _pieces[selectedMove.From.Column, selectedMove.From.Row];
                 piece = new ChessBoardPiece(piece.Player, PieceRank.Queen);
-                _pieces[selectedMove.From.HorizontalLocation, selectedMove.From.VerticalLocation] = piece;
+                _pieces[selectedMove.From.Column, selectedMove.From.Row] = piece;
                 break;
 
             case ChessSpecialMove.Check:
@@ -805,19 +805,19 @@ public class ChessBoard
                 break;
         }
 
-        if (_pieces[selectedMove.To.HorizontalLocation, selectedMove.To.VerticalLocation].Rank != PieceRank.None)
+        if (_pieces[selectedMove.To.Column, selectedMove.To.Row].Rank != PieceRank.None)
         {
             // Capture so let's store it
-            var capturePiece = _pieces[selectedMove.To.HorizontalLocation, selectedMove.To.VerticalLocation];
+            var capturePiece = _pieces[selectedMove.To.Column, selectedMove.To.Row];
             executedMoves.Add(
                 new ChessMove(
                     capturePiece.Rank, capturePiece.Player,
-                    selectedMove.To.HorizontalLocation, selectedMove.To.VerticalLocation,
+                    selectedMove.To.Column, selectedMove.To.Row,
                     ChessBoardLocation.OUTSIDE_BOARD, ChessBoardLocation.OUTSIDE_BOARD, ChessSpecialMove.Capture));
         }
 
-        _pieces[selectedMove.To.HorizontalLocation, selectedMove.To.VerticalLocation] = _pieces[selectedMove.From.HorizontalLocation, selectedMove.From.VerticalLocation];
-        _pieces[selectedMove.From.HorizontalLocation, selectedMove.From.VerticalLocation] = ChessBoardPiece.Empty;
+        _pieces[selectedMove.To.Column, selectedMove.To.Row] = _pieces[selectedMove.From.Column, selectedMove.From.Row];
+        _pieces[selectedMove.From.Column, selectedMove.From.Row] = ChessBoardPiece.Empty;
 
         _previousMove = selectedMove;
         CurrentPlayer = CurrentPlayer == PiecePlayer.White ? PiecePlayer.Black : PiecePlayer.White;
@@ -836,12 +836,12 @@ public class ChessBoard
             {
                 if (undoMove.From.CompareTo(ChessBoardLocation.OutsideBoard) != 0)
                 {
-                    _pieces[undoMove.From.HorizontalLocation, undoMove.From.VerticalLocation] = new ChessBoardPiece(undoMove.Player, undoMove.Rank);
+                    _pieces[undoMove.From.Column, undoMove.From.Row] = new ChessBoardPiece(undoMove.Player, undoMove.Rank);
                 }
 
                 if (undoMove.To.CompareTo(ChessBoardLocation.OutsideBoard) != 0)
                 {
-                    _pieces[undoMove.To.HorizontalLocation, undoMove.To.VerticalLocation] = ChessBoardPiece.Empty;
+                    _pieces[undoMove.To.Column, undoMove.To.Row] = ChessBoardPiece.Empty;
                 }
             }
 
@@ -904,7 +904,7 @@ public class ChessBoard
     {
         var movesAvailable = GetAvailableMoves(horizontalFrom, verticalFrom);
         var move = movesAvailable
-            .Where(m => m.To.HorizontalLocation == horizontalTo && m.To.VerticalLocation == verticalTo)
+            .Where(m => m.To.Column == horizontalTo && m.To.Row == verticalTo)
             .FirstOrDefault();
         if (move == null)
         {
@@ -943,11 +943,11 @@ public class ChessBoard
                 if (promotionMove.SpecialMove == ChessSpecialMove.PromotionIn)
                 {
                     lastMoves[i] = new ChessMove(promotionRank, promotionMove.Player,
-                        promotionMove.From.HorizontalLocation, promotionMove.From.VerticalLocation,
-                        promotionMove.To.HorizontalLocation, promotionMove.To.VerticalLocation,
+                        promotionMove.From.Column, promotionMove.From.Row,
+                        promotionMove.To.Column, promotionMove.To.Row,
                         promotionMove.SpecialMove);
 
-                    _pieces[promotionMove.To.HorizontalLocation, promotionMove.To.VerticalLocation] =
+                    _pieces[promotionMove.To.Column, promotionMove.To.Row] =
                         new ChessBoardPiece(promotionMove.Player, promotionRank);
                     return;
                 }
