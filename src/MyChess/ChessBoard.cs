@@ -57,6 +57,19 @@ public class ChessBoard
         }
     }
 
+    public List<ChessMove> LastMoveList
+    {
+        get
+        {
+            if (_moves.Count > 0)
+            {
+                return _moves.Peek().ToList();
+            }
+
+            return new List<ChessMove>();
+        }
+    }
+
     public ChessBoard(ILogger<ChessBoard> log)
     {
         _log = log;

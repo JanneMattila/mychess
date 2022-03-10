@@ -246,15 +246,18 @@ public class ChessBoardViewBase : MyChessComponentBase
         ThinkTime = GetThinkTime();
         LastComment = GetComment();
 
-        var lastMove = Board.LastMove;
-        var lastMoveCapture = Board.LastMoveCapture;
-
         var graphics = new ChessBoardDraw();
 
         if (direction != 0)
         {
-            if (lastMove != null)
+            foreach (var lastMove in Board.LastMoveList)
             {
+                //if (lastMove.SpecialMove == ChessSpecialMove.Capture)
+                //{
+                //    // Don't animate captured piece
+                //    continue;
+                //}
+
                 var from = new ChessBoardPosition()
                 {
                     Column = lastMove.From.Column,
@@ -275,6 +278,8 @@ public class ChessBoardViewBase : MyChessComponentBase
         }
         else
         {
+            var lastMove = Board.LastMove;
+            var lastMoveCapture = Board.LastMoveCapture;
             foreach (var previousMove in PreviousAvailableMoves)
             {
                 graphics.AvailableMoves.Add(new ChessBoardPosition()
@@ -322,6 +327,18 @@ public class ChessBoardViewBase : MyChessComponentBase
                 var piece = Board.GetPiece(column, row);
                 if (piece.Player != PiecePlayer.None)
                 {
+                    if (direction != 0)
+                    {
+                        var inAnimation = graphics.Animations.Any(a =>
+                            (a.From.Column == column && a.From.Row == row) ||
+                            (a.To.Column == column && a.To.Row == row));
+                        if (inAnimation)
+                        {
+                            // This piece is part of animation so we must not draw it to the board.
+                            continue;
+                        }
+                    }
+
                     graphics.Pieces.Add(new ChessBoardGraphics()
                     {
                         Row = row,
