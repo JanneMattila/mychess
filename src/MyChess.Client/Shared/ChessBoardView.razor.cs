@@ -98,6 +98,7 @@ public class ChessBoardViewBase : MyChessComponentBase
                 if (game != null)
                 {
                     await MakeMoves(game);
+                    Game = game;
                 }
             }
             catch (Exception)
@@ -491,6 +492,7 @@ public class ChessBoardViewBase : MyChessComponentBase
         var row = (int)Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
         Console.WriteLine($"CanvasOnClick: {column} - {row}");
 
+        var animate = false;
         if (PreviousAvailableMoves.Count > 0)
         {
             var selectedMove = PreviousAvailableMoves
@@ -498,6 +500,7 @@ public class ChessBoardViewBase : MyChessComponentBase
             if (selectedMove != null)
             {
                 Board.MakeMove(selectedMove);
+                animate = true;
                 if (Board.LastMovePromotion != null)
                 {
                     _promotion = "";
@@ -509,14 +512,12 @@ public class ChessBoardViewBase : MyChessComponentBase
                 }
             }
             PreviousAvailableMoves.Clear();
-            await DrawAsync(direction: 1);
-            return;
         }
         else
         {
             PreviousAvailableMoves = Board.GetAvailableMoves(column, row).ToList();
         }
-        await DrawAsync();
+        await DrawAsync(direction: animate ? 1 : 0);
     }
 
     protected async Task ConfirmMove()

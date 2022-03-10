@@ -141,7 +141,6 @@ MyChessPlay.draw = (game, delta = 0) => {
         return;
     }
     console.log("draw");
-    console.log(game);
     _context.save();
     const scale = window.devicePixelRatio;
     _context.scale(scale, scale);
@@ -218,12 +217,11 @@ MyChessPlay.draw = (game, delta = 0) => {
     _context.restore();
 };
 const update = (timestamp) => {
-    const delta = Math.min((timestamp - _animationUpdate) / 1000, 1.0);
+    const delta = Math.min((timestamp - _animationUpdate) / 800 /* milliseconds */, 1.0);
     if (_context === undefined || _imagesLoaded !== _imagesToLoad || _game === undefined) {
         console.log("Not yet ready to draw animation");
         return;
     }
-    console.log("Delta:", delta);
     MyChessPlay.draw(_game, delta);
     return delta;
 };
