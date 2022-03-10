@@ -727,7 +727,7 @@ public class ChessBoardViewBase : MyChessComponentBase
     {
         await Cancel();
         CurrentMoveNumber = Math.Max(CurrentMoveNumber - 1, 1);
-        await MakeMoves(Game, CurrentMoveNumber, direction: -1);
+        await MakeMoves(Game, CurrentMoveNumber, direction: 1);
     }
 
     protected async Task NextMove()
