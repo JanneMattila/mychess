@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace MyChess.Backend.Handlers
+namespace MyChess.Backend.Handlers;
+
+public interface INotificationHandler
 {
-    public interface INotificationHandler
-    {
-        Task SendNotificationAsync(string userID, string gameID, string comment);
-    }
+    Task SendNotificationAsync(string userID, string gameID, string comment);
 }

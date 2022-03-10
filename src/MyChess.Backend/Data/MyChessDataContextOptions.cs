@@ -1,7 +1,6 @@
-﻿namespace MyChess.Backend.Data
+﻿namespace MyChess.Backend.Data;
+
+public class MyChessDataContextOptions
 {
-    public class MyChessDataContextOptions
-    {
-        public string StorageConnectionString { get; set; } = string.Empty;
-    }
+    public string StorageConnectionString { get; set; } = string.Empty;
 }

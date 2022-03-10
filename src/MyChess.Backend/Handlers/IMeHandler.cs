@@ -2,10 +2,9 @@
 using MyChess.Backend.Models;
 using MyChess.Interfaces;
 
-namespace MyChess.Backend.Handlers
+namespace MyChess.Backend.Handlers;
+
+public interface IMeHandler
 {
-    public interface IMeHandler
-    {
-        Task<User> LoginAsync(AuthenticatedUser authenticatedUser);
-    }
+    Task<User> LoginAsync(AuthenticatedUser authenticatedUser);
 }
