@@ -1,7 +1,6 @@
-﻿namespace MyChess.Interfaces
+﻿namespace MyChess.Interfaces;
+
+public class CustomHeaderNames
 {
-    public class CustomHeaderNames
-    {
-        public const string Authorization = "X-MyChessAuth";
-    }
+    public const string Authorization = "X-MyChessAuth";
 }

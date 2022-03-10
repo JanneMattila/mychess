@@ -1,9 +1,8 @@
-﻿namespace MyChess
+﻿namespace MyChess;
+
+public enum PiecePlayer
 {
-    public enum PiecePlayer
-    {
-        None,
-        White,
-        Black
-    }
+    None,
+    White,
+    Black
 }
