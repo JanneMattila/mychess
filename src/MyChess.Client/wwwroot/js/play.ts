@@ -2,7 +2,6 @@
 
 let _animationRunning = false;
 let _animationUpdate = 0;
-let _animations: any;
 
 let _pieceSizeMin = 20;
 let _pieceSize = _pieceSizeMin;
@@ -88,6 +87,8 @@ window.addEventListener('resize', () => {
 });
 
 window.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (_animationRunning) return;
+
     const code = event.code;
     console.log(`keyup: ${event.code}`);
     if (_dotnetRef !== undefined) {
@@ -116,10 +117,6 @@ window.addEventListener('keydown', (event: KeyboardEvent) => {
         }
     }
 });
-
-const drawImage = (item: any, row: number, column: number, skipHighlights = false, skipBackground = false) => {
-
-}
 
 const setTouchHandlers = (canvas: HTMLCanvasElement) => {
     //canvas.addEventListener('click', (event: MouseEvent) => {
@@ -166,7 +163,7 @@ MyChessPlay.scrollToComment = (): void => {
     }, 100);
 };
 
-MyChessPlay.draw = (game: any) => {
+MyChessPlay.draw = (game: any, delta: number = 0) => {
     _game = game;
     if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined) {
         console.log("Not yet ready to draw");
@@ -200,42 +197,57 @@ MyChessPlay.draw = (game: any) => {
         }
     }
 
-    for (const highlights of game.highlights) {
-        const x = Math.floor(highlights.row * _pieceSize);
-        const y = Math.floor(highlights.column * _pieceSize);
+    if (game.animations.length == 0) {
+        for (const highlights of game.highlights) {
+            const column = Math.floor(highlights.column * _pieceSize);
+            const row = Math.floor(highlights.row * _pieceSize);
 
-        _context.save();
-        if (highlights.data === "HighlightPreviousFrom") {
-            _context.fillStyle = "rgba(195, 140, 140, 0.9)";
+            _context.save();
+            if (highlights.data === "HighlightPreviousFrom") {
+                _context.fillStyle = "rgba(195, 140, 140, 0.9)";
+            }
+            else if (highlights.data === "HighlightCapture") {
+                _context.fillStyle = "rgba(255, 216, 0, 0.9)";
+            }
+            else if (highlights.data === "HighlightPreviousTo") {
+                _context.fillStyle = "rgba(140, 195, 140, 0.9)";
+            }
+            _context.fillRect(column, row, _pieceSize, _pieceSize);
+            _context.fill();
+            _context.restore();
         }
-        else if (highlights.data === "HighlightCapture") {
-            _context.fillStyle = "rgba(255, 216, 0, 0.9)";
+
+        for (const availableMove of game.availableMoves) {
+            const column = Math.floor(availableMove.column * _pieceSize);
+            const row = Math.floor(availableMove.row * _pieceSize);
+
+            _context.save();
+            _context.fillStyle = "rgba(0, 255, 0, 0.5)";
+            _context.fillRect(column, row, _pieceSize, _pieceSize);
+            _context.fill();
+            _context.restore();
         }
-        else if (highlights.data === "HighlightPreviousTo") {
-            _context.fillStyle = "rgba(140, 195, 140, 0.9)";
-        }
-        _context.fillRect(x, y, _pieceSize, _pieceSize);
-        _context.fill();
-        _context.restore();
     }
-
-    for (const availableMove of game.availableMoves) {
-        const x = Math.floor(availableMove.row * _pieceSize);
-        const y = Math.floor(availableMove.column * _pieceSize);
-
-        _context.save();
-        _context.fillStyle = "rgba(0, 255, 0, 0.5)";
-        _context.fillRect(x, y, _pieceSize, _pieceSize);
-        _context.fill();
-        _context.restore();
-    }
-
     for (const piece of game.pieces) {
-        const x = Math.floor(piece.column * _pieceSize);
-        const y = Math.floor(piece.row * _pieceSize);
+        const column = Math.floor(piece.column * _pieceSize);
+        const row = Math.floor(piece.row * _pieceSize);
 
         const img = _images[piece.data];
-        _context.drawImage(img, x, y, _pieceSize, _pieceSize);
+        _context.drawImage(img, column, row, _pieceSize, _pieceSize);
+    }
+
+    if (game.animations.length !== 0) {
+        for (const animations of game.animations) {
+            const dc = animations.to.column - animations.from.column;
+            const dr = animations.to.row - animations.from.row;
+            const column = animations.from.column + delta * dc;
+            const row = animations.from.row + delta * dr;
+            const x = Math.floor(column * _pieceSize);
+            const y = Math.floor(row * _pieceSize);
+
+            const img = _images[animations.data];
+            _context.drawImage(img, x, y, _pieceSize, _pieceSize);
+        }
     }
 
     // devicePixelRatio debugging helpers:
@@ -250,7 +262,7 @@ MyChessPlay.draw = (game: any) => {
 }
 
 const update = (timestamp: number) => {
-    const delta = (timestamp - _animationUpdate) / 2000;
+    const delta = Math.min((timestamp - _animationUpdate) / 1000, 1.0);
 
     if (_context === undefined || _imagesLoaded !== _imagesToLoad || _game === undefined) {
         console.log("Not yet ready to draw animation");
@@ -258,25 +270,7 @@ const update = (timestamp: number) => {
     }
 
     console.log("Delta:", delta);
-
-    _context.save();
-
-    const scale = window.devicePixelRatio;
-    _context.scale(scale, scale);
-
-    for (let row = 0; row < _game.length; row++) {
-        const r = _game[row];
-        for (let column = 0; column < r.length; column++) {
-            const item = r[column];
-            drawImage(item, row, column, true);
-        }
-    }
-
-    drawImage({
-        image: "queen_white", lastMove: [], moveAvailable: false
-    }, 0 + delta * 7, 5, true, true);
-
-    _context.restore();
+    MyChessPlay.draw(_game, delta);
     return delta;
 }
 
@@ -294,17 +288,17 @@ const playAnimationFrame = (timestamp: number) => {
     else {
         // Animation has ended.
         console.log("AnimationEnded");
+        _animationRunning = false;
         _dotnetRef.invokeMethodAsync("AnimationEnded");
     }
 }
 
-MyChessPlay.animate = (game: any, animations: any): void => {
+MyChessPlay.animate = (game: any): void => {
 
-    console.log("AnimationStarted:");
-    console.log(animations);
+    console.log("AnimationStarted");
     _game = game;
 
+    _animationRunning = true;
     _animationUpdate = 0;
-    _animations = animations;
     playAnimationFrame(0);
 }
