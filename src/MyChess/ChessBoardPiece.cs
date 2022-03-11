@@ -1,23 +1,22 @@
-﻿namespace MyChess
+﻿namespace MyChess;
+
+public class ChessBoardPiece
 {
-    public class ChessBoardPiece
+    public PiecePlayer Player { get; private set; }
+
+    public PieceRank Rank { get; private set; }
+
+    public static ChessBoardPiece Empty
     {
-        public PiecePlayer Player { get; private set; }
-
-        public PieceRank Rank { get; private set; }
-
-        public static ChessBoardPiece Empty
+        get
         {
-            get
-            {
-                return new ChessBoardPiece(PiecePlayer.None, PieceRank.None);
-            }
+            return new ChessBoardPiece(PiecePlayer.None, PieceRank.None);
         }
+    }
 
-        public ChessBoardPiece(PiecePlayer player, PieceRank rank)
-        {
-            Player = player;
-            Rank = rank;
-        }
+    public ChessBoardPiece(PiecePlayer player, PieceRank rank)
+    {
+        Player = player;
+        Rank = rank;
     }
 }

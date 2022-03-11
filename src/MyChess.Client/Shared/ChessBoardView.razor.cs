@@ -98,6 +98,8 @@ public class ChessBoardViewBase : MyChessComponentBase
                 if (game != null)
                 {
                     await MakeMoves(game);
+                    Game = game;
+                    CurrentMoveNumber = Game.Moves.Count;
                 }
             }
             catch (Exception)
@@ -107,7 +109,7 @@ public class ChessBoardViewBase : MyChessComponentBase
             }
         }
         await base.OnParametersSetAsync();
-        await DrawAsync();
+        await DrawAsync(direction: 1);
         StateHasChanged();
     }
 
@@ -151,7 +153,7 @@ public class ChessBoardViewBase : MyChessComponentBase
                     Game = gameUpdate;
                     CurrentMoveNumber = Game.Moves.Count;
                     await MakeMoves(Game);
-                    await DrawAsync();
+                    await DrawAsync(direction: 1);
                     StateHasChanged();
                 }
                 else
@@ -171,7 +173,7 @@ public class ChessBoardViewBase : MyChessComponentBase
         AppState.IsSmallLoading = false;
     }
 
-    private async Task MakeMoves(MyChessGame game, int moves = int.MaxValue)
+    private async Task MakeMoves(MyChessGame game, int moves = int.MaxValue, int direction = 0)
     {
         Board.Initialize();
 
@@ -197,7 +199,7 @@ public class ChessBoardViewBase : MyChessComponentBase
             }
         }
 
-        await DrawAsync();
+        await DrawAsync(direction);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -224,8 +226,8 @@ public class ChessBoardViewBase : MyChessComponentBase
         Game = await Client.GetGameAsync(id, state);
         CurrentMoveNumber = Game.Moves.Count;
         await MakeMoves(Game);
-        await DrawAsync();
         AppState.IsLoading = false;
+        await DrawAsync(direction: 1);
     }
 
     protected string GetComment()
@@ -240,60 +242,124 @@ public class ChessBoardViewBase : MyChessComponentBase
         return move.Comment;
     }
 
-    protected async Task DrawAsync()
+    protected async Task DrawAsync(int direction = 0)
     {
         Status = GetBoardStatus();
         ThinkTime = GetThinkTime();
         LastComment = GetComment();
 
-        var lastMove = Board.LastMove;
-        var lastMoveCapture = Board.LastMoveCapture;
+        var graphics = new ChessBoardDraw();
 
-        var rows = new List<List<ChessBoardGraphics>>();
+        if (direction != 0)
+        {
+            foreach (var lastMove in Board.LastMoveList.OrderBy(m => m))
+            {
+                var from = new ChessBoardPosition()
+                {
+                    Column = lastMove.From.Column,
+                    Row = lastMove.From.Row
+                };
+                var to = new ChessBoardPosition()
+                {
+                    Column = lastMove.To.Column,
+                    Row = lastMove.To.Row
+                };
+
+                if (lastMove.SpecialMove == ChessSpecialMove.Capture)
+                {
+                    // Captured piece to locations is outside board.
+                    to = from;
+                }
+
+                graphics.Animations.Add(new ChessBoardAnimation()
+                {
+                    From = direction > 0 ? from : to,
+                    To = direction > 0 ? to : from,
+                    Data = lastMove.Rank.ToString().ToLower() + "_" + lastMove.Player.ToString().ToLower()
+                });
+            }
+        }
+        else
+        {
+            var lastMove = Board.LastMove;
+            var lastMoveCapture = Board.LastMoveCapture;
+            foreach (var previousMove in PreviousAvailableMoves)
+            {
+                graphics.AvailableMoves.Add(new ChessBoardPosition()
+                {
+                    Column = previousMove.To.Column,
+                    Row = previousMove.To.Row
+                });
+            }
+
+            // Add different highlights to board: Previous moves and captures
+            if (lastMove != null)
+            {
+                graphics.Highlights.Add(new ChessBoardGraphics()
+                {
+                    Column = lastMove.From.Column,
+                    Row = lastMove.From.Row,
+                    Data = "HighlightPreviousFrom"
+                });
+                if (lastMoveCapture != null)
+                {
+                    graphics.Highlights.Add(new ChessBoardGraphics()
+                    {
+                        Column = lastMoveCapture.From.Column,
+                        Row = lastMoveCapture.From.Row,
+                        Data = "HighlightCapture"
+                    });
+                }
+                else
+                {
+                    graphics.Highlights.Add(new ChessBoardGraphics()
+                    {
+                        Column = lastMove.To.Column,
+                        Row = lastMove.To.Row,
+                        Data = "HighlightPreviousTo"
+                    });
+                }
+            }
+        }
+
+        // Add all pieces on the board
         for (var row = 0; row < ChessBoard.BOARD_SIZE; row++)
         {
-            var cells = new List<ChessBoardGraphics>();
             for (var column = 0; column < ChessBoard.BOARD_SIZE; column++)
             {
                 var piece = Board.GetPiece(column, row);
-                var moveAvailable = PreviousAvailableMoves
-                    .Any(p => p.To.VerticalLocation == row && p.To.HorizontalLocation == column);
-                var lastMoveHighlight = "";
-                if (lastMove != null)
+                if (piece.Player != PiecePlayer.None)
                 {
-                    if (lastMove.From.HorizontalLocation == column &&
-                        lastMove.From.VerticalLocation == row)
+                    if (direction != 0)
                     {
-                        lastMoveHighlight = "HighlightPreviousFrom";
+                        var inAnimation = graphics.Animations.Any(a =>
+                            (a.From.Column == column && a.From.Row == row) ||
+                            (a.To.Column == column && a.To.Row == row));
+                        if (inAnimation)
+                        {
+                            // This piece is part of animation so we must not draw it to the board.
+                            continue;
+                        }
                     }
-                    else if (lastMoveCapture != null &&
-                        lastMoveCapture.From.HorizontalLocation == column &&
-                        lastMoveCapture.From.VerticalLocation == row)
+
+                    graphics.Pieces.Add(new ChessBoardGraphics()
                     {
-                        lastMoveHighlight = "HighlightCapture";
-                    }
-                    else if (lastMove.To.HorizontalLocation == column &&
-                        lastMove.To.VerticalLocation == row)
-                    {
-                        lastMoveHighlight = "HighlightPreviousTo";
-                    }
+                        Row = row,
+                        Column = column,
+                        Data = piece.Rank.ToString().ToLower() + "_" + piece.Player.ToString().ToLower()
+                    });
                 }
-
-                var image = piece.Player == PiecePlayer.None ?
-                    "empty" :
-                    piece.Rank.ToString().ToLower() + "_" + piece.Player.ToString().ToLower();
-
-                cells.Add(new ChessBoardGraphics()
-                {
-                    MoveAvailable = moveAvailable,
-                    LastMove = lastMoveHighlight,
-                    Image = image
-                });
             }
-            rows.Add(cells);
         }
 
-        await JS.InvokeVoidAsync("MyChessPlay.draw", rows);
+        if (graphics.Animations.Any())
+        {
+            await JS.InvokeVoidAsync("MyChessPlay.animate", graphics);
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("MyChessPlay.draw", graphics);
+        }
     }
 
     protected string GetThinkTime()
@@ -368,15 +434,6 @@ public class ChessBoardViewBase : MyChessComponentBase
     }
 
     [JSInvokable]
-    public async Task CanvasOnClick(int x, int y)
-    {
-        Console.WriteLine($"CanvasOnClick: {x} - {y}");
-
-        PreviousAvailableMoves = Board.GetAvailableMoves(x, y).ToList();
-        await DrawAsync();
-    }
-
-    [JSInvokable]
     public async Task<bool> CanvasOnKeyDown(string code)
     {
         Console.WriteLine($"CanvasOnKeyDown: {code}");
@@ -390,24 +447,36 @@ public class ChessBoardViewBase : MyChessComponentBase
         {
             case "Home":
                 await FirstMove();
+                StateHasChanged();
                 return true;
             case "ArrowLeft":
             case "ArrowDown":
             case "PageDown":
                 await PreviousMove();
+                StateHasChanged();
                 return true;
             case "ArrowRight":
             case "ArrowUp":
             case "PageUp":
                 await NextMove();
+                StateHasChanged();
                 return true;
             case "End":
                 await LastMove();
+                StateHasChanged();
                 return true;
             default:
                 break;
         }
         return false;
+    }
+
+
+    [JSInvokable]
+    public async Task AnimationEnded()
+    {
+        Console.WriteLine($"AnimationEnded");
+        await DrawAsync();
     }
 
     [JSInvokable]
@@ -424,13 +493,15 @@ public class ChessBoardViewBase : MyChessComponentBase
         var row = (int)Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
         Console.WriteLine($"CanvasOnClick: {column} - {row}");
 
+        var animate = false;
         if (PreviousAvailableMoves.Count > 0)
         {
             var selectedMove = PreviousAvailableMoves
-                    .FirstOrDefault(p => p.To.VerticalLocation == row && p.To.HorizontalLocation == column);
+                .FirstOrDefault(p => p.To.Row == row && p.To.Column == column);
             if (selectedMove != null)
             {
                 Board.MakeMove(selectedMove);
+                animate = true;
                 if (Board.LastMovePromotion != null)
                 {
                     _promotion = "";
@@ -447,7 +518,7 @@ public class ChessBoardViewBase : MyChessComponentBase
         {
             PreviousAvailableMoves = Board.GetAvailableMoves(column, row).ToList();
         }
-        await DrawAsync();
+        await DrawAsync(direction: animate ? 1 : 0);
     }
 
     protected async Task ConfirmMove()
@@ -656,28 +727,30 @@ public class ChessBoardViewBase : MyChessComponentBase
     {
         await Cancel();
         CurrentMoveNumber = 1;
-        await MakeMoves(Game, CurrentMoveNumber);
+        await MakeMoves(Game, CurrentMoveNumber, direction: 1);
     }
 
     protected async Task PreviousMove()
     {
         await Cancel();
         CurrentMoveNumber = Math.Max(CurrentMoveNumber - 1, 1);
-        await MakeMoves(Game, CurrentMoveNumber);
+        await MakeMoves(Game, CurrentMoveNumber, direction: 0);
     }
 
     protected async Task NextMove()
     {
         await Cancel();
+        var currentVisibleMoveNumber = CurrentMoveNumber;
         CurrentMoveNumber = Math.Min(CurrentMoveNumber + 1, Game.Moves.Count);
-        await MakeMoves(Game, CurrentMoveNumber);
+        // Do not animate if already at the latest move
+        await MakeMoves(Game, CurrentMoveNumber, direction: currentVisibleMoveNumber == CurrentMoveNumber ? 0 : 1);
     }
 
     protected async Task LastMove()
     {
         await Cancel();
         CurrentMoveNumber = Game.Moves.Count;
-        await MakeMoves(Game, CurrentMoveNumber);
+        await MakeMoves(Game, CurrentMoveNumber, direction: 1);
     }
 
     private async Task SaveState()

@@ -1,15 +1,14 @@
-﻿namespace MyChess
+﻿namespace MyChess;
+
+public enum ChessSpecialMove
 {
-    public enum ChessSpecialMove
-    {
-        None,
-        Capture,
-        Castling,
-        EnPassant,
-        Promotion,
-        PromotionOut,
-        PromotionIn,
-        Check,
-        CheckMate,
-    }
+    None,
+    Capture,
+    Castling,
+    EnPassant,
+    Promotion,
+    PromotionOut,
+    PromotionIn,
+    Check,
+    CheckMate,
 }

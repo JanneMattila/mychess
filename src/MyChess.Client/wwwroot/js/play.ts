@@ -1,5 +1,8 @@
 ﻿var MyChessPlay = MyChessPlay || {};
 
+let _animationRunning = false;
+let _animationUpdate = 0;
+
 let _pieceSizeMin = 20;
 let _pieceSize = _pieceSizeMin;
 let _canvasElement: HTMLCanvasElement;
@@ -84,6 +87,8 @@ window.addEventListener('resize', () => {
 });
 
 window.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (_animationRunning) return;
+
     const code = event.code;
     console.log(`keyup: ${event.code}`);
     if (_dotnetRef !== undefined) {
@@ -112,50 +117,6 @@ window.addEventListener('keydown', (event: KeyboardEvent) => {
         }
     }
 });
-
-const drawImage = (item: any, row: number, column: number) => {
-    const x = Math.floor(column * _pieceSize);
-    const y = Math.floor(row * _pieceSize);
-
-    _context.save();
-    if ((row + column) % 2 == 0) {
-        _context.fillStyle = "#A9A9A9";
-    }
-    else {
-        _context.fillStyle = "#FFFFFF";
-    }
-    _context.fillRect(x, y, _pieceSize, _pieceSize);
-    _context.fill();
-    _context.restore();
-
-    if (item.lastMove.length > 0) {
-        _context.save();
-
-        if (item.lastMove === "HighlightPreviousFrom") {
-            _context.fillStyle = "rgba(195, 140, 140, 0.9)";
-        }
-        else if (item.lastMove === "HighlightCapture") {
-            _context.fillStyle = "rgba(255, 216, 0, 0.9)";
-        }
-        else if (item.lastMove === "HighlightPreviousTo") {
-            _context.fillStyle = "rgba(140, 195, 140, 0.9)";
-        }
-        _context.fillRect(x, y, _pieceSize, _pieceSize);
-        _context.fill();
-        _context.restore();
-    }
-
-    if (item.moveAvailable) {
-        _context.save();
-        _context.fillStyle = "rgba(0, 255, 0, 0.5)";
-        _context.fillRect(x, y, _pieceSize, _pieceSize);
-        _context.fill();
-        _context.restore();
-    }
-
-    const img = _images[item.image];
-    _context.drawImage(img, x, y, _pieceSize, _pieceSize);
-}
 
 const setTouchHandlers = (canvas: HTMLCanvasElement) => {
     //canvas.addEventListener('click', (event: MouseEvent) => {
@@ -202,23 +163,88 @@ MyChessPlay.scrollToComment = (): void => {
     }, 100);
 };
 
-MyChessPlay.draw = (game: any) => {
+MyChessPlay.draw = (game: any, delta: number = 0) => {
     _game = game;
     if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined) {
         console.log("Not yet ready to draw");
         return;
     }
 
+    console.log("draw");
     _context.save();
 
     const scale = window.devicePixelRatio;
     _context.scale(scale, scale);
 
-    for (let row = 0; row < game.length; row++) {
-        const r = game[row];
-        for (let column = 0; column < r.length; column++) {
-            const item = r[column];
-            drawImage(item, row, column);
+    // Draw chess board
+    for (let row = 0; row < 8; row++) {
+        for (let column = 0; column < 8; column++) {
+            const x = Math.floor(column * _pieceSize);
+            const y = Math.floor(row * _pieceSize);
+
+            _context.save();
+            if ((row + column) % 2 == 0) {
+                _context.fillStyle = "#A9A9A9";
+            }
+            else {
+                _context.fillStyle = "#FFFFFF";
+            }
+            _context.fillRect(x, y, _pieceSize, _pieceSize);
+            _context.fill();
+            _context.restore();
+        }
+    }
+
+    if (game.animations.length == 0) {
+        for (const highlights of game.highlights) {
+            const column = Math.floor(highlights.column * _pieceSize);
+            const row = Math.floor(highlights.row * _pieceSize);
+
+            _context.save();
+            if (highlights.data === "HighlightPreviousFrom") {
+                _context.fillStyle = "rgba(195, 140, 140, 0.9)";
+            }
+            else if (highlights.data === "HighlightCapture") {
+                _context.fillStyle = "rgba(255, 216, 0, 0.9)";
+            }
+            else if (highlights.data === "HighlightPreviousTo") {
+                _context.fillStyle = "rgba(140, 195, 140, 0.9)";
+            }
+            _context.fillRect(column, row, _pieceSize, _pieceSize);
+            _context.fill();
+            _context.restore();
+        }
+
+        for (const availableMove of game.availableMoves) {
+            const column = Math.floor(availableMove.column * _pieceSize);
+            const row = Math.floor(availableMove.row * _pieceSize);
+
+            _context.save();
+            _context.fillStyle = "rgba(0, 255, 0, 0.5)";
+            _context.fillRect(column, row, _pieceSize, _pieceSize);
+            _context.fill();
+            _context.restore();
+        }
+    }
+    for (const piece of game.pieces) {
+        const column = Math.floor(piece.column * _pieceSize);
+        const row = Math.floor(piece.row * _pieceSize);
+
+        const img = _images[piece.data];
+        _context.drawImage(img, column, row, _pieceSize, _pieceSize);
+    }
+
+    if (game.animations.length !== 0) {
+        for (const animations of game.animations) {
+            const dc = animations.to.column - animations.from.column;
+            const dr = animations.to.row - animations.from.row;
+            const column = animations.from.column + delta * dc;
+            const row = animations.from.row + delta * dr;
+            const x = Math.floor(column * _pieceSize);
+            const y = Math.floor(row * _pieceSize);
+
+            const img = _images[animations.data];
+            _context.drawImage(img, x, y, _pieceSize, _pieceSize);
         }
     }
 
@@ -233,18 +259,43 @@ MyChessPlay.draw = (game: any) => {
     _context.restore();
 }
 
-MyChessPlay.animateDraw = (game: any, animations: any) => {
-    if (_context === undefined || _imagesLoaded !== _imagesToLoad || game === undefined || animations === undefined) {
+const update = (timestamp: number) => {
+    const delta = Math.min((timestamp - _animationUpdate) / 800 /* milliseconds */, 1.0);
+
+    if (_context === undefined || _imagesLoaded !== _imagesToLoad || _game === undefined) {
         console.log("Not yet ready to draw animation");
         return;
     }
 
-    for (let row = 0; row < game.length; row++) {
-        const r = game[row];
-        for (let column = 0; column < r.length; column++) {
-            const item = r[column];
-            drawImage(item, row, column);
-        }
+    MyChessPlay.draw(_game, delta);
+    return delta;
+}
+
+const playAnimationFrame = (timestamp: number) => {
+
+    if (_animationUpdate === 0) {
+        _animationUpdate = timestamp;
     }
-    _context.restore();
+
+    const delta = update(timestamp);
+
+    if (delta < 1 /* _animations !== undefined */) {
+        window.requestAnimationFrame(playAnimationFrame);
+    }
+    else {
+        // Animation has ended.
+        console.log("AnimationEnded");
+        _animationRunning = false;
+        _dotnetRef.invokeMethodAsync("AnimationEnded");
+    }
+}
+
+MyChessPlay.animate = (game: any): void => {
+
+    console.log("AnimationStarted");
+    _game = game;
+
+    _animationRunning = true;
+    _animationUpdate = 0;
+    playAnimationFrame(0);
 }
