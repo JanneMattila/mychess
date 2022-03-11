@@ -99,6 +99,7 @@ public class ChessBoardViewBase : MyChessComponentBase
                 {
                     await MakeMoves(game);
                     Game = game;
+                    CurrentMoveNumber = Game.Moves.Count;
                 }
             }
             catch (Exception)
