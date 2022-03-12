@@ -87,7 +87,11 @@ window.addEventListener('resize', () => {
 });
 
 window.addEventListener('keydown', (event: KeyboardEvent) => {
-    if (_animationRunning) return;
+    if (_animationRunning) {
+        console.log("AnimationEnded due to keypress");
+        _animationRunning = false;
+        _dotnetRef.invokeMethodAsync("AnimationEnded");
+    }
 
     const code = event.code;
     console.log(`keyup: ${event.code}`);
@@ -272,6 +276,10 @@ const update = (timestamp: number) => {
 }
 
 const playAnimationFrame = (timestamp: number) => {
+
+    if (!_animationRunning) {
+        return;
+    }
 
     if (_animationUpdate === 0) {
         _animationUpdate = timestamp;
