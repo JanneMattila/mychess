@@ -19,6 +19,7 @@ public class ChessBoardViewBase : MyChessComponentBase
     private DateTimeOffset _start = DateTimeOffset.UtcNow;
     private string _promotion = "";
     private int _pieceSize = 20;
+    private bool _updateAfterAnimation = false;
 
     private DotNetObjectReference<ChessBoardViewBase>? _selfRef;
 
@@ -175,6 +176,7 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     private async Task MakeMoves(MyChessGame game, int moves = int.MaxValue, int direction = 0)
     {
+        PreviousAvailableMoves.Clear();
         Board.Initialize();
 
         foreach (var gameMove in game.Moves.Take(moves))
@@ -380,6 +382,11 @@ public class ChessBoardViewBase : MyChessComponentBase
             seconds = (int)Math.Floor(thinkTime % 60);
         }
 
+        if (CurrentMoveNumber == 0)
+        {
+            return string.Empty;
+        }
+
         if (minutes > 0)
         {
             return $"Move {CurrentMoveNumber} think time was {minutes} minutes and {seconds} seconds.";
@@ -391,6 +398,11 @@ public class ChessBoardViewBase : MyChessComponentBase
     {
         var status = Board.GetBoardState();
         var gameStatusMessage = "";
+
+        if (CurrentMoveNumber == 0)
+        {
+            return string.Empty;
+        }
 
         if (CurrentMoveNumber < Game.Moves.Count)
         {
@@ -437,8 +449,7 @@ public class ChessBoardViewBase : MyChessComponentBase
     public async Task<bool> CanvasOnKeyDown(string code)
     {
         Console.WriteLine($"CanvasOnKeyDown: {code}");
-        if (ShowCommentDialog || ShowPromotionDialog || ShowConfirmationDialog ||
-             PreviousAvailableMoves.Any())
+        if (ShowCommentDialog || ShowPromotionDialog || ShowConfirmationDialog)
         {
             return false;
         }
@@ -471,12 +482,19 @@ public class ChessBoardViewBase : MyChessComponentBase
         return false;
     }
 
-
     [JSInvokable]
     public async Task AnimationEnded()
     {
         Console.WriteLine($"AnimationEnded");
-        await DrawAsync();
+        if (_updateAfterAnimation)
+        {
+            _updateAfterAnimation = false;
+            await MakeMoves(Game, CurrentMoveNumber);
+        }
+        else
+        {
+            await DrawAsync();
+        }
     }
 
     [JSInvokable]
@@ -489,6 +507,12 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     public async Task CanvasOnClick(MouseEventArgs mouseEventArgs)
     {
+        if (CurrentMoveNumber < Game.Moves.Count)
+        {
+            Console.WriteLine("No selection since not in last move");
+            return;
+        }
+
         var column = (int)Math.Floor(mouseEventArgs.OffsetX / _pieceSize);
         var row = (int)Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
         Console.WriteLine($"CanvasOnClick: {column} - {row}");
@@ -733,8 +757,22 @@ public class ChessBoardViewBase : MyChessComponentBase
     protected async Task PreviousMove()
     {
         await Cancel();
-        CurrentMoveNumber = Math.Max(CurrentMoveNumber - 1, 1);
-        await MakeMoves(Game, CurrentMoveNumber, direction: 0);
+        var currentVisibleMoveNumber = CurrentMoveNumber;
+
+        currentVisibleMoveNumber = Math.Max(currentVisibleMoveNumber - 1, 0);
+
+        Console.WriteLine($"currentVisibleMoveNumber: {currentVisibleMoveNumber}");
+
+        if (currentVisibleMoveNumber == 0 && CurrentMoveNumber == 0)
+        {
+            await MakeMoves(Game, currentVisibleMoveNumber, direction: 0);
+        }
+        else
+        {
+            await MakeMoves(Game, currentVisibleMoveNumber + 1, direction: -1);
+            _updateAfterAnimation = true;
+        }
+        CurrentMoveNumber = currentVisibleMoveNumber;
     }
 
     protected async Task NextMove()
@@ -776,6 +814,7 @@ public class ChessBoardViewBase : MyChessComponentBase
             ShowCommentDialog = false;
             Board.Initialize();
             PreviousAvailableMoves.Clear();
+            Game = new();
             await DrawAsync();
         }
         else
