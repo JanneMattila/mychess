@@ -19,6 +19,7 @@ public class ChessBoardViewBase : MyChessComponentBase
     private DateTimeOffset _start = DateTimeOffset.UtcNow;
     private string _promotion = "";
     private int _pieceSize = 20;
+    private bool _updateAfterAnimation = false;
 
     private DotNetObjectReference<ChessBoardViewBase>? _selfRef;
 
@@ -485,8 +486,15 @@ public class ChessBoardViewBase : MyChessComponentBase
     public async Task AnimationEnded()
     {
         Console.WriteLine($"AnimationEnded");
-        await MakeMoves(Game, CurrentMoveNumber);
-        await DrawAsync();
+        if (_updateAfterAnimation)
+        {
+            _updateAfterAnimation = false;
+            await MakeMoves(Game, CurrentMoveNumber);
+        }
+        else
+        {
+            await DrawAsync();
+        }
     }
 
     [JSInvokable]
@@ -756,6 +764,7 @@ public class ChessBoardViewBase : MyChessComponentBase
         else
         {
             await MakeMoves(Game, currentVisibleMoveNumber + 1, direction: -1);
+            _updateAfterAnimation = true;
         }
         CurrentMoveNumber = currentVisibleMoveNumber;
     }
@@ -799,6 +808,7 @@ public class ChessBoardViewBase : MyChessComponentBase
             ShowCommentDialog = false;
             Board.Initialize();
             PreviousAvailableMoves.Clear();
+            Game = new();
             await DrawAsync();
         }
         else
