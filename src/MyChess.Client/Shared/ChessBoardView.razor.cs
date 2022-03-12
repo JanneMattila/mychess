@@ -176,6 +176,7 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     private async Task MakeMoves(MyChessGame game, int moves = int.MaxValue, int direction = 0)
     {
+        PreviousAvailableMoves.Clear();
         Board.Initialize();
 
         foreach (var gameMove in game.Moves.Take(moves))
@@ -448,8 +449,7 @@ public class ChessBoardViewBase : MyChessComponentBase
     public async Task<bool> CanvasOnKeyDown(string code)
     {
         Console.WriteLine($"CanvasOnKeyDown: {code}");
-        if (ShowCommentDialog || ShowPromotionDialog || ShowConfirmationDialog ||
-             PreviousAvailableMoves.Any())
+        if (ShowCommentDialog || ShowPromotionDialog || ShowConfirmationDialog)
         {
             return false;
         }
@@ -507,6 +507,12 @@ public class ChessBoardViewBase : MyChessComponentBase
 
     public async Task CanvasOnClick(MouseEventArgs mouseEventArgs)
     {
+        if (CurrentMoveNumber < Game.Moves.Count)
+        {
+            Console.WriteLine("No selection since not in last move");
+            return;
+        }
+
         var column = (int)Math.Floor(mouseEventArgs.OffsetX / _pieceSize);
         var row = (int)Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
         Console.WriteLine($"CanvasOnClick: {column} - {row}");
