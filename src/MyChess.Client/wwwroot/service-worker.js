@@ -1,7 +1,44 @@
-﻿// In development, always fetch from the network and do not enable offline support.
+﻿const CACHE = "mychess-pages";
+const offlineFallbackPage = "offline.html";
+
+self.addEventListener("install", function (event) {
+    console.log("[My Chess] Install Event processing");
+
+    event.waitUntil(
+        caches.open(CACHE).then(function (cache) {
+            console.log("[My Chess] Cached offline page during install");
+
+            return cache.add(offlineFallbackPage);
+        })
+    );
+});
+
+// If any fetch fails, it will show the offline page.
+self.addEventListener("fetch", function (event) {
+    if (event.request.method !== "GET") return;
+
+    event.respondWith(
+        fetch(event.request).catch(function (error) {
+            // The following validates that the request was for a navigation to a new document
+            if (
+                event.request.destination !== "document" ||
+                event.request.mode !== "navigate"
+            ) {
+                return;
+            }
+
+            console.error("[My Chess] Network request Failed. Serving offline page " + error);
+            return caches.open(CACHE).then(function (cache) {
+                return cache.match(offlineFallbackPage);
+            });
+        })
+    );
+});
+
+// In development, always fetch from the network and do not enable offline support.
 // This is because caching would make development more difficult (changes would not
 // be reflected on the first load after each change).
-self.addEventListener('fetch', () => { });
+//self.addEventListener('fetch', () => { });
 
 self.addEventListener('push', (event) => {
     console.log("serviceWorker - push");

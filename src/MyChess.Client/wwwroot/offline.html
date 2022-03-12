@@ -1,25 +1,154 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!<!DOCTYPE html>
+<html>
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,user-scalable=yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>My Chess</title>
+    <link rel="icon" href="favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
         body {
-            font-family: 'Segoe UI';
-            background-color: black;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI";
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #353535;
+            /* Prevent pull to refresh */
+            touch-action: manipulation;
+            overscroll-behavior-y: contain;
             color: white;
+        }
+
+        .App {
+            color: white;
+        }
+
+        .App-header-container {
+            width: 100%;
+            height: 85px;
+        }
+
+        .App-logo {
+            padding: 5px;
+        }
+
+        .App-auth {
+            float: right;
+        }
+
+        .App-footer-container {
+            width: 100%;
+            color: white;
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 10px;
+        }
+
+        .App-footer-link {
+            color: white;
+            text-decoration: none;
+            margin-bottom: 25px;
+        }
+
+        .App-footer-link-separator {
+            color: gray;
+            margin-bottom: 25px;
+        }
+
+        .welcome {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(64,64,64,0.6);
+            backdrop-filter: blur(6px);
+            display: table;
+            vertical-align: middle;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .welcome-Text {
+            position: absolute;
+            top: 40%;
+            width: 100%;
+            display: table-cell;
+            color: white;
+            z-index: 100;
+        }
+
+        .offline-Text {
+            height: 10vmin;
+            font-size: calc(10px + 2vmin);
+            text-align: center;
+            margin: 10px;
+        }
+
+        .offline-Text-link {
+            color: white;
+            background-color: transparent;
+            text-decoration: underline;
+            margin-bottom: 25px;
+        }
+
+        a:visited {
+            color: white;
+            background-color: transparent;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: white;
+            background-color: transparent;
+            text-decoration: underline;
+        }
+
+        a:active {
+            color: white;
+            background-color: transparent;
+            text-decoration: underline;
+        }
+
+        .title {
+            height: 10vmin;
+            font-size: calc(14px + 2vmin);
+            text-align: center;
+            margin: 10px;
         }
     </style>
 </head>
 
 <body>
-    <div>
-        <a href="/" class="gamePageTitle" onclick="document.location.href = '/';"><img
-                src="data:image/png;base64,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" />
-        </a>
-        <br />is currently offline. Click logo to try again.
+    <div id="App">
+        <div class="App-header-container">
+            <a href="/"><img alt="My Chess" class="App-logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZlcnNpb249IjEuMSIgd2lkdGg9IjQ1IiBoZWlnaHQ9IjQ1Ij4NCiAgPGcgc3R5bGU9Im9wYWNpdHk6MTsgZmlsbDojZmZmZmZmOyBmaWxsLW9wYWNpdHk6MTsgZmlsbC1ydWxlOmV2ZW5vZGQ7IHN0cm9rZTojMDAwMDAwOyBzdHJva2Utd2lkdGg6MS41OyBzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbGluZWpvaW46cm91bmQ7c3Ryb2tlLW1pdGVybGltaXQ6NDsgc3Ryb2tlLWRhc2hhcnJheTpub25lOyBzdHJva2Utb3BhY2l0eToxOyI+DQogICAgPHBhdGgNCiAgICAgIGQ9Ik0gOSAxMyBBIDIgMiAwIDEgMSAgNSwxMyBBIDIgMiAwIDEgMSAgOSAxMyB6Ig0KICAgICAgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEsLTEpIiAvPg0KICAgIDxwYXRoDQogICAgICBkPSJNIDkgMTMgQSAyIDIgMCAxIDEgIDUsMTMgQSAyIDIgMCAxIDEgIDkgMTMgeiINCiAgICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE1LjUsLTUuNSkiIC8+DQogICAgPHBhdGgNCiAgICAgIGQ9Ik0gOSAxMyBBIDIgMiAwIDEgMSAgNSwxMyBBIDIgMiAwIDEgMSAgOSAxMyB6Ig0KICAgICAgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzIsLTEpIiAvPg0KICAgIDxwYXRoDQogICAgICBkPSJNIDkgMTMgQSAyIDIgMCAxIDEgIDUsMTMgQSAyIDIgMCAxIDEgIDkgMTMgeiINCiAgICAgIHRyYW5zZm9ybT0idHJhbnNsYXRlKDcsLTQuNSkiIC8+DQogICAgPHBhdGgNCiAgICAgIGQ9Ik0gOSAxMyBBIDIgMiAwIDEgMSAgNSwxMyBBIDIgMiAwIDEgMSAgOSAxMyB6Ig0KICAgICAgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjQsLTQpIiAvPg0KICAgIDxwYXRoDQogICAgICBkPSJNIDksMjYgQyAxNy41LDI0LjUgMzAsMjQuNSAzNiwyNiBMIDM4LDE0IEwgMzEsMjUgTCAzMSwxMSBMIDI1LjUsMjQuNSBMIDIyLjUsOS41IEwgMTkuNSwyNC41IEwgMTQsMTAuNSBMIDE0LDI1IEwgNywxNCBMIDksMjYgeiAiDQogICAgICBzdHlsZT0ic3Ryb2tlLWxpbmVjYXA6YnV0dDsiIC8+DQogICAgPHBhdGgNCiAgICAgIGQ9Ik0gOSwyNiBDIDksMjggMTAuNSwyOCAxMS41LDMwIEMgMTIuNSwzMS41IDEyLjUsMzEgMTIsMzMuNSBDIDEwLjUsMzQuNSAxMC41LDM2IDEwLjUsMzYgQyA5LDM3LjUgMTEsMzguNSAxMSwzOC41IEMgMTcuNSwzOS41IDI3LjUsMzkuNSAzNCwzOC41IEMgMzQsMzguNSAzNS41LDM3LjUgMzQsMzYgQyAzNCwzNiAzNC41LDM0LjUgMzMsMzMuNSBDIDMyLjUsMzEgMzIuNSwzMS41IDMzLjUsMzAgQyAzNC41LDI4IDM2LDI4IDM2LDI2IEMgMjcuNSwyNC41IDE3LjUsMjQuNSA5LDI2IHogIg0KICAgICAgc3R5bGU9InN0cm9rZS1saW5lY2FwOmJ1dHQ7IiAvPg0KICAgIDxwYXRoDQogICAgICBkPSJNIDExLjUsMzAgQyAxNSwyOSAzMCwyOSAzMy41LDMwIg0KICAgICAgc3R5bGU9ImZpbGw6bm9uZTsiIC8+DQogICAgPHBhdGgNCiAgICAgIGQ9Ik0gMTIsMzMuNSBDIDE4LDMyLjUgMjcsMzIuNSAzMywzMy41Ig0KICAgICAgc3R5bGU9ImZpbGw6bm9uZTsiIC8+DQogIDwvZz4NCjwvc3ZnPg0K" /></a>
+            <div class="App-auth">
+            </div>
+        </div>
+        <div>
+            <div class="title">Welcome to My Chess!</div>
+            <div class="welcomeText">
+                My Chess is social (and not that serious) chess game where
+                you can play chess online with your friends.
+                You can comment your moves and put some pressure to your friends (in fun way of course!).
+                <br />
+                <br />
+                <div class="offline-Text">
+                    Unfortunately, it seems that we're offline now. You can try again later or
+                    <a href="/play/local" class="offline-link">play local</a> game in the meanwhile.
+                </div>
+            </div>
+        </div>
+        <footer class="App-footer-container">
+            <a href="/About" class="App-footer-link">About </a>
+            <span class="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <a href="/privacy" class="App-footer-link">Privacy</a>
+            <span class="App-footer-link-separator">&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <a href="/play/local" class="App-footer-link">Play locally</a>
+        </footer>
     </div>
 </body>
 
