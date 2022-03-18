@@ -174,7 +174,6 @@ MyChessPlay.draw = (game: any, delta: number = 0) => {
         return;
     }
 
-    console.log("draw");
     _context.save();
 
     const scale = window.devicePixelRatio;

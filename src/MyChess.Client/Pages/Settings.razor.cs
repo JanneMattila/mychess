@@ -14,6 +14,7 @@ public class SettingsBase : MyChessComponentBase
 {
     protected bool IsNotificationsEnabled { get; set; } = false;
     protected string NotificationText { get; set; } = string.Empty;
+    protected string StatusMessage { get; set; } = string.Empty;
 
     protected UserSettings Settings { get; set; } = new();
 
@@ -33,9 +34,18 @@ public class SettingsBase : MyChessComponentBase
     protected async Task RefreshSettings()
     {
         AppState.IsLoading = true;
-        Settings = await Client.GetSettingsAsync();
 
-        IsNotificationsEnabled = Settings.Notifications.Any();
+        try
+        {
+            StatusMessage = string.Empty;
+            Settings = await Client.GetSettingsAsync();
+            IsNotificationsEnabled = Settings.Notifications.Any();
+        }
+        catch (Exception)
+        {
+            StatusMessage = "Could not load settings 😥";
+        }
+
         AppState.IsLoading = false;
     }
 
@@ -93,5 +103,16 @@ public class SettingsBase : MyChessComponentBase
     {
         await SignOutManager.SetSignOutState();
         NavigationManager.NavigateTo("authentication/logout");
+    }
+
+    protected async Task PurgeCache()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("caches.delete", "mychess-pages");
+        }
+        catch (JSException)
+        {
+        }
     }
 }

@@ -50,6 +50,10 @@
     opacity: 0;
 }
 
+.GameList-StatusMessage {
+    text-align: center;
+}
+
 .gameTemplate {
     float: left;
     padding: 10px 25px;

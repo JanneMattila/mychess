@@ -13,24 +13,66 @@ self.addEventListener("install", function (event) {
     );
 });
 
-// If any fetch fails, it will show the offline page.
-self.addEventListener("fetch", function (event) {
-    if (event.request.method !== "GET") return;
+self.addEventListener('fetch', (event) => {
+    if (event.request.method !== "GET") {
+        console.log(`[My Chess] Skip cache for request method: ${event.request.method} ${event.request.url}`);
+        return;
+    }
+    if (!event.request.url.startsWith(self.location.origin)) {
+        console.log(`[My Chess] Skip cache for external url: ${event.request.url}`);
+        return;
+    }
+
+    if (event.request.url.startsWith(self.location.origin + "/api/")) {
+        console.log(`[My Chess] Skip cache backend calls: ${event.request.url}`);
+        return;
+    }
+
+    if (event.request.url.startsWith(self.location.origin + "/authentication/")) {
+        console.log(`[My Chess] Skip cache for authentication: ${event.request.url}`);
+        return;
+    }
+
+    if (event.request.url.startsWith(self.location.origin + "/play/") &&
+        !event.request.url.endsWith("/local")) {
+        console.log(`[My Chess] Skip cache for play views: ${event.request.url}`);
+        return;
+    }
 
     event.respondWith(
-        fetch(event.request).catch(function (error) {
-            // The following validates that the request was for a navigation to a new document
-            if (
-                event.request.destination !== "document" ||
-                event.request.mode !== "navigate"
-            ) {
-                return;
+        caches.match(event.request).then((resp) => {
+            let cachedResponse = false;
+
+            if (event.request.url === self.location.origin + "/") {
+                console.log(`[My Chess] Skip cache for root: ${event.request.url}`);
+                resp = undefined;
             }
 
-            console.error("[My Chess] Network request Failed. Serving offline page " + error);
-            return caches.open(CACHE).then(function (cache) {
-                return cache.match(offlineFallbackPage);
-            });
+            if (resp !== undefined) {
+                console.log(`[My Chess] Responding from cache: ${event.request.url}`);
+                cachedResponse = true;
+            }
+
+            return resp || fetch(event.request).then((response) => {
+                console.log(`[My Chess] Responding from network: ${event.request.url}`);
+                if (event.request.url.startsWith(self.location.origin + "/_framework/") &&
+                    !(event.request.url.endsWith(".js") || event.request.url.endsWith(".json"))) {
+                    console.log(`[My Chess] Do not cache framework files: ${event.request.url}`);
+                    return response;
+                }
+
+                return caches.open(CACHE).then((cache) => {
+                    cache.put(event.request, response.clone());
+                    return response;
+                });
+            }).catch(function (error) {
+                if (!cachedResponse) {
+                    console.error(`[My Chess] Network request failed for ${event.request.url}. Serving offline page ${error}`);
+                    return caches.open(CACHE).then((cache) => {
+                        return cache.match(offlineFallbackPage);
+                    });
+                }
+            });;
         })
     );
 });

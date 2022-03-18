@@ -7,6 +7,7 @@ namespace MyChess.Client.Shared;
 public class FriendListBase : MyChessComponentBase
 {
     protected List<User> Friends { get; set; } = new();
+    protected string StatusMessage { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -16,7 +17,16 @@ public class FriendListBase : MyChessComponentBase
     protected async Task RefreshFriends()
     {
         AppState.IsLoading = true;
-        Friends = await Client.GetFriendsAsync();
+
+        try
+        {
+            StatusMessage = string.Empty;
+            Friends = await Client.GetFriendsAsync();
+        }
+        catch (Exception)
+        {
+            StatusMessage = "Could not load friends 😥";
+        }
         AppState.IsLoading = false;
     }
 

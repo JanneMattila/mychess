@@ -143,7 +143,6 @@ MyChessPlay.draw = (game, delta = 0) => {
         console.log("Not yet ready to draw");
         return;
     }
-    console.log("draw");
     _context.save();
     const scale = window.devicePixelRatio;
     _context.scale(scale, scale);
