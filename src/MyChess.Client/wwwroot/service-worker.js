@@ -2,13 +2,21 @@
 const offlineFallbackPage = "offline.html";
 
 self.addEventListener("install", function (event) {
+    self.skipWaiting();
     console.log("[My Chess] Install Event processing");
 
     event.waitUntil(
         caches.open(CACHE).then(function (cache) {
-            console.log("[My Chess] Cached offline page during install");
+            console.log("[My Chess] Cache offline pages");
 
-            return cache.add(offlineFallbackPage);
+            return cache.addAll([
+                offlineFallbackPage,
+                '/settings',
+                '/friends',
+                '/about',
+                '/privacy',
+                '/play/local'
+            ]);
         })
     );
 });
@@ -40,20 +48,20 @@ self.addEventListener('fetch', (event) => {
     }
 
     event.respondWith(
-        caches.match(event.request).then((resp) => {
+        caches.match(event.request).then((cacheResponse) => {
             let cachedResponse = false;
 
             if (event.request.url === self.location.origin + "/") {
                 console.log(`[My Chess] Skip cache for root: ${event.request.url}`);
-                resp = undefined;
+                cacheResponse = undefined;
             }
 
-            if (resp !== undefined) {
+            if (cacheResponse !== undefined) {
                 console.log(`[My Chess] Responding from cache: ${event.request.url}`);
                 cachedResponse = true;
             }
 
-            return resp || fetch(event.request).then((response) => {
+            const networkResponse = fetch(event.request).then((response) => {
                 console.log(`[My Chess] Responding from network: ${event.request.url}`);
                 if (event.request.url.startsWith(self.location.origin + "/_framework/") &&
                     !(event.request.url.endsWith(".js") || event.request.url.endsWith(".json"))) {
@@ -72,7 +80,9 @@ self.addEventListener('fetch', (event) => {
                         return cache.match(offlineFallbackPage);
                     });
                 }
-            });;
+            });
+
+            return cacheResponse || networkResponse;
         })
     );
 });
