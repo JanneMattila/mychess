@@ -155,7 +155,6 @@ public class ChessBoardViewBase : MyChessComponentBase
                     CurrentMoveNumber = Game.Moves.Count;
                     await MakeMoves(Game);
                     await DrawAsync(direction: 1);
-                    StateHasChanged();
                 }
                 else
                 {
@@ -172,6 +171,7 @@ public class ChessBoardViewBase : MyChessComponentBase
             });
         }
         AppState.IsSmallLoading = false;
+        StateHasChanged();
     }
 
     private async Task MakeMoves(MyChessGame game, int moves = int.MaxValue, int direction = 0)

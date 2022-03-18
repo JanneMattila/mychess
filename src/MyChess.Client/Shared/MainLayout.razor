@@ -43,9 +43,11 @@
 	protected override void OnInitialized()
 	{
 		_appState.OnLoadingChange += StateHasChanged;
+		_appState.OnSmallLoadingChange += StateHasChanged;
 	}
 	public void Dispose()
 	{
 		_appState.OnLoadingChange -= StateHasChanged;
+		_appState.OnSmallLoadingChange -= StateHasChanged;
 	}
 }

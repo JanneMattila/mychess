@@ -10,5 +10,5 @@ MyChess.acceptCookieConsent = () => {
 
 window.addEventListener("focus", function () {
     console.log("Refresh page due to focus");
-    DotNet.invokeMethod("MyChess.Client", "OnFocus");
+    DotNet.invokeMethodAsync("MyChess.Client", "OnFocus");
 });

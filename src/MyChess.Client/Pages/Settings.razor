@@ -5,6 +5,12 @@
 	<div>
 		<div class="title">Profile</div>
 		<div class="Settings-Container">
+        @if (!string.IsNullOrEmpty(StatusMessage))
+	    {
+		    <h3>@StatusMessage</h3>
+	    }
+        else
+        {
 			<label class="subtitle">
 				Your player identifier<br />
 				<div class="Settings-SubText">
@@ -17,7 +23,7 @@
 
 			<div class="subtitle">Settings</div>
 
-			Notifications<br />
+			<text>Notifications</text><br />
 			<label class="toggle-switch-wrapper">
 				<InputCheckbox @bind-Value="IsNotificationsEnabled" />
 				<span class="toggle-switch"></span>
@@ -47,6 +53,13 @@
 			<br />
 
 			<button @onclick="SignOut">Sign out</button>
+
+            <br />
+			<hr />
+			<br />
+
+			<button @onclick="PurgeCache">Purge cache</button>
+        }
 		</div>
 	</div>
 </EditForm>

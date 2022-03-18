@@ -25,9 +25,11 @@
 		}
 	</div>
 
-	@if (Games == null)
+	@if (!string.IsNullOrEmpty(StatusMessage))
 	{
-		<p><em>Loading...</em></p>
+	    <div class="GameList-titleWrapper">
+		    <h3 class="GameList-StatusMessage">@StatusMessage</h3>
+        </div>
 	}
 	else
 	{

@@ -52,9 +52,9 @@ namespace MyChess.Client.Shared
         }
 
         [JSInvokable]
-        public static void OnFocus()
+        public static async Task OnFocus()
         {
-            AppFocus.Focus();
+            await AppFocus.Focus();
         }
 
         protected virtual void Dispose(bool disposing)
