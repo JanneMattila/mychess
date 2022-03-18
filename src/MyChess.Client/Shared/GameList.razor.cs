@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using MyChess.Interfaces;
 
 namespace MyChess.Client.Shared;
@@ -31,7 +32,6 @@ public class GameListBase : MyChessComponentBase
             AppState.IsSmallLoading = true;
 
             Games = await Client.GetGamesAsync(Filters);
-            StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -42,6 +42,7 @@ public class GameListBase : MyChessComponentBase
             });
         }
         AppState.IsSmallLoading = false;
+        StateHasChanged();
     }
 
     protected async Task RefreshGames()

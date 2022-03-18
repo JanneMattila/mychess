@@ -2,9 +2,12 @@
 {
     public static class AppFocus
     {
-        public static void Focus()
+        public static async Task Focus()
         {
-            OnFocus?.Invoke();
+            if (OnFocus != null)
+            {
+                await OnFocus.Invoke();
+            }
         }
 
         public static event Func<Task>? OnFocus;
