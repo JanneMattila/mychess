@@ -7,15 +7,22 @@
 
 My Chess is social (and not that serious) chess game where you can play chess online with your friends. You can comment your moves and put some pressure to your friends (in fun way of course!).
 
-![My Chess board](https://user-images.githubusercontent.com/2357647/88582302-2afa4b80-d057-11ea-88d9-55f9ed02f5e2.png)
+![My Chess](https://user-images.githubusercontent.com/2357647/159117778-8a70fdb7-2341-465d-b376-8291328ee56a.gif)
 
 ## Try it yourself
 
 You can try My Chess at the [mychess.jannemattila.com](https://mychess.jannemattila.com).
 
-## Static web app development
+## History
 
-To test Blazor client using [Azure Static Web Apps CLI](https://github.com/Azure/static-web-apps-cli):
+Interested in the history of My Chess? Checkout [history](./doc/history.md)!
+
+## Local development
+
+My Chess is built for [Azure Static Web Apps](https://docs.microsoft.com/en-us/azure/static-web-apps/overview).
+Therefore, if you want to run application locally, you'll need [Azure Static Web Apps CLI](https://github.com/Azure/static-web-apps-cli).
+
+Here are some example commands to run My Chess using SWA CLI:
 
 ```powershell
 swa start https://localhost:5000 --run "cd ./src/MyChess.Client/ && dotnet watch run" --api-location ./src/MyChess.Functions --api-port=3000
