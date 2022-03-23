@@ -3,22 +3,23 @@ const offlineFallbackPage = "offline.html";
 
 self.addEventListener("install", function (event) {
     self.skipWaiting();
-    console.log("[My Chess] Install Event processing");
+    console.log("[My Chess Install] Install Event processing");
 
-    event.waitUntil(
-        caches.open(CACHE).then(function (cache) {
-            console.log("[My Chess] Cache offline pages");
+    const myInstall = async () => {
+        console.log("[My Chess Install] Caching pages");
+        const cache = await caches.open(CACHE)
+        await caches.delete(CACHE);
 
-            return cache.addAll([
-                offlineFallbackPage,
-                '/settings',
-                '/friends',
-                '/about',
-                '/privacy',
-                '/play/local'
-            ]);
-        })
-    );
+        await cache.addAll([
+            offlineFallbackPage,
+            '/settings',
+            '/friends',
+            '/about',
+            '/privacy',
+            '/play/local'
+        ]);
+    }
+    event.waitUntil(myInstall());
 });
 
 self.addEventListener('fetch', (event) => {
@@ -47,10 +48,11 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    event.respondWith(
-        caches.match(event.request).then((cacheResponse) => {
-            let cachedResponse = false;
+    const myFetch = async () => {
+        let cachedResponse = false;
+        let cacheResponse = await caches.match(event.request);
 
+        try {
             if (event.request.url === self.location.origin + "/") {
                 console.log(`[My Chess] Skip cache for root: ${event.request.url}`);
                 cacheResponse = undefined;
@@ -59,32 +61,65 @@ self.addEventListener('fetch', (event) => {
             if (cacheResponse !== undefined) {
                 console.log(`[My Chess] Responding from cache: ${event.request.url}`);
                 cachedResponse = true;
+
+                if (event.request.url === self.location.origin + "/_framework/blazor.boot.json") {
+                    let networkJson = {};
+                    try {
+                        const networkResponseBoot = await fetch(event.request);
+                        networkJson = await networkResponseBoot.clone().json();
+                    }
+                    catch (fetchError) {
+                        console.warn(`[My Chess Boot] Cannot check app updates`);
+                        return cacheResponse;
+                    }
+
+                    const cachedJson = await cacheResponse.clone().json();
+                    if (JSON.stringify(networkJson) === JSON.stringify(cachedJson)) {
+                        console.log(`[My Chess Boot] No App updates`);
+                        return cacheResponse;
+                    }
+                    else {
+                        console.log(`[My Chess Boot] App updated!`);
+                        await caches.delete(CACHE);
+
+                        const cache = await caches.open(CACHE);
+                        await cache.addAll([
+                            offlineFallbackPage,
+                            '/settings',
+                            '/friends',
+                            '/about',
+                            '/privacy',
+                            '/play/local'
+                        ]);
+                    }
+                }
+                else {
+                    return cacheResponse;
+                }
             }
 
-            const networkResponse = fetch(event.request).then((response) => {
-                console.log(`[My Chess] Responding from network: ${event.request.url}`);
-                if (event.request.url.startsWith(self.location.origin + "/_framework/") &&
-                    !(event.request.url.endsWith(".js") || event.request.url.endsWith(".json"))) {
-                    console.log(`[My Chess] Do not cache framework files: ${event.request.url}`);
-                    return response;
-                }
+            const networkResponse = await fetch(event.request);
+            console.log(`[My Chess] Responding from network: ${event.request.url}`);
+            if (event.request.url.startsWith(self.location.origin + "/_framework/") &&
+                !(event.request.url.endsWith(".js") || event.request.url.endsWith(".json"))) {
+                console.log(`[My Chess] Do not cache framework files: ${event.request.url}`);
+                return networkResponse;
+            }
 
-                return caches.open(CACHE).then((cache) => {
-                    cache.put(event.request, response.clone());
-                    return response;
-                });
-            }).catch(function (error) {
-                if (!cachedResponse) {
-                    console.error(`[My Chess] Network request failed for ${event.request.url}. Serving offline page ${error}`);
-                    return caches.open(CACHE).then((cache) => {
-                        return cache.match(offlineFallbackPage);
-                    });
-                }
-            });
+            const cache = await caches.open(CACHE);
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+        }
+        catch (error) {
+            if (!cachedResponse) {
+                console.log(`[My Chess] Network request failed for ${event.request.url}. Serving offline page ${error}`, error);
+                const cache = await caches.open(CACHE);
+                return await cache.match(offlineFallbackPage);
+            }
+        }
+    }
 
-            return cacheResponse || networkResponse;
-        })
-    );
+    event.respondWith(myFetch());
 });
 
 // In development, always fetch from the network and do not enable offline support.
