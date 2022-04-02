@@ -490,6 +490,7 @@ public class ChessBoardViewBase : MyChessComponentBase
         {
             _updateAfterAnimation = false;
             await MakeMoves(Game, CurrentMoveNumber);
+            StateHasChanged();
         }
         else
         {
