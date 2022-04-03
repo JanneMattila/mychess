@@ -127,41 +127,55 @@ self.addEventListener('fetch', (event) => {
 // be reflected on the first load after each change).
 //self.addEventListener('fetch', () => { });
 
-self.addEventListener('push', (event) => {
-    console.log("serviceWorker - push");
+self.addEventListener('push', async (event) => {
+    console.log(`[My Chess Push] Push event`);
 
     if (!self.Notification) {
-        console.log("No support for notifications.");
+        console.log(`[My Chess Push] No support for notifications.`);
         return;
     }
 
     if (!self.Notification.permission === 'granted') {
-        console.log("No notification permissions granted.");
+        console.log(`[My Chess Push] No notification permissions granted.`);
         return;
     }
 
+    let notificationData = {
+        text: "Open My Chess to play!",
+        uri: "/"
+    };
     if (!event.data) {
-        console.log("serviceWorker - local notification data:");
-        event.waitUntil(self.registration.showNotification("My Chess", {
-            body: "Open My Chess to play!",
-            vibrate: [250, 100, 250, 100, 250],
-            badge: '/logo_96x96_monochrome.png',
-            icon: '/logo_192x192.png',
-            data: "/"
-        }));
+        console.log(`[My Chess Push] No data`);
     }
     else {
-        const data = event.data.json();
-        console.log("serviceWorker - notification data:");
-        console.log(data);
+        console.log(`[My Chess Push] Data`, event.data);
+        try {
+            const data = event.data.json();
+            notificationData = data;
+        } catch (e) {
+            console.error(`[My Chess Push] Error in push data`, e);
+        }
+    }
 
-        event.waitUntil(self.registration.showNotification("My Chess", {
-            body: data.text,
-            vibrate: [250, 100, 250, 100, 250],
-            badge: '/logo_96x96_monochrome.png',
-            icon: '/logo_192x192.png',
-            data: data.uri
-        }));
+    await self.registration.showNotification("My Chess", {
+        body: notificationData.text,
+        vibrate: [250, 100, 250, 100, 250],
+        badge: '/logo_96x96_monochrome.png',
+        icon: '/logo_192x192.png',
+        data: notificationData.uri
+    });
+
+    const clientList = await clients.matchAll({
+        type: "window", includeUncontrolled: true
+    });
+    if (clientList.length > 0) {
+        let client = clientList[0];
+        for (let i = 0; i < clientList.length; i++) {
+            if (clientList[i].focused) {
+                client = clientList[i];
+            }
+        }
+        client.postMessage(notificationData);
     }
 });
 
