@@ -11,10 +11,12 @@ public class GameListBase : MyChessComponentBase
     protected string Filters { get; set; } = GameFilterType.WaitingForYou;
     protected string StatusMessage { get; set; } = string.Empty;
     protected string Title { get; set; } = "Games waiting for you";
+    protected string PlayerID { get; set; } = string.Empty;
     protected List<MyChessGame> Games { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
+        PlayerID = await GetPlayerID();
         await RefreshGames();
         AppFocus.OnFocus += SilentUpdate;
     }
