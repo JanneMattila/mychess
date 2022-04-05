@@ -57,7 +57,7 @@ public class BackendClient
             exception.Redirect();
         }
         ArgumentNullException.ThrowIfNull(list);
-        return list;
+        return list.OrderByDescending(o => o.Moves.Last().End).ToList();
     }
 
     public async Task<List<User>> GetFriendsAsync()

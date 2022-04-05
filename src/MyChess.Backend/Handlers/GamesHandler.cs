@@ -43,6 +43,8 @@ public class GamesHandler : BaseHandler, IGamesHandler
         var user = await GetOrCreateUserAsync(authenticatedUser);
 
         game.ID = Guid.NewGuid().ToString("D");
+        game.Created = DateTimeOffset.UtcNow;
+        game.Updated = DateTimeOffset.UtcNow;
         game.Players.White.ID = user.UserID;
         var data = _compactor.Compact(game);
 
@@ -193,6 +195,8 @@ public class GamesHandler : BaseHandler, IGamesHandler
 
         var state = _chessBoard.GetBoardState();
         game.State = state.ToString();
+        game.Updated = DateTimeOffset.UtcNow;
+
         if (state == ChessBoardState.CheckMate)
         {
             var player = _chessBoard.CurrentPlayer == PiecePlayer.Black ? PiecePlayer.White : PiecePlayer.Black;
@@ -317,6 +321,7 @@ public class GamesHandler : BaseHandler, IGamesHandler
         var player = game.Players.White.ID == user.PartitionKey ? PiecePlayer.White : PiecePlayer.Black;
         game.State = GameState.Resigned;
         game.StateText = $"{player} resigned";
+        game.Updated = DateTimeOffset.UtcNow;
 
         var data = _compactor.Compact(game);
         await _context.UpsertAsync(TableNames.GamesArchive, new GameEntity
