@@ -267,10 +267,15 @@ public class ChessBoardViewBase : MyChessComponentBase
                     Row = lastMove.To.Row
                 };
 
-                if (lastMove.SpecialMove == ChessSpecialMove.Capture)
+                // Location is outside board in special moves
+                if (lastMove.SpecialMove == ChessSpecialMove.Capture ||
+                    lastMove.SpecialMove == ChessSpecialMove.PromotionIn)
                 {
-                    // Captured piece to locations is outside board.
                     to = from;
+                }
+                else if (lastMove.SpecialMove == ChessSpecialMove.PromotionOut)
+                {
+                    from = to;
                 }
 
                 graphics.Animations.Add(new ChessBoardAnimation()
@@ -640,7 +645,7 @@ public class ChessBoardViewBase : MyChessComponentBase
 
         if (IsLocal)
         {
-            await SaveState();
+            await ConfirmMove();
         }
     }
 
