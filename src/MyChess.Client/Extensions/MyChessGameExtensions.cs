@@ -1,4 +1,5 @@
-﻿using MyChess.Interfaces;
+﻿using System.Globalization;
+using MyChess.Interfaces;
 
 namespace MyChess.Client.Extensions;
 
@@ -34,7 +35,7 @@ public static class MyChessGameExtensions
             var days = Math.Floor(hours / 24);
             if (days > 30)
             {
-                return $"Over month ago{postStatus}";
+                return $"{update.ToString("MMMM yyyy", CultureInfo.InvariantCulture)}{postStatus}";
             }
             else if (days > 0)
             {
