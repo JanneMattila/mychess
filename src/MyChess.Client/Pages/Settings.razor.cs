@@ -13,6 +13,7 @@ namespace MyChess.Client.Pages;
 public class SettingsBase : MyChessComponentBase
 {
     protected bool IsNotificationsEnabled { get; set; } = false;
+    protected bool ShowInstallAsApp { get; set; } = false;
     protected string NotificationText { get; set; } = string.Empty;
     protected string StatusMessage { get; set; } = string.Empty;
 
@@ -29,6 +30,15 @@ public class SettingsBase : MyChessComponentBase
     protected override async Task OnInitializedAsync()
     {
         await RefreshSettings();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var selfRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("MyChessSettings.initialize", selfRef);
+        }
     }
 
     protected async Task RefreshSettings()
@@ -114,5 +124,18 @@ public class SettingsBase : MyChessComponentBase
         catch (JSException)
         {
         }
+    }
+
+    protected async Task InstallApp()
+    {
+        await JS.InvokeVoidAsync("MyChessSettings.promptInstallAsApp");
+    }
+
+
+    [JSInvokable]
+    public void SetInstallAsAppVisibility(bool show)
+    {
+        ShowInstallAsApp = show;
+        StateHasChanged();
     }
 }

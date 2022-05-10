@@ -34,11 +34,14 @@
 			<div class="title">
 				<button @onclick="Save"><span role="img" aria-label="OK">✅</span> Save</button>
 				<button @onclick="Cancel"><span role="img" aria-label="Cancel">❌</span> Cancel</button>
-			</div>
+                </div>
 
-@*			<div id="installAsApp" class="title" style={hidden}>
-				<button onClick={installAsApp}><span role="img" aria-label="Install as App">📦</span> Install as App</button>
-			</div>*@
+            @if (ShowInstallAsApp)
+            {
+                <div class="title">
+				    <button @onclick="InstallApp"><span role="img" aria-label="Install as App">📦</span> Install as App</button>
+			    </div>
+            }
 
 			<br />
 			<hr />

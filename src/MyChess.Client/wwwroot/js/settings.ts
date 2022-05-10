@@ -61,8 +61,43 @@ MyChessSettings.enableNotifications = async (webPushPublicKey: string) => {
     };
 }
 
-//MyChessSettings.beforeinstallprompt = async (deferredPrompt: any) => {
-//    deferredPrompt.prompt();
-//}
+let _deferredPrompt;
+let _dotnetRefSetting;
+let _installApp;
 
-//window.addEventListener('beforeinstallprompt', MyChessSettings.beforeinstallprompt);
+MyChessSettings.initialize = (dotnetRefSetting: any): void => {
+    console.log("[My Chess Settings] Settings initialize");
+
+    _dotnetRefSetting = dotnetRefSetting;
+    if (_deferredPrompt !== undefined) {
+        _dotnetRefSetting.invokeMethod("SetInstallAsAppVisibility", true);
+    }
+};
+
+MyChessSettings.promptInstallAsApp = () => {
+    _deferredPrompt.prompt();
+    _deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+            console.log('[My Chess Settings] User accepted the prompt');
+            console.log(_dotnetRefSetting);
+
+            if (_dotnetRefSetting !== undefined) {
+                _dotnetRefSetting.invokeMethod("SetInstallAsAppVisibility", false);
+            }
+        } else {
+            console.log('[My Chess Settings] User dismissed the prompt');
+        }
+        _deferredPrompt = null;
+    });
+}
+
+window.addEventListener('beforeinstallprompt', event => {
+    console.log("[My Chess Settings] beforeinstallprompt");
+    console.log(event);
+    event.preventDefault();
+    _deferredPrompt = event;
+
+    if (_dotnetRefSetting !== undefined) {
+        _dotnetRefSetting.invokeMethod("SetInstallAsAppVisibility", true);
+    }
+});
