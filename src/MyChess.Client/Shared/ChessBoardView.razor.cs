@@ -518,6 +518,11 @@ public class ChessBoardViewBase : MyChessComponentBase
             Console.WriteLine("No selection since not in last move");
             return;
         }
+        else if (ShowConfirmationDialog || ShowPromotionDialog || ShowCommentDialog)
+        {
+            Console.WriteLine("No selection since dialog is open");
+            return;
+        }
 
         var column = (int)Math.Floor(mouseEventArgs.OffsetX / _pieceSize);
         var row = (int)Math.Floor(mouseEventArgs.OffsetY / _pieceSize);
