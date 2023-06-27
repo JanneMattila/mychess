@@ -166,7 +166,7 @@ self.addEventListener('push', async (event) => {
     });
 
     const clientList = await clients.matchAll({
-        type: "window", includeUncontrolled: true
+        type: "all", includeUncontrolled: true
     });
     if (clientList.length > 0) {
         let client = clientList[0];
