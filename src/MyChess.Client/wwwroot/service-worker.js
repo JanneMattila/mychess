@@ -171,9 +171,9 @@ self.addEventListener('push', async (event) => {
     if (clientList.length > 0) {
         let client = clientList[0];
         for (let i = 0; i < clientList.length; i++) {
-            if (clientList[i].focused) {
+            //if (clientList[i].focused) {
                 client = clientList[i];
-            }
+            //}
         }
         client.postMessage(notificationData);
     }
