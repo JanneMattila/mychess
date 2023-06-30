@@ -127,7 +127,7 @@ self.addEventListener('fetch', (event) => {
 // be reflected on the first load after each change).
 //self.addEventListener('fetch', () => { });
 
-self.addEventListener('push', async (event) => {
+self.addEventListener('push', (event) => {
     console.log(`[My Chess Push] Push event`);
 
     if (!self.Notification) {
@@ -157,7 +157,7 @@ self.addEventListener('push', async (event) => {
         }
     }
 
-    await self.registration.showNotification("My Chess", {
+    const showNotification = self.registration.showNotification("My Chess", {
         body: notificationData.text,
         vibrate: [250, 100, 250, 100, 250],
         badge: '/logo_96x96_monochrome.png',
@@ -165,15 +165,17 @@ self.addEventListener('push', async (event) => {
         data: notificationData.uri
     });
 
+    event.waitUntil(showNotification);
+
     const clientList = await clients.matchAll({
-        type: "all", includeUncontrolled: true
+        type: "window", includeUncontrolled: true
     });
     if (clientList.length > 0) {
         let client = clientList[0];
         for (let i = 0; i < clientList.length; i++) {
-            //if (clientList[i].focused) {
+            if (clientList[i].focused) {
                 client = clientList[i];
-            //}
+            }
         }
         client.postMessage(notificationData);
     }
