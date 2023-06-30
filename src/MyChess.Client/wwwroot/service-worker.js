@@ -167,18 +167,15 @@ self.addEventListener('push', (event) => {
 
     event.waitUntil(showNotification);
 
-    const clientList = await clients.matchAll({
+    clients.matchAll({
         type: "window", includeUncontrolled: true
-    });
-    if (clientList.length > 0) {
-        let client = clientList[0];
+    }).then((clientList) => {
         for (let i = 0; i < clientList.length; i++) {
             if (clientList[i].focused) {
-                client = clientList[i];
+                clientList[i].postMessage(notificationData);
             }
         }
-        client.postMessage(notificationData);
-    }
+    });
 });
 
 self.addEventListener('notificationclick', (event) => {
