@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using BlazorApplicationInsights.Models;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -164,10 +165,13 @@ public class ChessBoardViewBase : MyChessComponentBase
         }
         catch (Exception ex)
         {
-            await AppInsights.TrackException(new BlazorApplicationInsights.Error()
+            await AppInsights.TrackException(new ExceptionTelemetry()
             {
-                Message = ex.Message,
-                Name = "FailedSilentRefreshGameview"
+                Exception = new Error()
+                {
+                    Message = ex.Message,
+                    Name = "FailedSilentRefreshGameview"
+                }
             });
         }
         AppState.IsSmallLoading = false;

@@ -1,4 +1,6 @@
 ﻿using BlazorApplicationInsights;
+using BlazorApplicationInsights.Interfaces;
+using BlazorApplicationInsights.Models;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MyChess;
@@ -23,30 +25,31 @@ builder.Services.AddHttpClient<BackendClient>(
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
     .CreateClient());
 
-builder.Services.AddBlazorApplicationInsights(async applicationInsights =>
-{
-    var instrumentationKey = builder.Configuration.GetValue<string>("instrumentationKey");
-    if (!string.IsNullOrEmpty(instrumentationKey))
+builder.Services.AddBlazorApplicationInsights(config => {
+        var instrumentationKey = builder.Configuration.GetValue<string>("instrumentationKey");
+        if (!string.IsNullOrEmpty(instrumentationKey))
+        {
+            config.InstrumentationKey = instrumentationKey;
+        }
+    },
+    async applicationInsights =>
     {
         var telemetryItem = new TelemetryItem()
         {
-            Tags = new Dictionary<string, object>()
+            Tags = new()
                 {
                     { "ai.cloud.role", "SPA" },
                     { "ai.cloud.roleInstance", "Blazor" },
                 }
         };
-
         await applicationInsights.AddTelemetryInitializer(telemetryItem);
-        await applicationInsights.SetInstrumentationKey(instrumentationKey);
-    }
 });
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddTransient<ChessBoard>();
 builder.Services.AddScoped<AppState>();
 builder.Services.AddSingleton<WebPushOptions>(wpo => new WebPushOptions()
 {
-    WebPushPublicKey = builder.Configuration.GetValue<string>("webPushPublicKey")
+    WebPushPublicKey = builder.Configuration.GetValue<string>("webPushPublicKey") ?? throw new ArgumentNullException("webPushPublicKey"),
 });
 
 builder.Services.AddMsalAuthentication(options =>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BlazorApplicationInsights.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using MyChess.Interfaces;
 
@@ -37,10 +38,13 @@ public class GameListBase : MyChessComponentBase
         }
         catch (Exception ex)
         {
-            await AppInsights.TrackException(new BlazorApplicationInsights.Error()
+            await AppInsights.TrackException(new ExceptionTelemetry()
             {
-                Message = ex.Message,
-                Name = "FailedSilentRefresh"
+                Exception = new Error()
+                {
+                    Message = ex.Message,
+                    Name = "FailedSilentRefresh"
+                }
             });
         }
         AppState.IsSmallLoading = false;

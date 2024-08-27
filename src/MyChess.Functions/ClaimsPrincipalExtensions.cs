@@ -37,10 +37,10 @@ public static class ClaimsPrincipalExtensions
     {
         return new AuthenticatedUser()
         {
-            UserIdentifier = principal.FindFirstValue(ObjectIdentifierClaimType),
-            ProviderIdentifier = principal.FindFirstValue(TenantIdentifierClaimType),
-            Name = principal.FindFirstValue(NameClaimType),
-            PreferredUsername = principal.FindFirstValue(PreferredUsernameClaimType)
+            UserIdentifier = principal.FindFirstValue(ObjectIdentifierClaimType) ?? string.Empty,
+            ProviderIdentifier = principal.FindFirstValue(TenantIdentifierClaimType) ?? string.Empty,
+            Name = principal.FindFirstValue(NameClaimType) ?? string.Empty,
+            PreferredUsername = principal.FindFirstValue(PreferredUsernameClaimType) ?? string.Empty
         };
     }
 }

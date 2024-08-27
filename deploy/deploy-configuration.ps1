@@ -1,17 +1,17 @@
 Param (
-    [Parameter(HelpMessage = "Client Id")] 
+    [Parameter(HelpMessage = "Client Id")]
     [string] $ClientID,
 
-    [Parameter(HelpMessage = "API Application IdURI")] 
+    [Parameter(HelpMessage = "API Application IdURI")]
     [string] $ApplicationIdURI,
-        
-    [Parameter(HelpMessage = "App Insights Instrumentation Key")] 
+
+    [Parameter(HelpMessage = "App Insights Instrumentation Key")]
     [string] $IntrumentationKey,
-        
-    [Parameter(HelpMessage = "WebPush Public Key")] 
+
+    [Parameter(HelpMessage = "WebPush Public Key")]
     [string] $WebPushPublicKey,
 
-    [Parameter(HelpMessage = "App root folder path to publish e.g. ..\src\MyChess.Client\wwwroot\")] 
+    [Parameter(HelpMessage = "App root folder path to publish e.g. ..\src\MyChess.Client\wwwroot\")]
     [string] $AppRootFolder = "src/MyChess.Client/wwwroot"
 )
 
