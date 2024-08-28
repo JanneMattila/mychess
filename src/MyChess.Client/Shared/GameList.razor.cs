@@ -17,9 +17,18 @@ public class GameListBase : MyChessComponentBase
 
     protected override async Task OnInitializedAsync()
     {
-        PlayerID = await GetPlayerID();
-        await RefreshGames();
-        AppFocus.OnFocus += SilentUpdate;
+        try
+        {
+            PlayerID = await GetPlayerID();
+            await RefreshGames();
+        }
+        catch (Exception)
+        {
+        }
+        finally
+        {
+            AppFocus.OnFocus += SilentUpdate;
+        }
     }
 
     protected override void Dispose(bool disposing)

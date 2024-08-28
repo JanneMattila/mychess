@@ -1,5 +1,4 @@
 ﻿using BlazorApplicationInsights;
-using BlazorApplicationInsights.Interfaces;
 using BlazorApplicationInsights.Models;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -18,7 +17,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 // https://docs.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/additional-scenarios
 builder.Services.AddTransient<CustomAddressAuthorizationMessageHandler>();
 builder.Services.AddHttpClient<BackendClient>(
-        client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
+    client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress))
     //.AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
     .AddHttpMessageHandler<CustomAddressAuthorizationMessageHandler>();
 
@@ -52,6 +51,7 @@ builder.Services.AddSingleton<WebPushOptions>(wpo => new WebPushOptions()
     WebPushPublicKey = builder.Configuration.GetValue<string>("webPushPublicKey") ?? throw new ArgumentNullException("webPushPublicKey"),
 });
 
+builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);

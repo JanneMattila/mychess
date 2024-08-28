@@ -21,10 +21,6 @@ public class SettingsBase : MyChessComponentBase
 
     [AllowNull]
     [Inject]
-    protected SignOutSessionStateManager SignOutManager { get; set; }
-
-    [AllowNull]
-    [Inject]
     protected WebPushOptions WebPushOptions { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -111,8 +107,7 @@ public class SettingsBase : MyChessComponentBase
 
     protected async Task SignOut()
     {
-        await SignOutManager.SetSignOutState();
-        NavigationManager.NavigateTo("authentication/logout");
+        NavigationManager.NavigateToLogout("authentication/logout");
     }
 
     protected async Task PurgeCache()

@@ -25,9 +25,9 @@ Therefore, if you want to run application locally, you'll need [Azure Static Web
 Here are some example commands to run My Chess using SWA CLI:
 
 ```powershell
-swa start https://localhost:5000 --run "cd ./src/MyChess.Client/ && dotnet watch run" --api-location ./src/MyChess.Functions --api-port=3000
-```
+set DOTNET_WATCH_SUPPRESS_BROWSER_REFRESH=1
 
-```powershell
-swa start https://localhost:5000 --run "cd ./src/MyChess.Client/ && dotnet watch run" --api-port=7071
+swa start http://localhost:5001 --run "cd ./src/MyChess.Client/ && dotnet watch run" --api-location http://localhost:7071
+
+swa start http://localhost:5001 --run "cd ./src/MyChess.Client/ && dotnet run" --api-location ./src/MyChess.Functions --api-port=3000
 ```
